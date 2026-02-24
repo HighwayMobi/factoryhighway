@@ -1,4 +1,4 @@
-import TopUpPage from "@/pages/TopUpPage";
+import LoginPage from "@/pages/LoginPage";
 
-const Index = () => <TopUpPage />;
+const Index = () => <LoginPage />;
 export default Index;
