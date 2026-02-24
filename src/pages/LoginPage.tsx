@@ -5,6 +5,7 @@ import {
   Smartphone, CreditCard, Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import highwayLogo from "@/assets/highway-logo.png";
 
 type AuthTab = "email" | "phone";
 type ActiveSection = "login" | "topup";
@@ -49,14 +50,7 @@ const LoginPage = () => {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <Zap className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              HIGHWAY <span className="font-medium text-muted-foreground">MOBILE</span>
-            </span>
-          </div>
+          <img src={highwayLogo} alt="Highway Mobile" className="h-9" />
           <button className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
             <Globe className="h-4 w-4" />
             RU
