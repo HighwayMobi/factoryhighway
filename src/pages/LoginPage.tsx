@@ -44,17 +44,33 @@ const LoginPage = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const phoneDigits = (val: string) => val.replace(/\D/g, "");
+
   const isLoginValid =
     activeTab === "email"
       ? email.includes("@") && password.length >= 4
-      : phone.length >= 6 && password.length >= 4;
+      : phoneDigits(phone).length === 9 && password.length >= 4;
 
   const displayAmount = amount ? parseFloat(amount) : 0;
-  const isTopUpValid = topUpPhone.length >= 6 && displayAmount >= 3 && topUpEmail.includes("@");
+  const isTopUpValid = phoneDigits(topUpPhone).length === 9 && displayAmount >= 3 && topUpEmail.includes("@");
 
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
     setAmount(String(value));
+  };
+
+  // Format Spanish phone: starts with 6 or 7, max 9 digits, formatted as XXX XXX XXX
+  const formatSpanishPhone = (raw: string): string => {
+    const digits = raw.replace(/\D/g, "").slice(0, 9);
+    if (digits.length === 0) return "";
+    // Only allow first digit to be 6 or 7
+    if (digits[0] !== "6" && digits[0] !== "7") return "";
+    const parts = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 9)].filter(Boolean);
+    return parts.join(" ");
+  };
+
+  const handlePhoneChange = (val: string, setter: (v: string) => void) => {
+    setter(formatSpanishPhone(val));
   };
 
   const handleAmountChange = (val: string) => {
@@ -162,15 +178,21 @@ const LoginPage = () => {
                         />
                       </div>
                     ) : (
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <input
-                          type="tel"
-                          placeholder="+34 123 456 789"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                        />
+                      <div className="flex gap-2">
+                        <div className="flex items-center rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
+                          <span>🇪🇸</span>
+                          <span className="ml-1">+34</span>
+                        </div>
+                        <div className="relative flex-1">
+                          <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <input
+                            type="tel"
+                            placeholder={i.phonePlaceholder}
+                            value={phone}
+                            onChange={(e) => handlePhoneChange(e.target.value, setPhone)}
+                            className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -261,9 +283,9 @@ const LoginPage = () => {
                         <Smartphone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <input
                           type="tel"
-                          placeholder="123 456 789"
+                          placeholder={i.phonePlaceholder}
                           value={topUpPhone}
-                          onChange={(e) => setTopUpPhone(e.target.value)}
+                          onChange={(e) => handlePhoneChange(e.target.value, setTopUpPhone)}
                           className="h-full w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                         />
                       </div>
