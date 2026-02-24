@@ -216,7 +216,7 @@ const LoginPage = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                  <Zap className="h-4 w-4 text-primary" />
+                  <CreditCard className="h-4 w-4 text-primary" />
                 </div>
                 <span className="text-base font-semibold text-foreground">Пополнение баланса</span>
               </div>
