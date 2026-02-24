@@ -29,6 +29,10 @@ const translations = {
     privacy: "Политика конфиденциальности",
     terms: "Пользовательское соглашение",
     contacts: "Контакты",
+    loggingIn: "Вход...",
+    loginError: "Неверный логин или пароль",
+    loginSuccess: "Вы успешно вошли!",
+    networkError: "Ошибка сети. Попробуйте позже",
   },
   en: {
     loginTitle: "Sign in to your account",
@@ -58,6 +62,10 @@ const translations = {
     privacy: "Privacy Policy",
     terms: "Terms of Service",
     contacts: "Contacts",
+    loggingIn: "Signing in...",
+    loginError: "Invalid login or password",
+    loginSuccess: "Successfully signed in!",
+    networkError: "Network error. Please try again later",
   },
 } as const;
 
