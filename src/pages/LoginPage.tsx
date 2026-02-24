@@ -218,7 +218,7 @@ const LoginPage = () => {
                   {/* Tabs */}
                   <div className="mb-5 flex rounded-xl bg-secondary p-1">
                     <button
-                      onClick={() => setActiveTab("email")}
+                      onClick={() => { setActiveTab("email"); setPassword(""); setLoginError(""); }}
                       className={cn(
                         "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
                         activeTab === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
@@ -228,7 +228,7 @@ const LoginPage = () => {
                       {i.byEmail}
                     </button>
                     <button
-                      onClick={() => setActiveTab("phone")}
+                      onClick={() => { setActiveTab("phone"); setPassword(""); setLoginError(""); }}
                       className={cn(
                         "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
                         activeTab === "phone" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
