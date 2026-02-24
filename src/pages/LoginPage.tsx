@@ -277,7 +277,6 @@ const LoginPage = () => {
                       <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
                         <span>🇪🇸</span>
                         <span>+34</span>
-                        <ChevronDown className="h-3 w-3 text-muted-foreground" />
                       </div>
                       <div className="relative flex-1">
                         <Smartphone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
