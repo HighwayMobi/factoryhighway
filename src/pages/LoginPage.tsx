@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
-  Smartphone, CreditCard, Shield,
+  Smartphone, CreditCard, Shield, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t, type Lang } from "@/lib/i18n";
+import { useToast } from "@/hooks/use-toast";
 import highwayLogo from "@/assets/highway-logo.png";
 
 type AuthTab = "email" | "phone";
@@ -32,7 +33,10 @@ const LoginPage = () => {
   const [amount, setAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [topUpEmail, setTopUpEmail] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
+  const { toast } = useToast();
   const i = t(lang);
 
   // Close dropdown on outside click
@@ -77,6 +81,46 @@ const LoginPage = () => {
     setAmount(val);
     const num = parseFloat(val);
     setSelectedPreset(amountPresets.includes(num) ? num : null);
+  };
+
+  const handleLogin = async () => {
+    setLoginError("");
+    setIsLoggingIn(true);
+    try {
+      const body: Record<string, string> = {
+        password,
+        key: "6xARHinsvuC",
+      };
+      if (activeTab === "email") {
+        body.username = email;
+      } else {
+        body.phone = phoneDigits(phone);
+      }
+
+      const res = await fetch("https://sim.highway.mobi/web/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setLoginError(i.loginError);
+        return;
+      }
+
+      // Store token in cookie (30 days)
+      if (data.token) {
+        document.cookie = `auth_token=${data.token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+      }
+
+      toast({ title: i.loginSuccess });
+    } catch {
+      setLoginError(i.networkError);
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   return (
@@ -222,16 +266,24 @@ const LoginPage = () => {
                     <a href="#" className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</a>
                   </div>
 
+                  {loginError && (
+                    <div className="mb-4 rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+                      {loginError}
+                    </div>
+                  )}
+
                   <button
-                    disabled={!isLoginValid}
+                    disabled={!isLoginValid || isLoggingIn}
+                    onClick={handleLogin}
                     className={cn(
                       "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                      isLoginValid
+                      isLoginValid && !isLoggingIn
                         ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
                         : "bg-muted text-muted-foreground cursor-not-allowed"
                     )}
                   >
-                    {i.login}
+                    {isLoggingIn && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {isLoggingIn ? i.loggingIn : i.login}
                   </button>
 
                   <p className="mt-4 text-center text-xs text-muted-foreground">
