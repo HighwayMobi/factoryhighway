@@ -39,7 +39,9 @@ const LoginPage = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotTab, setForgotTab] = useState<AuthTab>("email");
   const [forgotPhone, setForgotPhone] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
@@ -134,16 +136,20 @@ const LoginPage = () => {
     setForgotMsg(null);
     setForgotLoading(true);
     try {
+      const body: Record<string, string> = forgotTab === "phone"
+        ? { phone: phoneDigits(forgotPhone) }
+        : { email: forgotEmail };
+
       const res = await fetch("https://sim.highway.mobi/web/api/forgotPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ phone: phoneDigits(forgotPhone) }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setForgotMsg({ type: "ok", text: i.passwordSent });
       } else {
-        setForgotMsg({ type: "err", text: i.forgotPasswordError });
+        setForgotMsg({ type: "err", text: forgotTab === "phone" ? i.forgotPasswordError : i.forgotPasswordEmailError });
       }
     } catch {
       setForgotMsg({ type: "err", text: i.networkError });
@@ -152,7 +158,9 @@ const LoginPage = () => {
     }
   };
 
-  const isForgotValid = phoneDigits(forgotPhone).length === 9;
+  const isForgotValid = forgotTab === "phone"
+    ? phoneDigits(forgotPhone).length === 9
+    : forgotEmail.includes("@");
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -294,7 +302,7 @@ const LoginPage = () => {
                   </div>
 
                   <div className="mb-5 text-right">
-                    <button type="button" onClick={() => { setForgotOpen(true); setForgotPhone(""); setForgotMsg(null); }} className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</button>
+                    <button type="button" onClick={() => { setForgotOpen(true); setForgotTab("email"); setForgotPhone(""); setForgotEmail(""); setForgotMsg(null); }} className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</button>
                   </div>
 
                   {loginError && (
@@ -487,25 +495,65 @@ const LoginPage = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{i.forgotPasswordTitle}</DialogTitle>
-            <DialogDescription>{i.forgotPasswordDesc}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
-            <div className="flex gap-2">
-              <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
-                <span>🇪🇸</span>
-                <span>+34</span>
-              </div>
-              <div className="relative flex-1">
-                <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            {/* Tabs */}
+            <div className="flex rounded-xl bg-secondary p-1">
+              <button
+                onClick={() => { setForgotTab("email"); setForgotMsg(null); }}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                  forgotTab === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Mail className="h-4 w-4" />
+                {i.byEmail}
+              </button>
+              <button
+                onClick={() => { setForgotTab("phone"); setForgotMsg(null); }}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                  forgotTab === "phone" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Phone className="h-4 w-4" />
+                {i.byPhone}
+              </button>
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              {forgotTab === "email" ? i.forgotPasswordDescEmail : i.forgotPasswordDescPhone}
+            </p>
+
+            {forgotTab === "email" ? (
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
-                  type="tel"
-                  placeholder={i.phonePlaceholder}
-                  value={forgotPhone}
-                  onChange={(e) => handlePhoneChange(e.target.value, setForgotPhone)}
+                  type="email"
+                  placeholder="mail@example.com"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
                   className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
-            </div>
+            ) : (
+              <div className="flex gap-2">
+                <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
+                  <span>🇪🇸</span>
+                  <span>+34</span>
+                </div>
+                <div className="relative flex-1">
+                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="tel"
+                    placeholder={i.phonePlaceholder}
+                    value={forgotPhone}
+                    onChange={(e) => handlePhoneChange(e.target.value, setForgotPhone)}
+                    className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                </div>
+              </div>
+            )}
 
             {forgotMsg && (
               <div className={cn(
