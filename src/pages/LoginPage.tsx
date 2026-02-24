@@ -44,6 +44,7 @@ const LoginPage = () => {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [apiResponse, setApiResponse] = useState<string | null>(null);
 
   const { toast } = useToast();
   const i = t(lang);
@@ -113,6 +114,7 @@ const LoginPage = () => {
       });
 
       const data = await res.json();
+      setApiResponse(JSON.stringify(data, null, 2));
 
       if (!res.ok) {
         setLoginError(i.loginError);
@@ -125,7 +127,8 @@ const LoginPage = () => {
       }
 
       toast({ title: i.loginSuccess });
-    } catch {
+    } catch (err) {
+      setApiResponse(String(err));
       setLoginError(i.networkError);
     } finally {
       setIsLoggingIn(false);
@@ -308,6 +311,16 @@ const LoginPage = () => {
                   {loginError && (
                     <div className="mb-4 rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
                       {loginError}
+                    </div>
+                  )}
+
+                  {apiResponse && (
+                    <div className="mb-4 rounded-xl bg-secondary border border-border px-4 py-3 text-xs text-foreground overflow-auto max-h-48">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-semibold text-sm">API Response:</span>
+                        <button onClick={() => setApiResponse(null)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
+                      </div>
+                      <pre className="whitespace-pre-wrap break-all">{apiResponse}</pre>
                     </div>
                   )}
 
