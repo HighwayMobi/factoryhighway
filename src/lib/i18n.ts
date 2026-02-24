@@ -33,6 +33,12 @@ const translations = {
     loginError: "Неверный логин или пароль",
     loginSuccess: "Вы успешно вошли!",
     networkError: "Ошибка сети. Попробуйте позже",
+    forgotPasswordTitle: "Восстановление пароля",
+    forgotPasswordDesc: "Введите номер телефона, на который будет отправлен пароль",
+    sendPassword: "Отправить пароль",
+    sending: "Отправка...",
+    passwordSent: "Пароль отправлен на ваш телефон",
+    forgotPasswordError: "Номер не найден",
   },
   en: {
     loginTitle: "Sign in to your account",
@@ -66,6 +72,12 @@ const translations = {
     loginError: "Invalid login or password",
     loginSuccess: "Successfully signed in!",
     networkError: "Network error. Please try again later",
+    forgotPasswordTitle: "Password Recovery",
+    forgotPasswordDesc: "Enter your phone number to receive your password",
+    sendPassword: "Send Password",
+    sending: "Sending...",
+    passwordSent: "Password sent to your phone",
+    forgotPasswordError: "Phone number not found",
   },
 } as const;
 

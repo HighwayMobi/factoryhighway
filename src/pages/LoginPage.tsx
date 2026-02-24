@@ -7,6 +7,9 @@ import { cn } from "@/lib/utils";
 import { t, type Lang } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import highwayLogo from "@/assets/highway-logo.png";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 
 type AuthTab = "email" | "phone";
 type ActiveSection = "login" | "topup";
@@ -35,6 +38,10 @@ const LoginPage = () => {
   const [topUpEmail, setTopUpEmail] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotPhone, setForgotPhone] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   const { toast } = useToast();
   const i = t(lang);
@@ -122,6 +129,30 @@ const LoginPage = () => {
       setIsLoggingIn(false);
     }
   };
+
+  const handleForgotPassword = async () => {
+    setForgotMsg(null);
+    setForgotLoading(true);
+    try {
+      const res = await fetch("https://sim.highway.mobi/web/api/forgotPassword", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ phone: phoneDigits(forgotPhone) }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setForgotMsg({ type: "ok", text: i.passwordSent });
+      } else {
+        setForgotMsg({ type: "err", text: i.forgotPasswordError });
+      }
+    } catch {
+      setForgotMsg({ type: "err", text: i.networkError });
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const isForgotValid = phoneDigits(forgotPhone).length === 9;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -263,7 +294,7 @@ const LoginPage = () => {
                   </div>
 
                   <div className="mb-5 text-right">
-                    <a href="#" className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</a>
+                    <button type="button" onClick={() => { setForgotOpen(true); setForgotPhone(""); setForgotMsg(null); }} className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</button>
                   </div>
 
                   {loginError && (
@@ -450,6 +481,59 @@ const LoginPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{i.forgotPasswordTitle}</DialogTitle>
+            <DialogDescription>{i.forgotPasswordDesc}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="flex gap-2">
+              <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
+                <span>🇪🇸</span>
+                <span>+34</span>
+              </div>
+              <div className="relative flex-1">
+                <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="tel"
+                  placeholder={i.phonePlaceholder}
+                  value={forgotPhone}
+                  onChange={(e) => handlePhoneChange(e.target.value, setForgotPhone)}
+                  className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+              </div>
+            </div>
+
+            {forgotMsg && (
+              <div className={cn(
+                "rounded-xl border px-4 py-3 text-sm",
+                forgotMsg.type === "ok"
+                  ? "bg-primary/10 border-primary/20 text-primary"
+                  : "bg-destructive/10 border-destructive/20 text-destructive"
+              )}>
+                {forgotMsg.text}
+              </div>
+            )}
+
+            <button
+              disabled={!isForgotValid || forgotLoading}
+              onClick={handleForgotPassword}
+              className={cn(
+                "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                isForgotValid && !forgotLoading
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 active:scale-[0.98]"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
+              )}
+            >
+              {forgotLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {forgotLoading ? i.sending : i.sendPassword}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
