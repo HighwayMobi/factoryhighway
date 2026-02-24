@@ -1,18 +1,26 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import {
-  Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Zap, Lock, User,
+  Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
   Smartphone, CreditCard, Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { t, type Lang } from "@/lib/i18n";
 import highwayLogo from "@/assets/highway-logo.png";
 
 type AuthTab = "email" | "phone";
 type ActiveSection = "login" | "topup";
 
 const amountPresets = [5, 10, 20, 50];
+const languages: { code: Lang; label: string }[] = [
+  { code: "ru", label: "RU" },
+  { code: "en", label: "EN" },
+];
 
 const LoginPage = () => {
+  const [lang, setLang] = useState<Lang>("ru");
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+
   const [activeSection, setActiveSection] = useState<ActiveSection>("login");
   const [activeTab, setActiveTab] = useState<AuthTab>("email");
   const [email, setEmail] = useState("");
@@ -20,11 +28,21 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Top-up state
   const [topUpPhone, setTopUpPhone] = useState("");
   const [amount, setAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [topUpEmail, setTopUpEmail] = useState("");
+
+  const i = t(lang);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const isLoginValid =
     activeTab === "email"
@@ -51,11 +69,34 @@ const LoginPage = () => {
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
           <img src={highwayLogo} alt="Highway Mobile" className="h-9" />
-          <button className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-            <Globe className="h-4 w-4" />
-            RU
-            <ChevronDown className="h-3 w-3" />
-          </button>
+
+          {/* Language Selector */}
+          <div className="relative" ref={langRef}>
+            <button
+              onClick={() => setLangOpen(!langOpen)}
+              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              <Globe className="h-4 w-4" />
+              {lang.toUpperCase()}
+              <ChevronDown className={cn("h-3 w-3 transition-transform", langOpen && "rotate-180")} />
+            </button>
+            {langOpen && (
+              <div className="absolute right-0 top-full mt-1 z-50 min-w-[80px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
+                {languages.map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => { setLang(l.code); setLangOpen(false); }}
+                    className={cn(
+                      "flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-secondary",
+                      lang === l.code ? "font-semibold text-primary" : "text-foreground"
+                    )}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -65,7 +106,6 @@ const LoginPage = () => {
 
           {/* ===== LOGIN SECTION ===== */}
           <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-            {/* Login Header (always visible) */}
             <button
               onClick={() => setActiveSection(activeSection === "login" ? "topup" : "login")}
               className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-secondary/50"
@@ -74,28 +114,15 @@ const LoginPage = () => {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                   <User className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-base font-semibold text-foreground">Вход в личный кабинет</span>
+                <span className="text-base font-semibold text-foreground">{i.loginTitle}</span>
               </div>
-              <ChevronDown
-                className={cn(
-                  "h-5 w-5 text-muted-foreground transition-transform duration-200",
-                  activeSection === "login" && "rotate-180"
-                )}
-              />
+              <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform duration-200", activeSection === "login" && "rotate-180")} />
             </button>
 
-            {/* Login Body */}
-            <div
-              className={cn(
-                "grid transition-all duration-300 ease-in-out",
-                activeSection === "login" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              )}
-            >
+            <div className={cn("grid transition-all duration-300 ease-in-out", activeSection === "login" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="border-t border-border px-6 pb-6 pt-5 sm:px-8 sm:pb-8">
-                  <p className="mb-5 text-sm text-muted-foreground">
-                    Управляйте своим аккаунтом и услугами
-                  </p>
+                  <p className="mb-5 text-sm text-muted-foreground">{i.loginSubtitle}</p>
 
                   {/* Tabs */}
                   <div className="mb-5 flex rounded-xl bg-secondary p-1">
@@ -103,25 +130,21 @@ const LoginPage = () => {
                       onClick={() => setActiveTab("email")}
                       className={cn(
                         "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
-                        activeTab === "email"
-                          ? "bg-card text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
+                        activeTab === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       )}
                     >
                       <Mail className="h-4 w-4" />
-                      По EMail
+                      {i.byEmail}
                     </button>
                     <button
                       onClick={() => setActiveTab("phone")}
                       className={cn(
                         "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
-                        activeTab === "phone"
-                          ? "bg-card text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
+                        activeTab === "phone" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       )}
                     >
                       <Phone className="h-4 w-4" />
-                      По телефону
+                      {i.byPhone}
                     </button>
                   </div>
 
@@ -158,7 +181,7 @@ const LoginPage = () => {
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Пароль"
+                        placeholder={i.password}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
@@ -174,9 +197,7 @@ const LoginPage = () => {
                   </div>
 
                   <div className="mb-5 text-right">
-                    <a href="#" className="text-sm text-primary hover:underline transition-colors">
-                      Забыли пароль?
-                    </a>
+                    <a href="#" className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</a>
                   </div>
 
                   <button
@@ -188,19 +209,19 @@ const LoginPage = () => {
                         : "bg-muted text-muted-foreground cursor-not-allowed"
                     )}
                   >
-                    Войти
+                    {i.login}
                   </button>
 
                   <p className="mt-4 text-center text-xs text-muted-foreground">
-                    Нажимая «Войти», вы подтверждаете согласие с{" "}
-                    <a href="#" className="text-primary hover:underline">Условиями предоставляемых услуг</a>
+                    {i.loginDisclaimer}{" "}
+                    <a href="#" className="text-primary hover:underline">{i.termsLink}</a>
                   </p>
 
                   <div className="my-5 border-t border-border" />
 
                   <p className="text-center text-sm text-muted-foreground">
-                    Если Вы ещё не являетесь абонентом, пожалуйста, пройдите{" "}
-                    <a href="#" className="font-semibold text-primary hover:underline">регистрацию</a>.
+                    {i.notSubscriber}{" "}
+                    <a href="#" className="font-semibold text-primary hover:underline">{i.registration}</a>.
                   </p>
                 </div>
               </div>
@@ -209,7 +230,6 @@ const LoginPage = () => {
 
           {/* ===== TOP-UP SECTION ===== */}
           <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-            {/* Top-up Header (always visible) */}
             <button
               onClick={() => setActiveSection(activeSection === "topup" ? "login" : "topup")}
               className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-secondary/50"
@@ -218,32 +238,19 @@ const LoginPage = () => {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                   <CreditCard className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-base font-semibold text-foreground">Пополнение баланса</span>
+                <span className="text-base font-semibold text-foreground">{i.topUpTitle}</span>
               </div>
-              <ChevronDown
-                className={cn(
-                  "h-5 w-5 text-muted-foreground transition-transform duration-200",
-                  activeSection === "topup" && "rotate-180"
-                )}
-              />
+              <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform duration-200", activeSection === "topup" && "rotate-180")} />
             </button>
 
-            {/* Top-up Body */}
-            <div
-              className={cn(
-                "grid transition-all duration-300 ease-in-out",
-                activeSection === "topup" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              )}
-            >
+            <div className={cn("grid transition-all duration-300 ease-in-out", activeSection === "topup" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="border-t border-border px-6 pb-6 pt-5 sm:px-8 sm:pb-8">
-                  <p className="mb-5 text-sm text-muted-foreground">
-                    Мгновенное пополнение без комиссии
-                  </p>
+                  <p className="mb-5 text-sm text-muted-foreground">{i.topUpSubtitle}</p>
 
                   {/* Phone */}
                   <div className="mb-5">
-                    <label className="mb-2 block text-sm font-medium text-foreground">Номер телефона</label>
+                    <label className="mb-2 block text-sm font-medium text-foreground">{i.phoneLabel}</label>
                     <div className="flex gap-2">
                       <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
                         <span>🇪🇸</span>
@@ -265,7 +272,7 @@ const LoginPage = () => {
 
                   {/* Amount */}
                   <div className="mb-5">
-                    <label className="mb-2 block text-sm font-medium text-foreground">Сумма</label>
+                    <label className="mb-2 block text-sm font-medium text-foreground">{i.amountLabel}</label>
                     <div className="mb-3 grid grid-cols-4 gap-2">
                       {amountPresets.map((preset) => (
                         <button
@@ -287,7 +294,7 @@ const LoginPage = () => {
                       <input
                         type="number"
                         min="3"
-                        placeholder="Другая сумма (мин. 3€)"
+                        placeholder={i.otherAmount}
                         value={amount}
                         onChange={(e) => handleAmountChange(e.target.value)}
                         className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
@@ -297,7 +304,7 @@ const LoginPage = () => {
 
                   {/* Email */}
                   <div className="mb-6">
-                    <label className="mb-2 block text-sm font-medium text-foreground">Email для чека</label>
+                    <label className="mb-2 block text-sm font-medium text-foreground">{i.emailReceipt}</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <input
@@ -313,15 +320,15 @@ const LoginPage = () => {
                   {/* Summary */}
                   <div className="mb-5 rounded-xl bg-secondary/60 p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Сумма пополнения</span>
+                      <span className="text-sm text-muted-foreground">{i.topUpAmount}</span>
                       <span className="font-mono text-lg font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
                     </div>
                     <div className="mt-2 flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Комиссия</span>
-                      <span className="text-sm font-semibold text-emerald-500">Бесплатно</span>
+                      <span className="text-sm text-muted-foreground">{i.commission}</span>
+                      <span className="text-sm font-semibold text-primary">{i.free}</span>
                     </div>
                     <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">Итого</span>
+                      <span className="text-sm font-semibold text-foreground">{i.total}</span>
                       <span className="font-mono text-xl font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
                     </div>
                   </div>
@@ -337,13 +344,13 @@ const LoginPage = () => {
                     )}
                   >
                     <CreditCard className="h-4 w-4" />
-                    Оплатить картой
+                    {i.payByCard}
                   </button>
 
                   <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Shield className="h-3.5 w-3.5" />
-                      Безопасная оплата
+                      {i.securePayment}
                     </div>
                     <span>•</span>
                     <span>Stripe</span>
@@ -362,9 +369,9 @@ const LoginPage = () => {
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
             <div className="flex gap-4 text-xs text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">Политика конфиденциальности</a>
-              <a href="#" className="hover:text-foreground transition-colors">Пользовательское соглашение</a>
-              <a href="#" className="hover:text-foreground transition-colors">Контакты</a>
+              <a href="#" className="hover:text-foreground transition-colors">{i.privacy}</a>
+              <a href="#" className="hover:text-foreground transition-colors">{i.terms}</a>
+              <a href="#" className="hover:text-foreground transition-colors">{i.contacts}</a>
             </div>
             <p className="text-xs text-muted-foreground">© 2026 highway.mobi</p>
           </div>
