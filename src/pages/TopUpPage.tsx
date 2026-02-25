@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CreditCard, Shield, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { type Lang } from "@/lib/i18n";
+import { type Lang, t } from "@/lib/i18n";
 import InternalHeader from "@/components/InternalHeader";
 
 const amountPresets = [5, 10, 20, 50];
@@ -16,6 +16,7 @@ const TopUpPage = () => {
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [lang, setLang] = useState<Lang>("ru");
   const navigate = useNavigate();
+  const i = t(lang);
 
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
@@ -41,33 +42,33 @@ const TopUpPage = () => {
 
       {/* Main */}
       <main className="mx-auto w-full max-w-lg px-4 py-8 sm:py-12">
-        <button
+      <button
           onClick={() => navigate("/account")}
           className="mb-6 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
-          Назад
+          {i.back}
         </button>
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Пополнение баланса
+            {i.topUpTitle}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Мгновенное пополнение без комиссии
+            {i.topUpSubtitle}
           </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
           {/* Phone (read-only) */}
           <div className="mb-6 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
-            <span className="text-sm text-muted-foreground">Номер телефона</span>
+            <span className="text-sm text-muted-foreground">{i.phoneLabel}</span>
             <span className="text-sm font-semibold text-foreground">{mockPhone}</span>
           </div>
 
           {/* Amount */}
           <div className="mb-6">
             <label className="mb-2 block text-sm font-medium text-foreground">
-              Сумма
+              {i.amountLabel}
             </label>
             <div className="mb-3 grid grid-cols-4 gap-2">
               {amountPresets.map((preset) => (
@@ -90,7 +91,7 @@ const TopUpPage = () => {
               <input
                 type="number"
                 min="3"
-                placeholder="Другая сумма (мин. 3€)"
+                placeholder={i.otherAmount}
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
                 className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
@@ -100,24 +101,24 @@ const TopUpPage = () => {
 
           {/* Email (read-only) */}
           <div className="mb-8 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
-            <span className="text-sm text-muted-foreground">Email для чека</span>
+            <span className="text-sm text-muted-foreground">{i.emailReceipt}</span>
             <span className="text-sm font-semibold text-foreground">{mockEmail}</span>
           </div>
 
           {/* Divider + Summary */}
           <div className="mb-6 rounded-xl bg-secondary/60 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Сумма пополнения</span>
+              <span className="text-sm text-muted-foreground">{i.topUpAmount}</span>
               <span className="font-mono text-lg font-bold text-foreground">
                 €{displayAmount.toFixed(2)}
               </span>
             </div>
             <div className="mt-2 flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Комиссия</span>
-              <span className="text-sm font-semibold text-success">Бесплатно</span>
+              <span className="text-sm text-muted-foreground">{i.commission}</span>
+              <span className="text-sm font-semibold text-success">{i.free}</span>
             </div>
             <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
-              <span className="text-sm font-semibold text-foreground">Итого</span>
+              <span className="text-sm font-semibold text-foreground">{i.total}</span>
               <span className="font-mono text-xl font-bold text-foreground">
                 €{displayAmount.toFixed(2)}
               </span>
@@ -135,14 +136,14 @@ const TopUpPage = () => {
             )}
           >
             <CreditCard className="h-4 w-4" />
-            Оплатить картой
+            {i.payByCard}
           </button>
 
           {/* Trust badges */}
           <div className="mt-5 flex items-center justify-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <Shield className="h-3.5 w-3.5" />
-              Безопасная оплата
+              {i.securePayment}
             </div>
             <span>•</span>
             <span>Stripe</span>
@@ -157,9 +158,9 @@ const TopUpPage = () => {
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
             <div className="flex gap-4 text-xs text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">Политика конфиденциальности</a>
-              <a href="#" className="hover:text-foreground transition-colors">Пользовательское соглашение</a>
-              <a href="#" className="hover:text-foreground transition-colors">Контакты</a>
+              <a href="#" className="hover:text-foreground transition-colors">{i.privacy}</a>
+              <a href="#" className="hover:text-foreground transition-colors">{i.terms}</a>
+              <a href="#" className="hover:text-foreground transition-colors">{i.contacts}</a>
             </div>
             <p className="text-xs text-muted-foreground">© 2026 highway.mobi</p>
           </div>
