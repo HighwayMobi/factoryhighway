@@ -1,8 +1,20 @@
 const API_BASE = "https://sim.highway.mobi/web";
 
 export const getAuthToken = (): string | null => {
+  // Try cookie first, then localStorage fallback
   const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
-  return match ? match[1] : null;
+  if (match && match[1]) return match[1];
+  return localStorage.getItem("auth_token");
+};
+
+export const setAuthToken = (token: string) => {
+  document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}`;
+  localStorage.setItem("auth_token", token);
+};
+
+export const clearAuthToken = () => {
+  document.cookie = "auth_token=; path=/; max-age=0";
+  localStorage.removeItem("auth_token");
 };
 
 export const apiFetch = async (path: string, options: RequestInit = {}) => {

@@ -8,7 +8,7 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useNavigate } from "react-router-dom";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, type UserClient } from "@/lib/api";
+import { fetchUser, clearAuthToken, type UserClient } from "@/lib/api";
 
 const AccountPage = () => {
   const { lang, setLang } = useLang();
@@ -61,7 +61,7 @@ const AccountPage = () => {
   }, []);
 
   const handleLogout = () => {
-    document.cookie = "auth_token=; path=/; max-age=0";
+    clearAuthToken();
     navigate("/");
   };
 

@@ -124,10 +124,11 @@ const LoginPage = () => {
         return;
       }
 
-      // Store token in cookie (30 days)
+      // Store token
       const token = data.data?.token || data.token;
       if (token) {
-        document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+        const { setAuthToken } = await import("@/lib/api");
+        setAuthToken(token);
       }
 
       toast({ title: i.loginSuccess });
