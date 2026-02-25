@@ -27,11 +27,12 @@ const AccountPage = () => {
     dataUsed: 0,
     dataTotal: 0,
     minutesLimit: null as number | null,
-    financePlanFee: 0,
-    financeAdditional: 0,
-    financeUsed: 0,
-    financeTopUp: 0,
-    financeRemaining: 0,
+    paymentType: "",
+    iccid: "",
+    activationDate: "",
+    contractNumber: "",
+    newPlan: "",
+    newPlanPrice: null as number | null,
   });
 
   const loadData = async () => {
@@ -73,9 +74,12 @@ const AccountPage = () => {
         dataTotal: Math.max(remains?.gb_initial ?? plan?.gb ?? 0, remains?.gb ?? 0),
         dataUsed: remains?.gb ?? 0,
         minutesLimit: plan?.minutes === 0 ? null : (plan?.minutes ?? null),
-        financeTopUp: sub?.balance ?? 0,
-        financeRemaining: sub?.balance ?? 0,
-        financePlanFee: plan?.price ?? 0,
+        paymentType: sub?.payment_type ?? "",
+        iccid: sub?.iccid ?? "",
+        activationDate: sub?.activation_date ?? "",
+        contractNumber: sub?.contract_number ?? "",
+        newPlan: sub?.new_paid_plan?.local_name?.[lang] || sub?.new_paid_plan?.name || "",
+        newPlanPrice: sub?.new_paid_plan?.price ?? null,
       }));
       if (c.lang === "en" || c.lang === "ru") {
         setLang(c.lang);
@@ -239,27 +243,31 @@ const AccountPage = () => {
               <div className="overflow-hidden">
                 <div className="border-t border-border">
                   <div className="px-6 py-3 flex items-center justify-between border-b border-border">
-                    <span className="text-sm text-foreground">{i.acc_planFee}</span>
-                    <span className="text-sm font-semibold text-primary">- {user.financePlanFee}€</span>
+                    <span className="text-sm text-foreground">{i.acc_balance}</span>
+                    <span className="text-sm font-semibold text-primary">€{user.balance}</span>
                   </div>
                   <div className="px-6 py-3 flex items-center justify-between border-b border-border">
-                    <span className="text-sm text-foreground">{i.acc_additionalServices}</span>
-                    <span className="text-sm font-semibold text-primary">- {user.financeAdditional}€</span>
+                    <span className="text-sm text-foreground">{i.acc_planFee}</span>
+                    <span className="text-sm font-semibold text-primary">€{user.monthlyFee}/{lang === "ru" ? "мес" : "mo"}</span>
                   </div>
-                  <div className="px-6 py-3 flex items-center justify-between">
-                    <span className="text-sm text-foreground">{i.acc_topUpBalance}</span>
-                    <span className="text-sm font-semibold text-primary">+ {user.financeTopUp}€</span>
-                  </div>
-                  <div className="flex bg-primary text-primary-foreground">
-                    <div className="flex-1 px-6 py-3 text-center border-r border-primary-foreground/20">
-                      <div className="text-xs font-medium opacity-80">{i.acc_used}</div>
-                      <div className="text-lg font-bold">{user.financeUsed}€</div>
+                  {user.paymentType && (
+                    <div className="px-6 py-3 flex items-center justify-between border-b border-border">
+                      <span className="text-sm text-foreground">{lang === "ru" ? "Тип оплаты" : "Payment type"}</span>
+                      <span className="text-sm font-semibold text-foreground capitalize">{user.paymentType}</span>
                     </div>
-                    <div className="flex-1 px-6 py-3 text-center">
-                      <div className="text-xs font-medium opacity-80">{i.acc_remaining}</div>
-                      <div className="text-lg font-bold">{user.financeRemaining}€</div>
+                  )}
+                  {user.newPlan && (
+                    <div className="px-6 py-3 flex items-center justify-between border-b border-border">
+                      <span className="text-sm text-foreground">{lang === "ru" ? "Новый тариф" : "Next plan"}</span>
+                      <span className="text-sm font-semibold text-primary">{user.newPlan}{user.newPlanPrice !== null ? ` — €${user.newPlanPrice}` : ""}</span>
                     </div>
-                  </div>
+                  )}
+                  {user.feeDate && (
+                    <div className="px-6 py-3 flex items-center justify-between">
+                      <span className="text-sm text-foreground">{i.acc_feeDate?.replace(":", "") || (lang === "ru" ? "Дата списания" : "Fee date")}</span>
+                      <span className="text-sm font-semibold text-foreground">{user.feeDate}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
