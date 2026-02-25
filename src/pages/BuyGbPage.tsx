@@ -1,9 +1,12 @@
-import { ArrowLeft, Wifi } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
+import { apiFetch } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 const gbPackages = [
   { gb: 1, price: 3 },
@@ -15,6 +18,44 @@ const BuyGbPage = () => {
   const { lang, setLang } = useLang();
   const navigate = useNavigate();
   const i = t(lang);
+  const [subscriberId, setSubscriberId] = useState<number | null>(null);
+  const [buyingGb, setBuyingGb] = useState<number | null>(null);
+
+  useEffect(() => {
+    apiFetch("api/subscriber").then((res) => {
+      if (res?.data) {
+        const sub = Array.isArray(res.data) ? res.data[0] : res.data;
+        setSubscriberId(sub.id);
+      }
+    });
+  }, []);
+
+  const handleBuy = async (gb: number) => {
+    if (!subscriberId || buyingGb !== null) return;
+    setBuyingGb(gb);
+    try {
+      const res = await apiFetch("api/addGB", {
+        method: "PUT",
+        body: JSON.stringify({
+          subscriber_id: subscriberId,
+          size: gb,
+        }),
+      });
+      if (res?.success) {
+        toast({ title: i.buyGb_success });
+        navigate("/account");
+      } else {
+        toast({
+          title: res?.message?.includes("Not enough funds") ? i.buyGb_noFunds : i.buyGb_error,
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({ title: i.buyGb_error, variant: "destructive" });
+    } finally {
+      setBuyingGb(null);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -66,14 +107,20 @@ const BuyGbPage = () => {
                 <div className="flex items-center gap-3">
                   <span className="text-lg font-bold text-primary">€{pkg.price}</span>
                   <button
+                    disabled={buyingGb !== null}
+                    onClick={() => handleBuy(pkg.gb)}
                     className={cn(
-                      "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
+                      "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-60",
                       pkg.popular
                         ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:brightness-110"
                         : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     )}
                   >
-                    {i.buyGb_buy}
+                    {buyingGb === pkg.gb ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      i.buyGb_buy
+                    )}
                   </button>
                 </div>
               </div>

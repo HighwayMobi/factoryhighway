@@ -93,6 +93,9 @@ const translations = {
     buyGb_subtitle: "Выберите подходящий пакет данных",
     buyGb_popular: "Популярный",
     buyGb_buy: "Купить",
+    buyGb_success: "Пакет успешно подключён!",
+    buyGb_noFunds: "Недостаточно средств",
+    buyGb_error: "Ошибка при покупке",
     buyGb_month: "/мес",
     // Change Plan page
     cp_title: "Сменить тариф",
@@ -202,6 +205,9 @@ const translations = {
     buyGb_subtitle: "Choose a data package that suits you",
     buyGb_popular: "Popular",
     buyGb_buy: "Buy",
+    buyGb_success: "Package activated successfully!",
+    buyGb_noFunds: "Not enough funds",
+    buyGb_error: "Purchase failed",
     buyGb_month: "/mo",
     // Change Plan page
     cp_title: "Change Plan",
