@@ -96,6 +96,10 @@ const translations = {
     buyGb_success: "Пакет успешно подключён!",
     buyGb_noFunds: "Недостаточно средств",
     buyGb_error: "Ошибка при покупке",
+    buyGb_confirmTitle: "Подтвердите покупку",
+    buyGb_confirmDesc: "Вы хотите подключить пакет {gb} GB за €{price}?",
+    buyGb_confirm: "Подтвердить",
+    buyGb_cancel: "Отмена",
     buyGb_month: "/мес",
     // Change Plan page
     cp_title: "Сменить тариф",
@@ -208,6 +212,10 @@ const translations = {
     buyGb_success: "Package activated successfully!",
     buyGb_noFunds: "Not enough funds",
     buyGb_error: "Purchase failed",
+    buyGb_confirmTitle: "Confirm purchase",
+    buyGb_confirmDesc: "Do you want to activate the {gb} GB package for €{price}?",
+    buyGb_confirm: "Confirm",
+    buyGb_cancel: "Cancel",
     buyGb_month: "/mo",
     // Change Plan page
     cp_title: "Change Plan",
