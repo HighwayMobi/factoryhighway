@@ -130,7 +130,10 @@ const AccountPage = () => {
                 </div>
                 <span className="text-base font-semibold text-foreground">{user.plan}</span>
               </div>
-              <button className="w-[130px] rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground text-center">
+              <button
+                onClick={() => navigate("/change-plan")}
+                className="w-[130px] rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground text-center"
+              >
                 {i.acc_changePlan}
               </button>
             </div>
