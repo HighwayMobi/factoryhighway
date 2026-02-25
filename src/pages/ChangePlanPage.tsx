@@ -21,6 +21,7 @@ const ChangePlanPage = () => {
   const [plans, setPlans] = useState<PaidPlan[]>([]);
   const [currentPlanId, setCurrentPlanId] = useState<number | null>(null);
   const [currentPlanName, setCurrentPlanName] = useState("");
+  const [currentPlanPrice, setCurrentPlanPrice] = useState<number | null>(null);
   const [paymentDay, setPaymentDay] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<PaidPlan | null>(null);
@@ -37,6 +38,7 @@ const ChangePlanPage = () => {
         const sub = userRes.data.client.subscribers;
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
+        setCurrentPlanPrice(sub.paid_plan?.price ?? null);
         setPaymentDay(sub.paymentDay);
         setSubscriberId(sub.id);
 
@@ -123,10 +125,13 @@ const ChangePlanPage = () => {
         {/* Current plan badge */}
         <div className="mb-6 rounded-2xl border border-primary/30 bg-primary/5 px-5 py-3 flex items-center gap-3">
           <Check className="h-5 w-5 text-primary" />
-          <div>
+          <div className="flex-1">
             <span className="text-xs text-muted-foreground">{i.cp_currentPlan}</span>
             <p className="text-sm font-bold text-foreground">{currentPlanName}</p>
           </div>
+          {currentPlanPrice !== null && (
+            <span className="text-lg font-bold text-primary whitespace-nowrap">€{currentPlanPrice}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
+          )}
         </div>
 
         <div className="space-y-3">
