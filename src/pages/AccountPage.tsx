@@ -1,17 +1,12 @@
 import { useState } from "react";
 import {
-  Globe, ChevronDown, Bell, LogOut, User, Wifi, Phone as PhoneIcon,
-  CreditCard, Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck,
+  LogOut, User, Wifi, Phone as PhoneIcon,
+  Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t, type Lang } from "@/lib/i18n";
-import highwayLogo from "@/assets/highway-logo.png";
 import { useNavigate } from "react-router-dom";
-
-const languages: { code: Lang; label: string }[] = [
-  { code: "ru", label: "RU" },
-  { code: "en", label: "EN" },
-];
+import InternalHeader from "@/components/InternalHeader";
 
 // Mock data — will come from API later
 const mockUser = {
@@ -33,10 +28,9 @@ const mockUser = {
 
 const AccountPage = () => {
   const [lang, setLang] = useState<Lang>("ru");
-  const [langOpen, setLangOpen] = useState(false);
   const [financesOpen, setFinancesOpen] = useState(true);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const navigate = useNavigate();
   const i = t(lang);
 
@@ -49,43 +43,7 @@ const AccountPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-          <img src={highwayLogo} alt="Highway Mobile" className="h-9" />
-          <div className="flex items-center gap-3">
-            <button className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-              <Bell className="h-5 w-5" />
-            </button>
-            <div className="relative">
-              <button
-                onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              >
-                <Globe className="h-4 w-4" />
-                {lang.toUpperCase()}
-                <ChevronDown className={cn("h-3 w-3 transition-transform", langOpen && "rotate-180")} />
-              </button>
-              {langOpen && (
-                <div className="absolute right-0 top-full mt-1 z-50 min-w-[80px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
-                  {languages.map((l) => (
-                    <button
-                      key={l.code}
-                      onClick={() => { setLang(l.code); setLangOpen(false); }}
-                      className={cn(
-                        "flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-secondary",
-                        lang === l.code ? "font-semibold text-primary" : "text-foreground"
-                      )}
-                    >
-                      {l.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <InternalHeader lang={lang} onLangChange={setLang} />
 
       <main className="flex-1 flex flex-col items-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-2xl space-y-4">
