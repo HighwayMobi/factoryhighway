@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, CreditCard, Shield, ArrowLeft } from "lucide-react";
+import { CreditCard, Shield, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { type Lang } from "@/lib/i18n";
@@ -9,11 +9,11 @@ const amountPresets = [5, 10, 20, 50];
 
 // Mock — later from auth/context
 const mockPhone = "+34 681 999 090";
+const mockEmail = "sergei@example.com";
 
 const TopUpPage = () => {
   const [amount, setAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
-  const [email, setEmail] = useState("");
   const [lang, setLang] = useState<Lang>("ru");
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const TopUpPage = () => {
   };
 
   const displayAmount = amount ? parseFloat(amount) : 0;
-  const isValid = displayAmount >= 3 && email.includes("@");
+  const isValid = displayAmount >= 3;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -98,21 +98,10 @@ const TopUpPage = () => {
             </div>
           </div>
 
-          {/* Email */}
-          <div className="mb-8">
-            <label className="mb-2 block text-sm font-medium text-foreground">
-              Email для чека
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="email"
-                placeholder="mail@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              />
-            </div>
+          {/* Email (read-only) */}
+          <div className="mb-8 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+            <span className="text-sm text-muted-foreground">Email для чека</span>
+            <span className="text-sm font-semibold text-foreground">{mockEmail}</span>
           </div>
 
           {/* Divider + Summary */}
