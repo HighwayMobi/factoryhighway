@@ -70,7 +70,7 @@ const AccountPage = () => {
         plan: planName,
         monthlyFee: plan?.price ?? 0,
         feeDate,
-        dataTotal: plan?.gb ?? 0,
+        dataTotal: Math.max(remains?.gb_initial ?? plan?.gb ?? 0, remains?.gb ?? 0),
         dataUsed: remains?.gb ?? 0,
         minutesLimit: plan?.minutes === 0 ? null : (plan?.minutes ?? null),
         financeTopUp: sub?.balance ?? 0,
