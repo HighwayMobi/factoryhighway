@@ -35,8 +35,8 @@ const ProfilePage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const inputClass =
-    "w-full rounded-xl border border-primary/40 bg-background px-4 py-3 text-sm text-primary placeholder:text-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
-  const labelClass = "mb-1.5 block text-sm font-semibold text-primary";
+    "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
+  const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -45,13 +45,13 @@ const ProfilePage = () => {
       <main className="mx-auto w-full max-w-lg px-4 py-8 sm:py-12">
         <button
           onClick={() => navigate("/account")}
-          className="mb-6 flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          className="mb-6 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
           {i.back}
         </button>
 
-        <h1 className="mb-6 text-2xl font-bold text-primary">{i.prof_title}</h1>
+        <h1 className="mb-6 text-2xl font-bold text-foreground">{i.prof_title}</h1>
 
         {/* Language selector + Save */}
         <div className="mb-6 space-y-3">
@@ -86,7 +86,7 @@ const ProfilePage = () => {
 
           {/* Address */}
           <div className="pt-2">
-            <h2 className="mb-3 text-sm font-bold text-primary">{i.prof_myAddress}</h2>
+            <h2 className="mb-3 text-sm font-bold text-foreground">{i.prof_myAddress}</h2>
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>{i.prof_street}</label>
@@ -120,11 +120,11 @@ const ProfilePage = () => {
           {/* Password */}
           <div className="pt-4 space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-foreground">{i.prof_newPassword}</label>
+              <label className={labelClass}>{i.prof_newPassword}</label>
               <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-foreground">{i.prof_confirmPassword}</label>
+              <label className={labelClass}>{i.prof_confirmPassword}</label>
               <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
             </div>
           </div>
