@@ -25,6 +25,8 @@ const ChangePlanPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<PaidPlan | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [subscriberId, setSubscriberId] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -36,6 +38,7 @@ const ChangePlanPage = () => {
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
         setPaymentDay(sub.paymentDay);
+        setSubscriberId(sub.id);
 
         const allPlans: PaidPlan[] = Array.isArray(plansRes.data)
           ? plansRes.data
@@ -64,10 +67,24 @@ const ChangePlanPage = () => {
     setConfirmOpen(true);
   };
 
-  const handleConfirm = () => {
-    // TODO: call API to change plan
-    setConfirmOpen(false);
-    navigate("/account");
+  const handleConfirm = async () => {
+    if (!selectedPlan || !subscriberId) return;
+    setSubmitting(true);
+    try {
+      await apiFetch("api/paidPlan", {
+        method: "PUT",
+        body: JSON.stringify({
+          subscriber_id: subscriberId,
+          plan_id: selectedPlan.id,
+        }),
+      });
+      setConfirmOpen(false);
+      navigate("/account");
+    } catch (err) {
+      console.error("Failed to change plan:", err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -203,9 +220,10 @@ const ChangePlanPage = () => {
             </button>
             <button
               onClick={handleConfirm}
-              className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98]"
+              disabled={submitting}
+              className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             >
-              {i.cp_confirm}
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : i.cp_confirm}
             </button>
           </DialogFooter>
         </DialogContent>
