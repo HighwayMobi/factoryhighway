@@ -8,7 +8,7 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useNavigate } from "react-router-dom";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, clearAuthToken, type UserClient } from "@/lib/api";
+import { fetchUser, apiFetch, clearAuthToken, type UserClient } from "@/lib/api";
 
 const AccountPage = () => {
   const { lang, setLang } = useLang();
@@ -60,7 +60,12 @@ const AccountPage = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await apiFetch("api/logout");
+    } catch (_) {
+      // ignore — clear token regardless
+    }
     clearAuthToken();
     navigate("/");
   };
