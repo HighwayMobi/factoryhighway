@@ -57,7 +57,7 @@ const AccountPage = () => {
         setUser((prev) => ({
           ...prev,
           name: `${c.first_name || ""} ${c.second_name || ""}`.trim(),
-          phone: c.phone || "",
+          phone: c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "",
           balance: sub?.balance ?? c.balance ?? 0,
           plan: planName,
           monthlyFee: plan?.price ?? 0,
