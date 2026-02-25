@@ -173,10 +173,10 @@ const AccountPage = () => {
               </div>
               <span className="text-sm font-bold text-primary">{user.minutesLimit ?? i.acc_unlimited}</span>
             </div>
-            {user.dataTotal === 0 && (
-              <div className="bg-primary/10 px-6 py-2.5 text-center text-xs font-medium text-primary">
+            {user.dataUsed === 0 && (
+              <div className="bg-destructive/10 px-6 py-2.5 text-center text-xs font-medium text-destructive">
                 {i.acc_noData}{" "}
-                <button className="underline font-semibold hover:text-primary/80">{i.acc_buyHere}</button>
+                <button onClick={() => navigate("/buy-gb")} className="underline font-semibold hover:text-destructive/80">{i.acc_buyHere}</button>
               </div>
             )}
           </div>
