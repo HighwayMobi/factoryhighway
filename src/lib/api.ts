@@ -34,21 +34,67 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
   return res.json();
 };
 
+export interface PaidPlan {
+  id: number;
+  name: string;
+  local_name: Record<string, string>;
+  price: number;
+  gb: number;
+  gb_roaming: number;
+  minutes: number;
+  sms: number;
+  isFiber: boolean;
+  isMobile: boolean;
+  services: unknown[];
+}
+
+export interface Remains {
+  gb: number;
+  gb_initial: number;
+  gb_used: number;
+  minutes: number;
+  sms: number;
+  isFresh: boolean;
+}
+
+export interface Subscriber {
+  id: number;
+  number: string;
+  active: boolean;
+  status: string;
+  balance: number;
+  payment_type: string;
+  type: number;
+  paid_plan_id: number;
+  paid_plan: PaidPlan;
+  new_paid_plan: PaidPlan | null;
+  remains: Remains;
+  parent_id: number | null;
+  activation_date: string;
+  paymentDay: number;
+  new_paid_plan_id: number | null;
+  iccid: string;
+  contract_number: string | null;
+  notifications: number;
+}
+
 export interface UserClient {
   id: number;
+  status: string;
   first_name: string;
   second_name: string;
   email: string;
   phone: string;
   lang: string;
   passport_number: string;
+  second_last_name: string | null;
+  balance: number;
   street: string;
   house: string;
   apartment: string;
   postal_code: string;
   city: string;
-  balance: number;
-  subscribers: unknown[];
+  subscribers: Subscriber;
 }
 
 export interface UserResponse {
