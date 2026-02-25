@@ -2,7 +2,8 @@ import { useState } from "react";
 import { CreditCard, Shield, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { type Lang, t } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
+import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 
 const amountPresets = [5, 10, 20, 50];
@@ -14,7 +15,7 @@ const mockEmail = "sergei@example.com";
 const TopUpPage = () => {
   const [amount, setAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
-  const [lang, setLang] = useState<Lang>("ru");
+  const { lang, setLang } = useLang();
   const navigate = useNavigate();
   const i = t(lang);
 
