@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Smartphone, Mail, CreditCard, Shield, Zap, ChevronDown, Globe } from "lucide-react";
+import { Smartphone, Mail, CreditCard, Shield, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { type Lang } from "@/lib/i18n";
+import InternalHeader from "@/components/InternalHeader";
 
 const amountPresets = [5, 10, 20, 50];
 
@@ -10,6 +12,7 @@ const TopUpPage = () => {
   const [amount, setAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [email, setEmail] = useState("");
+  const [lang, setLang] = useState<Lang>("ru");
 
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
@@ -30,25 +33,8 @@ const TopUpPage = () => {
   const isValid = phoneNumber.length >= 6 && displayAmount >= 3 && email.includes("@");
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <Zap className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              HIGHWAY <span className="font-medium text-muted-foreground">MOBILE</span>
-            </span>
-          </div>
-          <button className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-            <Globe className="h-4 w-4" />
-            RU
-            <ChevronDown className="h-3 w-3" />
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col bg-background">
+      <InternalHeader lang={lang} onLangChange={setLang} />
 
       {/* Main */}
       <main className="mx-auto max-w-lg px-4 py-8 sm:py-12">
