@@ -7,10 +7,8 @@ import InternalHeader from "@/components/InternalHeader";
 
 const gbPackages = [
   { gb: 1, price: 3 },
-  { gb: 3, price: 7 },
-  { gb: 5, price: 10, popular: true },
-  { gb: 10, price: 15 },
-  { gb: 20, price: 25 },
+  { gb: 5, price: 6, popular: true },
+  { gb: 20, price: 10 },
 ];
 
 const BuyGbPage = () => {
