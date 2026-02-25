@@ -2,25 +2,25 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
-  Smartphone, CreditCard, Shield, Loader2,
-} from "lucide-react";
+  Smartphone, CreditCard, Shield, Loader2 } from
+"lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useToast } from "@/hooks/use-toast";
 import highwayLogo from "@/assets/highway-logo.png";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from "@/components/ui/dialog";
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from
+"@/components/ui/dialog";
 
 type AuthTab = "email" | "phone";
 type ActiveSection = "login" | "topup";
 
 const amountPresets = [5, 10, 20, 50];
-const languages: { code: "ru" | "en"; label: string }[] = [
-  { code: "ru", label: "RU" },
-  { code: "en", label: "EN" },
-];
+const languages: {code: "ru" | "en";label: string;}[] = [
+{ code: "ru", label: "RU" },
+{ code: "en", label: "EN" }];
+
 
 const LoginPage = () => {
   const { lang, setLang } = useLang();
@@ -45,7 +45,7 @@ const LoginPage = () => {
   const [forgotPhone, setForgotPhone] = useState("");
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotMsg, setForgotMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [forgotMsg, setForgotMsg] = useState<{type: "ok" | "err";text: string;} | null>(null);
   const [apiResponse, setApiResponse] = useState<string | null>(null);
 
   const { toast } = useToast();
@@ -64,9 +64,9 @@ const LoginPage = () => {
   const phoneDigits = (val: string) => val.replace(/\D/g, "");
 
   const isLoginValid =
-    activeTab === "email"
-      ? email.includes("@") && password.length >= 4
-      : phoneDigits(phone).length === 9 && password.length >= 4;
+  activeTab === "email" ?
+  email.includes("@") && password.length >= 4 :
+  phoneDigits(phone).length === 9 && password.length >= 4;
 
   const displayAmount = amount ? parseFloat(amount) : 0;
   const isTopUpValid = phoneDigits(topUpPhone).length === 9 && displayAmount >= 3 && topUpEmail.includes("@");
@@ -102,7 +102,7 @@ const LoginPage = () => {
     try {
       const body: Record<string, string> = {
         password,
-        key: "6xARHinsvuC",
+        key: "6xARHinsvuC"
       };
       if (activeTab === "email") {
         body.username = email;
@@ -113,7 +113,7 @@ const LoginPage = () => {
       const res = await fetch("https://sim.highway.mobi/web/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(body)
       });
 
       const data = await res.json();
@@ -144,14 +144,14 @@ const LoginPage = () => {
     setForgotMsg(null);
     setForgotLoading(true);
     try {
-      const body: Record<string, string> = forgotTab === "phone"
-        ? { phone: phoneDigits(forgotPhone) }
-        : { email: forgotEmail };
+      const body: Record<string, string> = forgotTab === "phone" ?
+      { phone: phoneDigits(forgotPhone) } :
+      { email: forgotEmail };
 
       const res = await fetch("https://sim.highway.mobi/web/api/forgotPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -166,9 +166,9 @@ const LoginPage = () => {
     }
   };
 
-  const isForgotValid = forgotTab === "phone"
-    ? phoneDigits(forgotPhone).length === 9
-    : forgotEmail.includes("@");
+  const isForgotValid = forgotTab === "phone" ?
+  phoneDigits(forgotPhone).length === 9 :
+  forgotEmail.includes("@");
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -181,28 +181,28 @@ const LoginPage = () => {
           <div className="relative" ref={langRef}>
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
+              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+
               <Globe className="h-4 w-4" />
               {lang.toUpperCase()}
               <ChevronDown className={cn("h-3 w-3 transition-transform", langOpen && "rotate-180")} />
             </button>
-            {langOpen && (
-              <div className="absolute right-0 top-full mt-1 z-50 min-w-[80px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
-                {languages.map((l) => (
-                  <button
-                    key={l.code}
-                    onClick={() => { setLang(l.code); setLangOpen(false); }}
-                    className={cn(
-                      "flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-secondary",
-                      lang === l.code ? "font-semibold text-primary" : "text-foreground"
-                    )}
-                  >
+            {langOpen &&
+            <div className="absolute right-0 top-full mt-1 z-50 min-w-[80px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
+                {languages.map((l) =>
+              <button
+                key={l.code}
+                onClick={() => {setLang(l.code);setLangOpen(false);}}
+                className={cn(
+                  "flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-secondary",
+                  lang === l.code ? "font-semibold text-primary" : "text-foreground"
+                )}>
+
                     {l.label}
                   </button>
-                ))}
+              )}
               </div>
-            )}
+            }
           </div>
         </div>
       </header>
@@ -215,8 +215,8 @@ const LoginPage = () => {
           <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
             <button
               onClick={() => setActiveSection(activeSection === "login" ? "topup" : "login")}
-              className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-secondary/50"
-            >
+              className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-secondary/50">
+
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                   <User className="h-4 w-4 text-primary" />
@@ -234,22 +234,22 @@ const LoginPage = () => {
                   {/* Tabs */}
                   <div className="mb-5 flex rounded-xl bg-secondary p-1">
                     <button
-                      onClick={() => { setActiveTab("email"); setPassword(""); setLoginError(""); }}
+                      onClick={() => {setActiveTab("email");setPassword("");setLoginError("");}}
                       className={cn(
                         "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
                         activeTab === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
+                      )}>
+
                       <Mail className="h-4 w-4" />
                       {i.byEmail}
                     </button>
                     <button
-                      onClick={() => { setActiveTab("phone"); setPassword(""); setLoginError(""); }}
+                      onClick={() => {setActiveTab("phone");setPassword("");setLoginError("");}}
                       className={cn(
                         "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
                         activeTab === "phone" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
+                      )}>
+
                       <Phone className="h-4 w-4" />
                       {i.byPhone}
                     </button>
@@ -257,19 +257,19 @@ const LoginPage = () => {
 
                   {/* Email / Phone Input */}
                   <div className="mb-4">
-                    {activeTab === "email" ? (
-                      <div className="relative">
+                    {activeTab === "email" ?
+                    <div className="relative">
                         <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <input
-                          type="email"
-                          placeholder="test@test.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
+                        type="email"
+                        placeholder="test@test.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
+                      </div> :
+
+                    <div className="flex gap-2">
                         <div className="flex items-center rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
                           <span>🇪🇸</span>
                           <span className="ml-1">+34</span>
@@ -277,15 +277,15 @@ const LoginPage = () => {
                         <div className="relative flex-1">
                           <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                           <input
-                            type="tel"
-                            placeholder={i.phonePlaceholder}
-                            value={phone}
-                            onChange={(e) => handlePhoneChange(e.target.value, setPhone)}
-                            className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                          />
+                          type="tel"
+                          placeholder={i.phonePlaceholder}
+                          value={phone}
+                          onChange={(e) => handlePhoneChange(e.target.value, setPhone)}
+                          className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
                         </div>
                       </div>
-                    )}
+                    }
                   </div>
 
                   {/* Password */}
@@ -297,48 +297,48 @@ const LoginPage = () => {
                         placeholder={i.password}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                      />
+                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
 
                   <div className="mb-5 text-right">
-                    <button type="button" onClick={() => { setForgotOpen(true); setForgotTab("email"); setForgotPhone(""); setForgotEmail(""); setForgotMsg(null); }} className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</button>
+                    <button type="button" onClick={() => {setForgotOpen(true);setForgotTab("email");setForgotPhone("");setForgotEmail("");setForgotMsg(null);}} className="text-sm text-primary hover:underline transition-colors">{i.forgotPassword}</button>
                   </div>
 
-                  {loginError && (
-                    <div className="mb-4 rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+                  {loginError &&
+                  <div className="mb-4 rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
                       {loginError}
                     </div>
-                  )}
+                  }
 
-                  {apiResponse && (
-                    <div className="mb-4 rounded-xl bg-secondary border border-border px-4 py-3 text-xs text-foreground overflow-auto max-h-48">
+                  {apiResponse &&
+                  <div className="mb-4 rounded-xl bg-secondary border border-border px-4 py-3 text-xs text-foreground overflow-auto max-h-48">
                       <div className="flex justify-between items-center mb-1">
                         <span className="font-semibold text-sm">API Response:</span>
                         <button onClick={() => setApiResponse(null)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
                       </div>
                       <pre className="whitespace-pre-wrap break-all">{apiResponse}</pre>
                     </div>
-                  )}
+                  }
 
                   <button
                     disabled={!isLoginValid || isLoggingIn}
                     onClick={handleLogin}
                     className={cn(
                       "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                      isLoginValid && !isLoggingIn
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
-                        : "bg-muted text-muted-foreground cursor-not-allowed"
-                    )}
-                  >
+                      isLoginValid && !isLoggingIn ?
+                      "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                      "bg-muted text-muted-foreground cursor-not-allowed"
+                    )}>
+
                     {isLoggingIn && <Loader2 className="h-4 w-4 animate-spin" />}
                     {isLoggingIn ? i.loggingIn : i.login}
                   </button>
@@ -363,8 +363,8 @@ const LoginPage = () => {
           <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
             <button
               onClick={() => setActiveSection(activeSection === "topup" ? "login" : "topup")}
-              className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-secondary/50"
-            >
+              className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-secondary/50">
+
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                   <CreditCard className="h-4 w-4 text-primary" />
@@ -377,7 +377,7 @@ const LoginPage = () => {
             <div className={cn("grid transition-all duration-300 ease-in-out", activeSection === "topup" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="border-t border-border px-6 pb-6 pt-5 sm:px-8 sm:pb-8">
-                  <p className="mb-5 text-sm text-muted-foreground">{i.topUpSubtitle}</p>
+                  
 
                   {/* Phone */}
                   <div className="mb-5">
@@ -394,8 +394,8 @@ const LoginPage = () => {
                           placeholder={i.phonePlaceholder}
                           value={topUpPhone}
                           onChange={(e) => handlePhoneChange(e.target.value, setTopUpPhone)}
-                          className="h-full w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                        />
+                          className="h-full w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
                       </div>
                     </div>
                   </div>
@@ -404,20 +404,20 @@ const LoginPage = () => {
                   <div className="mb-5">
                     <label className="mb-2 block text-sm font-medium text-foreground">{i.amountLabel}</label>
                     <div className="mb-3 grid grid-cols-4 gap-2">
-                      {amountPresets.map((preset) => (
-                        <button
-                          key={preset}
-                          onClick={() => handlePresetClick(preset)}
-                          className={cn(
-                            "rounded-xl border py-2.5 text-sm font-semibold transition-all",
-                            selectedPreset === preset
-                              ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25"
-                              : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
-                          )}
-                        >
+                      {amountPresets.map((preset) =>
+                      <button
+                        key={preset}
+                        onClick={() => handlePresetClick(preset)}
+                        className={cn(
+                          "rounded-xl border py-2.5 text-sm font-semibold transition-all",
+                          selectedPreset === preset ?
+                          "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25" :
+                          "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
+                        )}>
+
                           €{preset}
                         </button>
-                      ))}
+                      )}
                     </div>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">€</span>
@@ -427,8 +427,8 @@ const LoginPage = () => {
                         placeholder={i.otherAmount}
                         value={amount}
                         onChange={(e) => handleAmountChange(e.target.value)}
-                        className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                      />
+                        className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
                     </div>
                   </div>
 
@@ -442,8 +442,8 @@ const LoginPage = () => {
                         placeholder="mail@example.com"
                         value={topUpEmail}
                         onChange={(e) => setTopUpEmail(e.target.value)}
-                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                      />
+                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
                     </div>
                   </div>
 
@@ -468,11 +468,11 @@ const LoginPage = () => {
                     disabled={!isTopUpValid}
                     className={cn(
                       "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                      isTopUpValid
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
-                        : "bg-muted text-muted-foreground cursor-not-allowed"
-                    )}
-                  >
+                      isTopUpValid ?
+                      "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                      "bg-muted text-muted-foreground cursor-not-allowed"
+                    )}>
+
                     <CreditCard className="h-4 w-4" />
                     {i.payByCard}
                   </button>
@@ -518,22 +518,22 @@ const LoginPage = () => {
             {/* Tabs */}
             <div className="flex rounded-xl bg-secondary p-1">
               <button
-                onClick={() => { setForgotTab("email"); setForgotMsg(null); }}
+                onClick={() => {setForgotTab("email");setForgotMsg(null);}}
                 className={cn(
                   "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
                   forgotTab === "email" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
+                )}>
+
                 <Mail className="h-4 w-4" />
                 {i.byEmail}
               </button>
               <button
-                onClick={() => { setForgotTab("phone"); setForgotMsg(null); }}
+                onClick={() => {setForgotTab("phone");setForgotMsg(null);}}
                 className={cn(
                   "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
                   forgotTab === "phone" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
+                )}>
+
                 <Phone className="h-4 w-4" />
                 {i.byPhone}
               </button>
@@ -543,19 +543,19 @@ const LoginPage = () => {
               {forgotTab === "email" ? i.forgotPasswordDescEmail : i.forgotPasswordDescPhone}
             </p>
 
-            {forgotTab === "email" ? (
-              <div className="relative">
+            {forgotTab === "email" ?
+            <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
-                  type="email"
-                  placeholder="mail@example.com"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-              </div>
-            ) : (
-              <div className="flex gap-2">
+                type="email"
+                placeholder="mail@example.com"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
+              </div> :
+
+            <div className="flex gap-2">
                 <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
                   <span>🇪🇸</span>
                   <span>+34</span>
@@ -563,45 +563,45 @@ const LoginPage = () => {
                 <div className="relative flex-1">
                   <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
-                    type="tel"
-                    placeholder={i.phonePlaceholder}
-                    value={forgotPhone}
-                    onChange={(e) => handlePhoneChange(e.target.value, setForgotPhone)}
-                    className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                  />
+                  type="tel"
+                  placeholder={i.phonePlaceholder}
+                  value={forgotPhone}
+                  onChange={(e) => handlePhoneChange(e.target.value, setForgotPhone)}
+                  className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+
                 </div>
               </div>
-            )}
+            }
 
-            {forgotMsg && (
-              <div className={cn(
-                "rounded-xl border px-4 py-3 text-sm",
-                forgotMsg.type === "ok"
-                  ? "bg-primary/10 border-primary/20 text-primary"
-                  : "bg-destructive/10 border-destructive/20 text-destructive"
-              )}>
+            {forgotMsg &&
+            <div className={cn(
+              "rounded-xl border px-4 py-3 text-sm",
+              forgotMsg.type === "ok" ?
+              "bg-primary/10 border-primary/20 text-primary" :
+              "bg-destructive/10 border-destructive/20 text-destructive"
+            )}>
                 {forgotMsg.text}
               </div>
-            )}
+            }
 
             <button
               disabled={!isForgotValid || forgotLoading}
               onClick={handleForgotPassword}
               className={cn(
                 "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                isForgotValid && !forgotLoading
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 active:scale-[0.98]"
-                  : "bg-muted text-muted-foreground cursor-not-allowed"
-              )}
-            >
+                isForgotValid && !forgotLoading ?
+                "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 active:scale-[0.98]" :
+                "bg-muted text-muted-foreground cursor-not-allowed"
+              )}>
+
               {forgotLoading && <Loader2 className="h-4 w-4 animate-spin" />}
               {forgotLoading ? i.sending : i.sendPassword}
             </button>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default LoginPage;
