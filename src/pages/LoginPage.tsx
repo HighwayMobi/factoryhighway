@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
   Smartphone, CreditCard, Shield, Loader2,
@@ -47,6 +48,7 @@ const LoginPage = () => {
   const [apiResponse, setApiResponse] = useState<string | null>(null);
 
   const { toast } = useToast();
+  const navigate = useNavigate();
   const i = t(lang);
 
   // Close dropdown on outside click
@@ -127,6 +129,7 @@ const LoginPage = () => {
       }
 
       toast({ title: i.loginSuccess });
+      navigate("/account");
     } catch (err) {
       setApiResponse(String(err));
       setLoginError(i.networkError);
