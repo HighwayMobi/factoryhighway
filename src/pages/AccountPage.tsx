@@ -4,7 +4,8 @@ import {
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { t, type Lang } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
+import { useLang } from "@/contexts/LangContext";
 import { useNavigate } from "react-router-dom";
 import InternalHeader from "@/components/InternalHeader";
 
@@ -27,7 +28,7 @@ const mockUser = {
 };
 
 const AccountPage = () => {
-  const [lang, setLang] = useState<Lang>("ru");
+  const { lang, setLang } = useLang();
   const [financesOpen, setFinancesOpen] = useState(true);
   const [infoOpen, setInfoOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -170,7 +171,7 @@ const AccountPage = () => {
 
           {/* Profile */}
           <button
-            onClick={() => setProfileOpen(!profileOpen)}
+            onClick={() => navigate("/profile")}
             className="w-full rounded-2xl border border-border bg-card shadow-sm px-6 py-4 flex items-center justify-between transition-colors hover:bg-secondary/50"
           >
             <div className="flex items-center gap-3">
@@ -179,7 +180,7 @@ const AccountPage = () => {
               </div>
               <span className="text-base font-semibold text-foreground">{i.acc_profile}</span>
             </div>
-            <ChevronRight className={cn("h-5 w-5 text-muted-foreground transition-transform duration-200", profileOpen && "rotate-90")} />
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </button>
 
           {/* Information */}

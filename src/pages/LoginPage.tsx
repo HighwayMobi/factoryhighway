@@ -5,7 +5,8 @@ import {
   Smartphone, CreditCard, Shield, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { t, type Lang } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
+import { useLang } from "@/contexts/LangContext";
 import { useToast } from "@/hooks/use-toast";
 import highwayLogo from "@/assets/highway-logo.png";
 import {
@@ -16,13 +17,13 @@ type AuthTab = "email" | "phone";
 type ActiveSection = "login" | "topup";
 
 const amountPresets = [5, 10, 20, 50];
-const languages: { code: Lang; label: string }[] = [
+const languages: { code: "ru" | "en"; label: string }[] = [
   { code: "ru", label: "RU" },
   { code: "en", label: "EN" },
 ];
 
 const LoginPage = () => {
-  const [lang, setLang] = useState<Lang>("ru");
+  const { lang, setLang } = useLang();
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
 
