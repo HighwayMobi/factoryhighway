@@ -53,6 +53,8 @@ const BuyGbPage = () => {
       if (res?.success) {
         toast({ title: i.buyGb_success });
         setConfirmPkg(null);
+        // Small delay to let the server update remains
+        await new Promise((r) => setTimeout(r, 1500));
         navigate("/account");
       } else {
         toast({
