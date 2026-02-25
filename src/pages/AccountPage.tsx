@@ -37,11 +37,21 @@ const AccountPage = () => {
 
   useEffect(() => {
     fetchUser()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         const c = data.client;
         const sub = c.subscribers;
         const plan = sub?.paid_plan;
-        const remains = sub?.remains;
+
+        // Fetch fresh remains from dedicated endpoint
+        let remains = sub?.remains;
+        if (sub?.number) {
+          try {
+            const remainsRes = await apiFetch(`api/remains/${sub.number}`);
+            if (remainsRes?.success && remainsRes.data) {
+              remains = remainsRes.data;
+            }
+          } catch {}
+        }
 
         const planName = plan?.local_name?.[lang] || plan?.name || "";
         const payDay = sub?.paymentDay;
