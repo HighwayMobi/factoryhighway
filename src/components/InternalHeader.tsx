@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Globe, ChevronDown, Bell, ArrowLeft } from "lucide-react";
+import { Globe, ChevronDown, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type Lang } from "@/lib/i18n";
 import highwayLogo from "@/assets/highway-logo.png";
@@ -22,8 +22,6 @@ const InternalHeader = ({ lang, onLangChange, showBack }: InternalHeaderProps) =
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isAccountPage = location.pathname === "/account";
-
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
@@ -35,22 +33,12 @@ const InternalHeader = ({ lang, onLangChange, showBack }: InternalHeaderProps) =
   return (
     <header className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          {!isAccountPage && (
-            <button
-              onClick={() => navigate("/account")}
-              className="flex items-center justify-center rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          )}
-          <img
-            src={highwayLogo}
-            alt="Highway Mobile"
-            className="h-9 cursor-pointer"
-            onClick={() => navigate("/account")}
-          />
-        </div>
+        <img
+          src={highwayLogo}
+          alt="Highway Mobile"
+          className="h-9 cursor-pointer"
+          onClick={() => navigate("/account")}
+        />
         <div className="flex items-center gap-3">
           <button className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
             <Bell className="h-5 w-5" />
