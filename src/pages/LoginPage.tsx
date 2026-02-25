@@ -125,8 +125,9 @@ const LoginPage = () => {
       }
 
       // Store token in cookie (30 days)
-      if (data.token) {
-        document.cookie = `auth_token=${data.token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+      const token = data.data?.token || data.token;
+      if (token) {
+        document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
       }
 
       toast({ title: i.loginSuccess });
