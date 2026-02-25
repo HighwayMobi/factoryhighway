@@ -148,7 +148,7 @@ const ChangePlanPage = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-primary">€{plan.price}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
+                    <span className="text-lg font-bold text-primary whitespace-nowrap">€{plan.price}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
                     <button
                       onClick={() => handleSelectPlan(plan)}
                       className="rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.98]"
