@@ -131,7 +131,6 @@ const LoginPage = () => {
         setAuthToken(token);
       }
 
-      toast({ title: i.loginSuccess });
       navigate("/account");
     } catch (err) {
       setApiResponse(String(err));
