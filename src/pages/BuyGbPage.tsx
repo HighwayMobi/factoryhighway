@@ -1,22 +1,55 @@
-import { ArrowLeft, Wifi } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
+import { apiFetch, type PaidPlan } from "@/lib/api";
 
-const gbPackages = [
-  { gb: 1, price: 3 },
-  { gb: 3, price: 7 },
-  { gb: 5, price: 10, popular: true },
-  { gb: 10, price: 15 },
-  { gb: 20, price: 25 },
-];
+interface GbPackage {
+  id: number;
+  gb: number;
+  price: number;
+  name: string;
+}
 
 const BuyGbPage = () => {
   const { lang, setLang } = useLang();
   const navigate = useNavigate();
   const i = t(lang);
+  const [packages, setPackages] = useState<GbPackage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    apiFetch("api/paidPlans/1")
+      .then((res) => {
+        const plans: PaidPlan[] = Array.isArray(res.data) ? res.data : Object.values(res.data || {});
+        const gbPkgs = plans
+          .filter((p) => p.gb > 0)
+          .map((p) => ({
+            id: p.id,
+            gb: p.gb,
+            price: p.price,
+            name: p.local_name?.[lang] || p.name || "",
+          }))
+          .sort((a, b) => a.gb - b.gb);
+        setPackages(gbPkgs);
+      })
+      .catch((err) => console.error("Failed to fetch plans:", err))
+      .finally(() => setLoading(false));
+  }, [lang]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <InternalHeader lang={lang} onLangChange={setLang} />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -41,21 +74,11 @@ const BuyGbPage = () => {
         </div>
 
         <div className="space-y-3">
-          {gbPackages.map((pkg) => (
+          {packages.map((pkg) => (
             <div
-              key={pkg.gb}
-              className={cn(
-                "relative rounded-2xl border bg-card p-5 shadow-sm transition-all",
-                pkg.popular
-                  ? "border-primary ring-2 ring-primary/20"
-                  : "border-border hover:border-primary/40"
-              )}
+              key={pkg.id}
+              className="relative rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/40"
             >
-              {pkg.popular && (
-                <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
-                  {i.buyGb_popular}
-                </span>
-              )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -63,18 +86,12 @@ const BuyGbPage = () => {
                   </div>
                   <div>
                     <span className="text-lg font-bold text-foreground">{pkg.gb} GB</span>
+                    {pkg.name && <p className="text-xs text-muted-foreground">{pkg.name}</p>}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-lg font-bold text-primary">€{pkg.price}</span>
-                  <button
-                    className={cn(
-                      "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98]",
-                      pkg.popular
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:brightness-110"
-                        : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                    )}
-                  >
+                  <button className="rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.98]">
                     {i.buyGb_buy}
                   </button>
                 </div>
