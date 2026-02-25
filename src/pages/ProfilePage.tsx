@@ -53,7 +53,7 @@ const ProfilePage = () => {
 
         <h1 className="mb-6 text-2xl font-bold text-foreground">{i.prof_title}</h1>
 
-        {/* Language selector + Save */}
+        {/* Language selector */}
         <div className="mb-6 space-y-3">
           <label className={labelClass}>{i.prof_language}</label>
           <select
@@ -64,9 +64,6 @@ const ProfilePage = () => {
             <option value="ru">Русский</option>
             <option value="en">English</option>
           </select>
-          <button className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98]">
-            {i.prof_save}
-          </button>
         </div>
 
         {/* Personal info */}
@@ -115,6 +112,13 @@ const ProfilePage = () => {
           <div>
             <label className={labelClass}>{i.prof_emailNotifications}</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+          </div>
+
+          {/* Save button */}
+          <div className="pt-2">
+            <button className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98]">
+              {i.prof_save}
+            </button>
           </div>
 
           {/* Password */}
