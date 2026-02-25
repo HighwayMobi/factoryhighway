@@ -63,6 +63,8 @@ const translations = {
     acc_remaining: "Остаток",
     acc_profile: "Профиль",
     acc_info: "Информация",
+    acc_termsConditions: "Условия предоставления услуг",
+    acc_privacyPolicy: "Политика конфиденциальности",
     acc_logout: "Выйти",
   },
   en: {
@@ -127,6 +129,8 @@ const translations = {
     acc_remaining: "I still have",
     acc_profile: "Profile",
     acc_info: "Information",
+    acc_termsConditions: "Terms & conditions",
+    acc_privacyPolicy: "Privacy policy",
     acc_logout: "Log out",
   },
 } as const;

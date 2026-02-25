@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Globe, ChevronDown, Bell, LogOut, User, Wifi, Phone as PhoneIcon,
-  CreditCard, Plus, Clock, Info, Settings, ChevronRight, Signal,
+  CreditCard, Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t, type Lang } from "@/lib/i18n";
@@ -225,18 +225,34 @@ const AccountPage = () => {
           </button>
 
           {/* Information */}
-          <button
-            onClick={() => setInfoOpen(!infoOpen)}
-            className="w-full rounded-2xl border border-border bg-card shadow-sm px-6 py-4 flex items-center justify-between transition-colors hover:bg-secondary/50"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                <Info className="h-4 w-4 text-primary" />
+          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+            <button
+              onClick={() => setInfoOpen(!infoOpen)}
+              className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-secondary/50"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <Info className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-base font-semibold text-foreground">{i.acc_info}</span>
               </div>
-              <span className="text-base font-semibold text-foreground">{i.acc_info}</span>
+              <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform duration-200", infoOpen && "rotate-180")} />
+            </button>
+            <div className={cn("grid transition-all duration-300 ease-in-out", infoOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
+              <div className="overflow-hidden">
+                <div className="border-t border-border">
+                  <a href="#" className="flex items-center gap-3 px-6 py-3.5 text-sm text-foreground transition-colors hover:bg-secondary/50 border-b border-border">
+                    <FileText className="h-4 w-4 text-primary" />
+                    {i.acc_termsConditions}
+                  </a>
+                  <a href="#" className="flex items-center gap-3 px-6 py-3.5 text-sm text-foreground transition-colors hover:bg-secondary/50">
+                    <ShieldCheck className="h-4 w-4 text-primary" />
+                    {i.acc_privacyPolicy}
+                  </a>
+                </div>
+              </div>
             </div>
-            <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform duration-200", infoOpen && "rotate-180")} />
-          </button>
+          </div>
 
           {/* Logout */}
           <button
