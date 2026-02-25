@@ -7,6 +7,16 @@ import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { apiFetch } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 const gbPackages = [
   { gb: 1, price: 3 },
@@ -20,6 +30,7 @@ const BuyGbPage = () => {
   const i = t(lang);
   const [subscriberId, setSubscriberId] = useState<number | null>(null);
   const [buyingGb, setBuyingGb] = useState<number | null>(null);
+  const [confirmPkg, setConfirmPkg] = useState<typeof gbPackages[0] | null>(null);
 
   useEffect(() => {
     apiFetch("api/subscriber").then((res) => {
@@ -30,19 +41,20 @@ const BuyGbPage = () => {
     });
   }, []);
 
-  const handleBuy = async (gb: number) => {
-    if (!subscriberId || buyingGb !== null) return;
-    setBuyingGb(gb);
+  const handleBuy = async () => {
+    if (!subscriberId || !confirmPkg || buyingGb !== null) return;
+    setBuyingGb(confirmPkg.gb);
     try {
       const res = await apiFetch("api/addGB", {
         method: "PUT",
         body: JSON.stringify({
           subscriber_id: subscriberId,
-          size: gb,
+          size: confirmPkg.gb,
         }),
       });
       if (res?.success) {
         toast({ title: i.buyGb_success });
+        setConfirmPkg(null);
         navigate("/account");
       } else {
         toast({
@@ -108,7 +120,7 @@ const BuyGbPage = () => {
                   <span className="text-lg font-bold text-primary">€{pkg.price}</span>
                   <button
                     disabled={buyingGb !== null}
-                    onClick={() => handleBuy(pkg.gb)}
+                    onClick={() => setConfirmPkg(pkg)}
                     className={cn(
                       "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-60",
                       pkg.popular
@@ -116,11 +128,7 @@ const BuyGbPage = () => {
                         : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     )}
                   >
-                    {buyingGb === pkg.gb ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      i.buyGb_buy
-                    )}
+                    {i.buyGb_buy}
                   </button>
                 </div>
               </div>
@@ -128,6 +136,32 @@ const BuyGbPage = () => {
           ))}
         </div>
       </main>
+
+      <AlertDialog open={!!confirmPkg} onOpenChange={(open) => !open && setConfirmPkg(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{i.buyGb_confirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmPkg &&
+                i.buyGb_confirmDesc
+                  .replace("{gb}", String(confirmPkg.gb))
+                  .replace("{price}", String(confirmPkg.price))}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={buyingGb !== null}>
+              {i.buyGb_cancel}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleBuy} disabled={buyingGb !== null}>
+              {buyingGb !== null ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                i.buyGb_confirm
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <footer className="mt-auto border-t border-border bg-card">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
