@@ -387,24 +387,24 @@ const LoginPage = () => {
               <div className="overflow-hidden">
                 <div className="border-t border-border px-6 pb-6 pt-5 sm:px-8 sm:pb-8">
                    {/* Sub-tabs: Balance / Buy GB */}
-                  <div className="mb-5 flex rounded-xl bg-secondary p-1">
+                  <div className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-secondary p-1">
                     <button
                       onClick={() => setTopUpMode("balance")}
                       className={cn(
-                        "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                        "flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs sm:text-sm font-semibold transition-all text-center",
                         topUpMode === "balance" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       )}>
-                      <CreditCard className="h-4 w-4" />
-                      {i.topup_tabBalance}
+                      <CreditCard className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{i.topup_tabBalance}</span>
                     </button>
                     <button
                       onClick={() => setTopUpMode("buyGb")}
                       className={cn(
-                        "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                        "flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs sm:text-sm font-semibold transition-all text-center",
                         topUpMode === "buyGb" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       )}>
-                      <Wifi className="h-4 w-4" />
-                      {i.topup_tabBuyGb}
+                      <Wifi className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{i.topup_tabBuyGb}</span>
                     </button>
                   </div>
 
