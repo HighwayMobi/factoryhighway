@@ -19,10 +19,10 @@ type TopUpMode = "balance" | "buyGb";
 
 const amountPresets = [5, 10, 20, 50];
 const gbPackages = [
-  { gb: 1, price: 3 },
-  { gb: 5, price: 6 },
-  { gb: 20, price: 10, popular: true },
-];
+{ gb: 1, price: 3 },
+{ gb: 5, price: 6 },
+{ gb: 20, price: 10, popular: true }];
+
 const languages: {code: "ru" | "en";label: string;}[] = [
 { code: "ru", label: "RU" },
 { code: "en", label: "EN" }];
@@ -402,7 +402,7 @@ const LoginPage = () => {
                       className={cn(
                         "flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[13px] sm:text-sm font-semibold transition-all text-center",
                         topUpMode === "buyGb" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                      )}>
+                      )}>Add gigabytes
                       <Wifi className="hidden sm:block h-4 w-4 shrink-0" />
                       {i.topup_tabBuyGb}
                     </button>
@@ -428,35 +428,35 @@ const LoginPage = () => {
                     </div>
                   </div>
 
-                  {topUpMode === "balance" ? (
-                    <>
+                  {topUpMode === "balance" ?
+                  <>
                       {/* Amount */}
                       <div className="mb-5">
                         <label className="mb-2 block text-sm font-medium text-foreground">{i.amountLabel}</label>
                         <div className="mb-3 grid grid-cols-4 gap-2">
                           {amountPresets.map((preset) =>
-                            <button
-                              key={preset}
-                              onClick={() => handlePresetClick(preset)}
-                              className={cn(
-                                "rounded-xl border py-2.5 text-sm font-semibold transition-all",
-                                selectedPreset === preset ?
-                                "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25" :
-                                "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
-                              )}>
+                        <button
+                          key={preset}
+                          onClick={() => handlePresetClick(preset)}
+                          className={cn(
+                            "rounded-xl border py-2.5 text-sm font-semibold transition-all",
+                            selectedPreset === preset ?
+                            "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25" :
+                            "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
+                          )}>
                               €{preset}
                             </button>
-                          )}
+                        )}
                         </div>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">€</span>
                           <input
-                            type="number"
-                            min="3"
-                            placeholder={i.otherAmount}
-                            value={amount}
-                            onChange={(e) => handleAmountChange(e.target.value)}
-                            className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                          type="number"
+                          min="3"
+                          placeholder={i.otherAmount}
+                          value={amount}
+                          onChange={(e) => handleAmountChange(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                         </div>
                       </div>
 
@@ -466,11 +466,11 @@ const LoginPage = () => {
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                           <input
-                            type="email"
-                            placeholder="mail@example.com"
-                            value={topUpEmail}
-                            onChange={(e) => setTopUpEmail(e.target.value)}
-                            className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                          type="email"
+                          placeholder="mail@example.com"
+                          value={topUpEmail}
+                          onChange={(e) => setTopUpEmail(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                         </div>
                       </div>
 
@@ -492,39 +492,39 @@ const LoginPage = () => {
 
                       {/* Pay Button */}
                       <button
-                        disabled={!isTopUpValid}
-                        className={cn(
-                          "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                          isTopUpValid ?
-                          "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
-                          "bg-muted text-muted-foreground cursor-not-allowed"
-                        )}>
+                      disabled={!isTopUpValid}
+                      className={cn(
+                        "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                        isTopUpValid ?
+                        "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                        "bg-muted text-muted-foreground cursor-not-allowed"
+                      )}>
                         <CreditCard className="h-4 w-4" />
                         {i.payByCard}
                       </button>
-                    </>
-                  ) : (
-                    <>
+                    </> :
+
+                  <>
                       {/* GB Packages */}
                       <div className="mb-5 space-y-3">
-                        {gbPackages.map((pkg) => (
-                          <div
-                            key={pkg.gb}
-                            onClick={() => setSelectedGbPkg(selectedGbPkg?.gb === pkg.gb ? null : pkg)}
-                            className={cn(
-                              "relative cursor-pointer rounded-2xl border p-4 transition-all",
-                              selectedGbPkg?.gb === pkg.gb
-                                ? "border-primary ring-2 ring-primary/20 bg-primary/5"
-                                : pkg.popular
-                                  ? "border-primary/40 bg-card"
-                                  : "border-border bg-card hover:border-primary/40"
-                            )}
-                          >
-                            {pkg.popular && (
-                              <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+                        {gbPackages.map((pkg) =>
+                      <div
+                        key={pkg.gb}
+                        onClick={() => setSelectedGbPkg(selectedGbPkg?.gb === pkg.gb ? null : pkg)}
+                        className={cn(
+                          "relative cursor-pointer rounded-2xl border p-4 transition-all",
+                          selectedGbPkg?.gb === pkg.gb ?
+                          "border-primary ring-2 ring-primary/20 bg-primary/5" :
+                          pkg.popular ?
+                          "border-primary/40 bg-card" :
+                          "border-border bg-card hover:border-primary/40"
+                        )}>
+
+                            {pkg.popular &&
+                        <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
                                 {i.buyGb_popular}
                               </span>
-                            )}
+                        }
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -535,7 +535,7 @@ const LoginPage = () => {
                               <span className="text-lg font-bold text-primary">€{pkg.price}</span>
                             </div>
                           </div>
-                        ))}
+                      )}
                       </div>
 
                       {/* Email */}
@@ -544,17 +544,17 @@ const LoginPage = () => {
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                           <input
-                            type="email"
-                            placeholder="mail@example.com"
-                            value={topUpEmail}
-                            onChange={(e) => setTopUpEmail(e.target.value)}
-                            className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                          type="email"
+                          placeholder="mail@example.com"
+                          value={topUpEmail}
+                          onChange={(e) => setTopUpEmail(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                         </div>
                       </div>
 
                       {/* Summary for GB */}
-                      {selectedGbPkg && (
-                        <div className="mb-5 rounded-xl bg-secondary/60 p-4">
+                      {selectedGbPkg &&
+                    <div className="mb-5 rounded-xl bg-secondary/60 p-4">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">{selectedGbPkg.gb} GB</span>
                             <span className="font-mono text-lg font-bold text-foreground">€{selectedGbPkg.price.toFixed(2)}</span>
@@ -568,22 +568,22 @@ const LoginPage = () => {
                             <span className="font-mono text-xl font-bold text-foreground">€{selectedGbPkg.price.toFixed(2)}</span>
                           </div>
                         </div>
-                      )}
+                    }
 
                       {/* Pay Button */}
                       <button
-                        disabled={!isGbValid}
-                        className={cn(
-                          "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                          isGbValid ?
-                          "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
-                          "bg-muted text-muted-foreground cursor-not-allowed"
-                        )}>
+                      disabled={!isGbValid}
+                      className={cn(
+                        "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                        isGbValid ?
+                        "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                        "bg-muted text-muted-foreground cursor-not-allowed"
+                      )}>
                         <CreditCard className="h-4 w-4" />
                         {i.payByCard}
                       </button>
                     </>
-                  )}
+                  }
 
                   <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
