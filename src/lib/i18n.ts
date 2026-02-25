@@ -86,6 +86,8 @@ const translations = {
     prof_update: "Изменить",
     prof_passwordMismatch: "Пароли не совпадают",
     prof_saved: "Данные сохранены",
+    prof_personalInfo: "Личные данные",
+    prof_changePassword: "Сменить пароль",
   },
   en: {
     loginTitle: "Sign in to your account",
@@ -172,6 +174,8 @@ const translations = {
     prof_update: "Update",
     prof_passwordMismatch: "Passwords do not match",
     prof_saved: "Data saved",
+    prof_personalInfo: "Personal information",
+    prof_changePassword: "Change password",
   },
 } as const;
 
