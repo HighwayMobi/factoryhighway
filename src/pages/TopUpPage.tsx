@@ -64,6 +64,9 @@ const TopUpPage = () => {
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             {i.topUpTitle}
           </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {i.topUpSubtitle}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
