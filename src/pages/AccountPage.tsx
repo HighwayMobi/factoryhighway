@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   LogOut, User, Wifi, Phone as PhoneIcon,
-  Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2,
+  Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -15,14 +15,13 @@ const AccountPage = () => {
   const [financesOpen, setFinancesOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigate = useNavigate();
-  const i = t(lang);
-
   const [user, setUser] = useState({
     name: "",
     phone: "",
-    plan: "",
     balance: 0,
+    plan: "",
     monthlyFee: 0,
     feeDate: "",
     dataUsed: 0,
@@ -30,67 +29,76 @@ const AccountPage = () => {
     minutesLimit: null as number | null,
     financePlanFee: 0,
     financeAdditional: 0,
-    financeTopUp: 0,
     financeUsed: 0,
+    financeTopUp: 0,
     financeRemaining: 0,
   });
 
+  const loadData = async () => {
+    try {
+      const { data } = await fetchUser();
+      const c = data.client;
+      const sub = c.subscribers;
+      const plan = sub?.paid_plan;
+
+      let remains = sub?.remains;
+      if (sub?.number) {
+        try {
+          const remainsRes = await apiFetch(`api/remains/${sub.number}`);
+          if (remainsRes?.success && remainsRes.data) {
+            remains = remainsRes.data;
+          }
+        } catch {}
+      }
+
+      const planName = plan?.local_name?.[lang] || plan?.name || "";
+      const payDay = sub?.paymentDay;
+      const now = new Date();
+      let feeDate = "";
+      if (payDay) {
+        const month = now.getDate() > payDay ? now.getMonth() + 2 : now.getMonth() + 1;
+        const year = now.getFullYear() + (month > 12 ? 1 : 0);
+        const m = ((month - 1) % 12) + 1;
+        feeDate = `${String(payDay).padStart(2, "0")}.${String(m).padStart(2, "0")}.${year}`;
+      }
+
+      setUser((prev) => ({
+        ...prev,
+        name: `${c.first_name || ""} ${c.second_name || ""}`.trim(),
+        phone: c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "",
+        balance: sub?.balance ?? c.balance ?? 0,
+        plan: planName,
+        monthlyFee: plan?.price ?? 0,
+        feeDate,
+        dataTotal: plan?.gb ?? 0,
+        dataUsed: remains?.gb ?? 0,
+        minutesLimit: plan?.minutes === 0 ? null : (plan?.minutes ?? null),
+        financeTopUp: sub?.balance ?? 0,
+        financeRemaining: sub?.balance ?? 0,
+        financePlanFee: plan?.price ?? 0,
+      }));
+      if (c.lang === "en" || c.lang === "ru") {
+        setLang(c.lang);
+      }
+    } catch (err: any) {
+      console.error("Failed to fetch user:", err);
+      if (err.message?.includes("401")) {
+        navigate("/");
+      }
+    }
+  };
+
   useEffect(() => {
-    fetchUser()
-      .then(async ({ data }) => {
-        const c = data.client;
-        const sub = c.subscribers;
-        const plan = sub?.paid_plan;
-
-        // Fetch fresh remains from dedicated endpoint
-        let remains = sub?.remains;
-        if (sub?.number) {
-          try {
-            const remainsRes = await apiFetch(`api/remains/${sub.number}`);
-            if (remainsRes?.success && remainsRes.data) {
-              remains = remainsRes.data;
-            }
-          } catch {}
-        }
-
-        const planName = plan?.local_name?.[lang] || plan?.name || "";
-        const payDay = sub?.paymentDay;
-        const now = new Date();
-        let feeDate = "";
-        if (payDay) {
-          const month = now.getDate() > payDay ? now.getMonth() + 2 : now.getMonth() + 1;
-          const year = now.getFullYear() + (month > 12 ? 1 : 0);
-          const m = ((month - 1) % 12) + 1;
-          feeDate = `${String(payDay).padStart(2, "0")}.${String(m).padStart(2, "0")}.${year}`;
-        }
-
-        setUser((prev) => ({
-          ...prev,
-          name: `${c.first_name || ""} ${c.second_name || ""}`.trim(),
-          phone: c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "",
-          balance: sub?.balance ?? c.balance ?? 0,
-          plan: planName,
-          monthlyFee: plan?.price ?? 0,
-          feeDate,
-          dataTotal: plan?.gb ?? 0,
-          dataUsed: remains?.gb ?? 0,
-          minutesLimit: plan?.minutes === 0 ? null : (plan?.minutes ?? null),
-          financeTopUp: sub?.balance ?? 0,
-          financeRemaining: sub?.balance ?? 0,
-          financePlanFee: plan?.price ?? 0,
-        }));
-        if (c.lang === "en" || c.lang === "ru") {
-          setLang(c.lang);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch user:", err);
-        if (err.message?.includes("401")) {
-          navigate("/");
-        }
-      })
-      .finally(() => setLoading(false));
+    loadData().finally(() => setLoading(false));
   }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  };
+
+  const i = t(lang);
 
   const handleLogout = async () => {
     try {
@@ -129,6 +137,14 @@ const AccountPage = () => {
               <h1 className="text-xl font-bold text-foreground">{user.name}</h1>
               <p className="text-sm font-medium text-primary">{user.phone}</p>
             </div>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="ml-auto p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+              title={lang === "ru" ? "Обновить" : "Refresh"}
+            >
+              <RefreshCw className={cn("h-5 w-5", refreshing && "animate-spin")} />
+            </button>
           </div>
 
           {/* Plan Card */}
