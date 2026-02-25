@@ -17,6 +17,7 @@ const AccountPage = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const navigate = useNavigate();
+  const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; topUp: number; used: number; remaining: number } | null>(null);
   const [user, setUser] = useState({
     name: "",
     phone: "",
@@ -33,6 +34,7 @@ const AccountPage = () => {
     contractNumber: "",
     newPlan: "",
     newPlanPrice: null as number | null,
+    subscriberId: null as number | null,
   });
 
   const loadData = async () => {
@@ -80,7 +82,29 @@ const AccountPage = () => {
         contractNumber: sub?.contract_number ?? "",
         newPlan: sub?.new_paid_plan?.local_name?.[lang] || sub?.new_paid_plan?.name || "",
         newPlanPrice: sub?.new_paid_plan?.price ?? null,
+        subscriberId: sub?.id ?? null,
       }));
+
+      // Fetch finance data
+      if (sub?.id) {
+        try {
+          const now = new Date();
+          const dateParam = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+          const finRes = await apiFetch(`api/finance?subscriber_id=${sub.id}&date=${dateParam}`);
+          if (finRes?.success !== false && finRes?.data) {
+            const d = finRes.data;
+            setFinance({
+              planFee: d.plan_fee ?? d.planFee ?? 0,
+              additionalServices: d.additional_services ?? d.additionalServices ?? 0,
+              topUp: d.top_up ?? d.topUp ?? d.topup ?? 0,
+              used: d.used ?? d.total_used ?? 0,
+              remaining: d.remaining ?? d.balance ?? 0,
+            });
+          }
+        } catch (e) {
+          console.error("Failed to fetch finance:", e);
+        }
+      }
       if (c.lang === "en" || c.lang === "ru") {
         setLang(c.lang);
       }
@@ -242,32 +266,29 @@ const AccountPage = () => {
             <div className={cn("grid transition-all duration-300 ease-in-out", financesOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="border-t border-border">
-                  <div className="px-6 py-3 flex items-center justify-between border-b border-border">
-                    <span className="text-sm text-foreground">{i.acc_balance}</span>
-                    <span className="text-sm font-semibold text-primary">€{user.balance}</span>
-                  </div>
-                  <div className="px-6 py-3 flex items-center justify-between border-b border-border">
+                  <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
                     <span className="text-sm text-foreground">{i.acc_planFee}</span>
-                    <span className="text-sm font-semibold text-primary">€{user.monthlyFee}/{lang === "ru" ? "мес" : "mo"}</span>
+                    <span className="text-sm font-semibold text-primary">- {finance?.planFee ?? user.monthlyFee}€</span>
                   </div>
-                  {user.paymentType && (
-                    <div className="px-6 py-3 flex items-center justify-between border-b border-border">
-                      <span className="text-sm text-foreground">{lang === "ru" ? "Тип оплаты" : "Payment type"}</span>
-                      <span className="text-sm font-semibold text-foreground capitalize">{user.paymentType}</span>
+                  <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
+                    <span className="text-sm text-foreground">{i.acc_additionalServices}</span>
+                    <span className="text-sm font-semibold text-primary">- {finance?.additionalServices ?? 0}€</span>
+                  </div>
+                  <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
+                    <span className="text-sm text-foreground">{i.acc_topUpBalance}</span>
+                    <span className="text-sm font-semibold text-primary">+ {finance?.topUp ?? 0}€</span>
+                  </div>
+                  <div className="flex items-stretch rounded-b-2xl bg-primary text-primary-foreground">
+                    <div className="flex-1 px-6 py-3 flex flex-col items-start justify-center">
+                      <span className="text-xs font-medium opacity-90">{i.acc_used}</span>
+                      <span className="text-lg font-bold">{finance?.used ?? 0}€</span>
                     </div>
-                  )}
-                  {user.newPlan && (
-                    <div className="px-6 py-3 flex items-center justify-between border-b border-border">
-                      <span className="text-sm text-foreground">{lang === "ru" ? "Новый тариф" : "Next plan"}</span>
-                      <span className="text-sm font-semibold text-primary">{user.newPlan}{user.newPlanPrice !== null ? ` — €${user.newPlanPrice}` : ""}</span>
+                    <div className="w-px bg-primary-foreground/30 my-2" />
+                    <div className="flex-1 px-6 py-3 flex flex-col items-end justify-center">
+                      <span className="text-xs font-medium opacity-90">{i.acc_remaining}</span>
+                      <span className="text-lg font-bold">{finance?.remaining ?? user.balance}€</span>
                     </div>
-                  )}
-                  {user.feeDate && (
-                    <div className="px-6 py-3 flex items-center justify-between">
-                      <span className="text-sm text-foreground">{i.acc_feeDate?.replace(":", "") || (lang === "ru" ? "Дата списания" : "Fee date")}</span>
-                      <span className="text-sm font-semibold text-foreground">{user.feeDate}</span>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
