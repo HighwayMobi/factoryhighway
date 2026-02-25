@@ -1,36 +1,26 @@
-import { useState } from "react";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-
-const mockProfile = {
-  firstName: "Sergei",
-  lastName: "Karpushin",
-  docId: "1234567",
-  street: "",
-  house: "",
-  apartment: "",
-  postalCode: "",
-  city: "",
-  email: "sergei@example.com",
-};
+import { fetchUser } from "@/lib/api";
 
 const ProfilePage = () => {
   const { lang, setLang } = useLang();
   const i = t(lang);
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState(mockProfile.firstName);
-  const [lastName, setLastName] = useState(mockProfile.lastName);
-  const [docId, setDocId] = useState(mockProfile.docId);
-  const [street, setStreet] = useState(mockProfile.street);
-  const [house, setHouse] = useState(mockProfile.house);
-  const [apartment, setApartment] = useState(mockProfile.apartment);
-  const [postalCode, setPostalCode] = useState(mockProfile.postalCode);
-  const [city, setCity] = useState(mockProfile.city);
-  const [email, setEmail] = useState(mockProfile.email);
+  const [loading, setLoading] = useState(true);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [docId, setDocId] = useState("");
+  const [street, setStreet] = useState("");
+  const [house, setHouse] = useState("");
+  const [apartment, setApartment] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
+  const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -38,9 +28,43 @@ const ProfilePage = () => {
 
   const passwordsMatch = newPassword === "" || confirmPassword === "" || newPassword === confirmPassword;
 
+  useEffect(() => {
+    fetchUser()
+      .then(({ data }) => {
+        const c = data.client;
+        setFirstName(c.first_name || "");
+        setLastName(c.second_name || "");
+        setDocId(c.passport_number || "");
+        setStreet(c.street || "");
+        setHouse(c.house || "");
+        setApartment(c.apartment || "");
+        setPostalCode(c.postal_code || "");
+        setCity(c.city || "");
+        setEmail(c.email || "");
+        if (c.lang === "en" || c.lang === "ru") {
+          setLang(c.lang);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   const inputClass =
     "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
   const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <InternalHeader lang={lang} onLangChange={setLang} />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
