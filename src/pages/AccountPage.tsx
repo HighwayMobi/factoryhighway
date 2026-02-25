@@ -68,7 +68,7 @@ const AccountPage = () => {
                 </div>
                 <span className="text-base font-semibold text-foreground">{user.plan}</span>
               </div>
-              <button className="rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground">
+              <button className="w-[130px] rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground text-center">
                 {i.acc_changePlan}
               </button>
             </div>
@@ -82,7 +82,7 @@ const AccountPage = () => {
               </div>
               <button
                 onClick={() => navigate("/topup")}
-                className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:brightness-110 active:scale-[0.98]"
+                className="w-[130px] rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:brightness-110 active:scale-[0.98] text-center"
               >
                 {i.acc_topUp}
               </button>
