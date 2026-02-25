@@ -88,6 +88,12 @@ const translations = {
     prof_saved: "Данные сохранены",
     prof_personalInfo: "Личные данные",
     prof_changePassword: "Сменить пароль",
+    // Buy GB page
+    buyGb_title: "Купить GB",
+    buyGb_subtitle: "Выберите подходящий пакет данных",
+    buyGb_popular: "Популярный",
+    buyGb_buy: "Купить",
+    buyGb_month: "/мес",
   },
   en: {
     loginTitle: "Sign in to your account",
@@ -176,6 +182,12 @@ const translations = {
     prof_saved: "Data saved",
     prof_personalInfo: "Personal information",
     prof_changePassword: "Change password",
+    // Buy GB page
+    buyGb_title: "Buy GB",
+    buyGb_subtitle: "Choose a data package that suits you",
+    buyGb_popular: "Popular",
+    buyGb_buy: "Buy",
+    buyGb_month: "/mo",
   },
 } as const;
 

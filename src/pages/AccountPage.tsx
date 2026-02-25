@@ -179,11 +179,17 @@ const AccountPage = () => {
           </div>
 
           {/* Buy GB */}
-          <button className="w-full rounded-2xl border border-border bg-card shadow-sm px-6 py-4 flex items-center gap-3 transition-colors hover:bg-secondary/50">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Plus className="h-4 w-4 text-primary" />
+          <button
+            onClick={() => navigate("/buy-gb")}
+            className="w-full rounded-2xl border border-border bg-card shadow-sm px-6 py-4 flex items-center justify-between transition-colors hover:bg-secondary/50"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <Plus className="h-4 w-4 text-primary" />
+              </div>
+              <span className="text-base font-semibold text-foreground">{i.acc_buyGb}</span>
             </div>
-            <span className="text-base font-semibold text-foreground">{i.acc_buyGb}</span>
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </button>
 
           {/* Finances Accordion */}
