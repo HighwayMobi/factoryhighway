@@ -33,11 +33,9 @@ const BuyGbPage = () => {
   const [confirmPkg, setConfirmPkg] = useState<typeof gbPackages[0] | null>(null);
 
   useEffect(() => {
-    apiFetch("api/subscriber").then((res) => {
-      if (res?.data) {
-        const sub = Array.isArray(res.data) ? res.data[0] : res.data;
-        setSubscriberId(sub.id);
-      }
+    apiFetch("api/user").then((res) => {
+      const sub = res?.data?.client?.subscribers;
+      if (sub?.id) setSubscriberId(sub.id);
     });
   }, []);
 
