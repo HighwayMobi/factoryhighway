@@ -1,46 +1,80 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LogOut, User, Wifi, Phone as PhoneIcon,
-  Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown,
+  Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useNavigate } from "react-router-dom";
 import InternalHeader from "@/components/InternalHeader";
-
-// Mock data — will come from API later
-const mockUser = {
-  name: "Sergei Karpushin",
-  phone: "+34 681 999 090",
-  plan: "EURO 12 Гб",
-  balance: 9,
-  monthlyFee: 8,
-  feeDate: "15.03.2026",
-  dataUsed: 0,
-  dataTotal: 0,
-  minutesLimit: null as string | null, // null = unlimited
-  financePlanFee: 0,
-  financeAdditional: 0,
-  financeTopUp: 9,
-  financeUsed: 0,
-  financeRemaining: 9,
-};
+import { fetchUser, type UserClient } from "@/lib/api";
 
 const AccountPage = () => {
   const { lang, setLang } = useLang();
   const [financesOpen, setFinancesOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const i = t(lang);
 
-  const user = mockUser;
+  const [user, setUser] = useState({
+    name: "",
+    phone: "",
+    plan: "EURO 12 Гб",
+    balance: 0,
+    monthlyFee: 8,
+    feeDate: "15.03.2026",
+    dataUsed: 0,
+    dataTotal: 0,
+    minutesLimit: null as string | null,
+    financePlanFee: 0,
+    financeAdditional: 0,
+    financeTopUp: 0,
+    financeUsed: 0,
+    financeRemaining: 0,
+  });
+
+  useEffect(() => {
+    fetchUser()
+      .then(({ data }) => {
+        const c = data.client;
+        setUser((prev) => ({
+          ...prev,
+          name: `${c.first_name || ""} ${c.second_name || ""}`.trim(),
+          phone: c.phone || "",
+          balance: c.balance ?? 0,
+          financeTopUp: c.balance ?? 0,
+          financeRemaining: c.balance ?? 0,
+        }));
+        if (c.lang === "en" || c.lang === "ru") {
+          setLang(c.lang);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+        if (err.message?.includes("401")) {
+          navigate("/");
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleLogout = () => {
     document.cookie = "auth_token=; path=/; max-age=0";
     navigate("/");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <InternalHeader lang={lang} onLangChange={setLang} />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

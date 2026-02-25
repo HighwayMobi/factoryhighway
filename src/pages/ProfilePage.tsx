@@ -47,6 +47,9 @@ const ProfilePage = () => {
       })
       .catch((err) => {
         console.error("Failed to fetch user:", err);
+        if (err.message?.includes("401")) {
+          navigate("/");
+        }
       })
       .finally(() => setLoading(false));
   }, []);
