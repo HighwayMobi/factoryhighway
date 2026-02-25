@@ -394,7 +394,7 @@ const LoginPage = () => {
                         "flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[13px] sm:text-sm font-semibold transition-all text-center",
                         topUpMode === "balance" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       )}>
-                      <CreditCard className="hidden sm:block h-4 w-4 shrink-0" />
+                      <span className="hidden sm:inline-flex"><CreditCard className="h-4 w-4 shrink-0" /></span>
                       {i.topup_tabBalance}
                     </button>
                     <button
@@ -402,8 +402,8 @@ const LoginPage = () => {
                       className={cn(
                         "flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[13px] sm:text-sm font-semibold transition-all text-center",
                         topUpMode === "buyGb" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                      )}>Add gigabytes
-                      <Wifi className="hidden sm:block h-4 w-4 shrink-0" />
+                      )}>
+                      <span className="hidden sm:inline-flex"><Wifi className="h-4 w-4 shrink-0" /></span>
                       {i.topup_tabBuyGb}
                     </button>
                   </div>
