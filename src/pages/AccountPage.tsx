@@ -21,13 +21,13 @@ const AccountPage = () => {
   const [user, setUser] = useState({
     name: "",
     phone: "",
-    plan: "EURO 12 Гб",
+    plan: "",
     balance: 0,
-    monthlyFee: 8,
-    feeDate: "15.03.2026",
+    monthlyFee: 0,
+    feeDate: "",
     dataUsed: 0,
     dataTotal: 0,
-    minutesLimit: null as string | null,
+    minutesLimit: null as number | null,
     financePlanFee: 0,
     financeAdditional: 0,
     financeTopUp: 0,
@@ -39,13 +39,35 @@ const AccountPage = () => {
     fetchUser()
       .then(({ data }) => {
         const c = data.client;
+        const sub = c.subscribers;
+        const plan = sub?.paid_plan;
+        const remains = sub?.remains;
+
+        const planName = plan?.local_name?.[lang] || plan?.name || "";
+        const payDay = sub?.paymentDay;
+        const now = new Date();
+        let feeDate = "";
+        if (payDay) {
+          const month = now.getDate() > payDay ? now.getMonth() + 2 : now.getMonth() + 1;
+          const year = now.getFullYear() + (month > 12 ? 1 : 0);
+          const m = ((month - 1) % 12) + 1;
+          feeDate = `${String(payDay).padStart(2, "0")}.${String(m).padStart(2, "0")}.${year}`;
+        }
+
         setUser((prev) => ({
           ...prev,
           name: `${c.first_name || ""} ${c.second_name || ""}`.trim(),
           phone: c.phone || "",
-          balance: c.balance ?? 0,
-          financeTopUp: c.balance ?? 0,
-          financeRemaining: c.balance ?? 0,
+          balance: sub?.balance ?? c.balance ?? 0,
+          plan: planName,
+          monthlyFee: plan?.price ?? 0,
+          feeDate,
+          dataTotal: plan?.gb ?? 0,
+          dataUsed: remains?.gb ?? 0,
+          minutesLimit: plan?.minutes === 0 ? null : (plan?.minutes ?? null),
+          financeTopUp: sub?.balance ?? 0,
+          financeRemaining: sub?.balance ?? 0,
+          financePlanFee: plan?.price ?? 0,
         }));
         if (c.lang === "en" || c.lang === "ru") {
           setLang(c.lang);
