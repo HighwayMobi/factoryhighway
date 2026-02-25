@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Smartphone, Mail, CreditCard, Shield, ChevronDown } from "lucide-react";
+import { Mail, CreditCard, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type Lang } from "@/lib/i18n";
 import InternalHeader from "@/components/InternalHeader";
 
 const amountPresets = [5, 10, 20, 50];
 
+// Mock — later from auth/context
+const mockPhone = "+34 681 999 090";
+
 const TopUpPage = () => {
-  const [phoneCode, setPhoneCode] = useState("+34");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [amount, setAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ const TopUpPage = () => {
   };
 
   const displayAmount = amount ? parseFloat(amount) : 0;
-  const isValid = phoneNumber.length >= 6 && displayAmount >= 3 && email.includes("@");
+  const isValid = displayAmount >= 3 && email.includes("@");
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -48,28 +49,10 @@ const TopUpPage = () => {
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-          {/* Phone */}
-          <div className="mb-6">
-            <label className="mb-2 block text-sm font-medium text-foreground">
-              Номер телефона
-            </label>
-            <div className="flex gap-2">
-              <div className="flex items-center gap-1 rounded-xl border border-border bg-secondary px-3 py-3 text-sm font-medium text-secondary-foreground">
-                <span>🇪🇸</span>
-                <span>{phoneCode}</span>
-                <ChevronDown className="h-3 w-3 text-muted-foreground" />
-              </div>
-              <div className="relative flex-1">
-                <Smartphone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="tel"
-                  placeholder="123 456 789"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="h-full w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-              </div>
-            </div>
+          {/* Phone (read-only) */}
+          <div className="mb-6 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+            <span className="text-sm text-muted-foreground">Номер телефона</span>
+            <span className="text-sm font-semibold text-foreground">{mockPhone}</span>
           </div>
 
           {/* Amount */}
