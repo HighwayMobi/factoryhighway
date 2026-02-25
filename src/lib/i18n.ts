@@ -84,6 +84,7 @@ const translations = {
     prof_newPassword: "Новый пароль",
     prof_confirmPassword: "Подтвердите пароль",
     prof_update: "Изменить",
+    prof_passwordMismatch: "Пароли не совпадают",
     prof_saved: "Данные сохранены",
   },
   en: {
@@ -169,6 +170,7 @@ const translations = {
     prof_newPassword: "New password",
     prof_confirmPassword: "Confirm password",
     prof_update: "Update",
+    prof_passwordMismatch: "Passwords do not match",
     prof_saved: "Data saved",
   },
 } as const;

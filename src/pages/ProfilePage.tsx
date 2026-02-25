@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
@@ -33,6 +33,10 @@ const ProfilePage = () => {
   const [email, setEmail] = useState(mockProfile.email);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const passwordsMatch = newPassword === "" || confirmPassword === "" || newPassword === confirmPassword;
 
   const inputClass =
     "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
@@ -125,11 +129,24 @@ const ProfilePage = () => {
           <div className="pt-4 space-y-4">
             <div>
               <label className={labelClass}>{i.prof_newPassword}</label>
-              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputClass} />
+              <div className="relative">
+                <input type={showNewPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputClass + " pr-10"} />
+                <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             <div>
               <label className={labelClass}>{i.prof_confirmPassword}</label>
-              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
+              <div className="relative">
+                <input type={showConfirmPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass + " pr-10"} />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {!passwordsMatch && (
+                <p className="mt-1.5 text-xs text-destructive">{i.prof_passwordMismatch}</p>
+              )}
             </div>
           </div>
 
