@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Mail, CreditCard, Shield } from "lucide-react";
+import { Mail, CreditCard, Shield, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { type Lang } from "@/lib/i18n";
 import InternalHeader from "@/components/InternalHeader";
@@ -14,6 +15,7 @@ const TopUpPage = () => {
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [email, setEmail] = useState("");
   const [lang, setLang] = useState<Lang>("ru");
+  const navigate = useNavigate();
 
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
@@ -38,7 +40,14 @@ const TopUpPage = () => {
       <InternalHeader lang={lang} onLangChange={setLang} />
 
       {/* Main */}
-      <main className="mx-auto max-w-lg px-4 py-8 sm:py-12">
+      <main className="mx-auto w-full max-w-lg px-4 py-8 sm:py-12">
+        <button
+          onClick={() => navigate("/account")}
+          className="mb-6 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Назад
+        </button>
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Пополнение баланса
