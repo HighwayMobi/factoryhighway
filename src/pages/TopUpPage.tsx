@@ -1,23 +1,33 @@
-import { useState } from "react";
-import { CreditCard, Shield, ArrowLeft } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CreditCard, Shield, ArrowLeft, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
+import { fetchUser } from "@/lib/api";
 
 const amountPresets = [5, 10, 20, 50];
-
-// Mock — later from auth/context
-const mockPhone = "+34 681 999 090";
-const mockEmail = "sergei@example.com";
 
 const TopUpPage = () => {
   const [amount, setAmount] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
+  const [email, setEmail] = useState("");
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [phone, setPhone] = useState("");
   const { lang, setLang } = useLang();
   const navigate = useNavigate();
   const i = t(lang);
+
+  useEffect(() => {
+    fetchUser()
+      .then(({ data }) => {
+        const c = data.client;
+        setEmail(c.email || "");
+        setPhone(c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "");
+      })
+      .catch(() => {});
+  }, []);
 
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
@@ -63,7 +73,7 @@ const TopUpPage = () => {
           {/* Phone (read-only) */}
           <div className="mb-6 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
             <span className="text-sm text-muted-foreground">{i.phoneLabel}</span>
-            <span className="text-sm font-semibold text-foreground">{mockPhone}</span>
+            <span className="text-sm font-semibold text-foreground">{phone}</span>
           </div>
 
           {/* Amount */}
@@ -100,10 +110,36 @@ const TopUpPage = () => {
             </div>
           </div>
 
-          {/* Email (read-only) */}
-          <div className="mb-8 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
-            <span className="text-sm text-muted-foreground">{i.emailReceipt}</span>
-            <span className="text-sm font-semibold text-foreground">{mockEmail}</span>
+          {/* Email (editable) */}
+          <div className="mb-8 rounded-xl bg-secondary/60 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">{i.emailReceipt}</span>
+              {editingEmail ? (
+                <button
+                  onClick={() => setEditingEmail(false)}
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  OK
+                </button>
+              ) : (
+                <button
+                  onClick={() => setEditingEmail(true)}
+                  className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                >
+                  <Pencil className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+            {editingEmail ? (
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              />
+            ) : (
+              <span className="mt-1 block text-sm font-semibold text-foreground">{email}</span>
+            )}
           </div>
 
           {/* Divider + Summary */}
