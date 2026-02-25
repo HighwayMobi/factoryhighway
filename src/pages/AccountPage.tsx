@@ -29,7 +29,7 @@ const mockUser = {
 
 const AccountPage = () => {
   const { lang, setLang } = useLang();
-  const [financesOpen, setFinancesOpen] = useState(true);
+  const [financesOpen, setFinancesOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const navigate = useNavigate();
