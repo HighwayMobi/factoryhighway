@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser } from "@/lib/api";
+import { fetchUser, apiFetch } from "@/lib/api";
 
 const ProfilePage = () => {
   const { lang, setLang } = useLang();
@@ -65,9 +65,21 @@ const ProfilePage = () => {
   const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
   const sectionTitle = "flex items-center gap-2 text-base font-bold text-foreground mb-4";
 
-  const handleSaveLang = () => {
-    setLang(selectedLang);
-    // TODO: API call to save language
+  const [savingLang, setSavingLang] = useState(false);
+
+  const handleSaveLang = async () => {
+    setSavingLang(true);
+    try {
+      await apiFetch("api/lang", {
+        method: "PUT",
+        body: JSON.stringify({ lang: selectedLang }),
+      });
+      setLang(selectedLang);
+    } catch (err) {
+      console.error("Failed to save language:", err);
+    } finally {
+      setSavingLang(false);
+    }
   };
 
   const handleChangePassword = () => {
@@ -182,9 +194,10 @@ const ProfilePage = () => {
           </select>
           <button
             onClick={handleSaveLang}
-            className="mt-4 w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98]"
+            disabled={savingLang || selectedLang === lang}
+            className="mt-4 w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
           >
-            {i.prof_save}
+            {savingLang ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : i.prof_save}
           </button>
         </div>
 
