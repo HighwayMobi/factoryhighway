@@ -63,6 +63,13 @@
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
   }
+
+  /* Prevent iOS Safari auto-zoom on input focus */
+  @supports (-webkit-touch-callout: none) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @layer utilities {
