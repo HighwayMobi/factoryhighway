@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
-  Smartphone, CreditCard, Shield, Loader2 } from
+  Smartphone, CreditCard, Shield, Loader2, Wifi } from
 "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -15,8 +15,14 @@ import {
 
 type AuthTab = "email" | "phone";
 type ActiveSection = "login" | "topup";
+type TopUpMode = "balance" | "buyGb";
 
 const amountPresets = [5, 10, 20, 50];
+const gbPackages = [
+  { gb: 1, price: 3 },
+  { gb: 5, price: 6 },
+  { gb: 20, price: 10, popular: true },
+];
 const languages: {code: "ru" | "en";label: string;}[] = [
 { code: "ru", label: "RU" },
 { code: "en", label: "EN" }];
@@ -47,6 +53,8 @@ const LoginPage = () => {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState<{type: "ok" | "err";text: string;} | null>(null);
   const [apiResponse, setApiResponse] = useState<string | null>(null);
+  const [topUpMode, setTopUpMode] = useState<TopUpMode>("balance");
+  const [selectedGbPkg, setSelectedGbPkg] = useState<typeof gbPackages[0] | null>(null);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -70,6 +78,7 @@ const LoginPage = () => {
 
   const displayAmount = amount ? parseFloat(amount) : 0;
   const isTopUpValid = phoneDigits(topUpPhone).length === 9 && displayAmount >= 3 && topUpEmail.includes("@");
+  const isGbValid = phoneDigits(topUpPhone).length === 9 && topUpEmail.includes("@") && selectedGbPkg !== null;
 
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
@@ -377,9 +386,29 @@ const LoginPage = () => {
             <div className={cn("grid transition-all duration-300 ease-in-out", activeSection === "topup" ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="border-t border-border px-6 pb-6 pt-5 sm:px-8 sm:pb-8">
-                  
+                   {/* Sub-tabs: Balance / Buy GB */}
+                  <div className="mb-5 flex rounded-xl bg-secondary p-1">
+                    <button
+                      onClick={() => setTopUpMode("balance")}
+                      className={cn(
+                        "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                        topUpMode === "balance" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                      )}>
+                      <CreditCard className="h-4 w-4" />
+                      {i.topup_tabBalance}
+                    </button>
+                    <button
+                      onClick={() => setTopUpMode("buyGb")}
+                      className={cn(
+                        "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                        topUpMode === "buyGb" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                      )}>
+                      <Wifi className="h-4 w-4" />
+                      {i.topup_tabBuyGb}
+                    </button>
+                  </div>
 
-                  {/* Phone */}
+                  {/* Phone (shared) */}
                   <div className="mb-5">
                     <label className="mb-2 block text-sm font-medium text-foreground">{i.phoneLabel}</label>
                     <div className="flex gap-2">
@@ -395,87 +424,166 @@ const LoginPage = () => {
                           value={topUpPhone}
                           onChange={(e) => handlePhoneChange(e.target.value, setTopUpPhone)}
                           className="h-full w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
-
                       </div>
                     </div>
                   </div>
 
-                  {/* Amount */}
-                  <div className="mb-5">
-                    <label className="mb-2 block text-sm font-medium text-foreground">{i.amountLabel}</label>
-                    <div className="mb-3 grid grid-cols-4 gap-2">
-                      {amountPresets.map((preset) =>
+                  {topUpMode === "balance" ? (
+                    <>
+                      {/* Amount */}
+                      <div className="mb-5">
+                        <label className="mb-2 block text-sm font-medium text-foreground">{i.amountLabel}</label>
+                        <div className="mb-3 grid grid-cols-4 gap-2">
+                          {amountPresets.map((preset) =>
+                            <button
+                              key={preset}
+                              onClick={() => handlePresetClick(preset)}
+                              className={cn(
+                                "rounded-xl border py-2.5 text-sm font-semibold transition-all",
+                                selectedPreset === preset ?
+                                "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25" :
+                                "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
+                              )}>
+                              €{preset}
+                            </button>
+                          )}
+                        </div>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">€</span>
+                          <input
+                            type="number"
+                            min="3"
+                            placeholder={i.otherAmount}
+                            value={amount}
+                            onChange={(e) => handleAmountChange(e.target.value)}
+                            className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                        </div>
+                      </div>
+
+                      {/* Email */}
+                      <div className="mb-6">
+                        <label className="mb-2 block text-sm font-medium text-foreground">{i.emailReceipt}</label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <input
+                            type="email"
+                            placeholder="mail@example.com"
+                            value={topUpEmail}
+                            onChange={(e) => setTopUpEmail(e.target.value)}
+                            className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                        </div>
+                      </div>
+
+                      {/* Summary */}
+                      <div className="mb-5 rounded-xl bg-secondary/60 p-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">{i.topUpAmount}</span>
+                          <span className="font-mono text-lg font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">{i.commission}</span>
+                          <span className="text-sm font-semibold text-primary">{i.free}</span>
+                        </div>
+                        <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
+                          <span className="text-sm font-semibold text-foreground">{i.total}</span>
+                          <span className="font-mono text-xl font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      {/* Pay Button */}
                       <button
-                        key={preset}
-                        onClick={() => handlePresetClick(preset)}
+                        disabled={!isTopUpValid}
                         className={cn(
-                          "rounded-xl border py-2.5 text-sm font-semibold transition-all",
-                          selectedPreset === preset ?
-                          "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25" :
-                          "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
+                          "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                          isTopUpValid ?
+                          "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                          "bg-muted text-muted-foreground cursor-not-allowed"
                         )}>
+                        <CreditCard className="h-4 w-4" />
+                        {i.payByCard}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {/* GB Packages */}
+                      <div className="mb-5 space-y-3">
+                        {gbPackages.map((pkg) => (
+                          <div
+                            key={pkg.gb}
+                            onClick={() => setSelectedGbPkg(selectedGbPkg?.gb === pkg.gb ? null : pkg)}
+                            className={cn(
+                              "relative cursor-pointer rounded-2xl border p-4 transition-all",
+                              selectedGbPkg?.gb === pkg.gb
+                                ? "border-primary ring-2 ring-primary/20 bg-primary/5"
+                                : pkg.popular
+                                  ? "border-primary/40 bg-card"
+                                  : "border-border bg-card hover:border-primary/40"
+                            )}
+                          >
+                            {pkg.popular && (
+                              <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+                                {i.buyGb_popular}
+                              </span>
+                            )}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                                  <Wifi className="h-5 w-5 text-primary" />
+                                </div>
+                                <span className="text-lg font-bold text-foreground">{pkg.gb} GB</span>
+                              </div>
+                              <span className="text-lg font-bold text-primary">€{pkg.price}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
 
-                          €{preset}
-                        </button>
+                      {/* Email */}
+                      <div className="mb-6">
+                        <label className="mb-2 block text-sm font-medium text-foreground">{i.emailReceipt}</label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <input
+                            type="email"
+                            placeholder="mail@example.com"
+                            value={topUpEmail}
+                            onChange={(e) => setTopUpEmail(e.target.value)}
+                            className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                        </div>
+                      </div>
+
+                      {/* Summary for GB */}
+                      {selectedGbPkg && (
+                        <div className="mb-5 rounded-xl bg-secondary/60 p-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">{selectedGbPkg.gb} GB</span>
+                            <span className="font-mono text-lg font-bold text-foreground">€{selectedGbPkg.price.toFixed(2)}</span>
+                          </div>
+                          <div className="mt-2 flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">{i.commission}</span>
+                            <span className="text-sm font-semibold text-primary">{i.free}</span>
+                          </div>
+                          <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
+                            <span className="text-sm font-semibold text-foreground">{i.total}</span>
+                            <span className="font-mono text-xl font-bold text-foreground">€{selectedGbPkg.price.toFixed(2)}</span>
+                          </div>
+                        </div>
                       )}
-                    </div>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">€</span>
-                      <input
-                        type="number"
-                        min="3"
-                        placeholder={i.otherAmount}
-                        value={amount}
-                        onChange={(e) => handleAmountChange(e.target.value)}
-                        className="w-full rounded-xl border border-border bg-background py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
 
-                    </div>
-                  </div>
-
-                  {/* Email */}
-                  <div className="mb-6">
-                    <label className="mb-2 block text-sm font-medium text-foreground">{i.emailReceipt}</label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <input
-                        type="email"
-                        placeholder="mail@example.com"
-                        value={topUpEmail}
-                        onChange={(e) => setTopUpEmail(e.target.value)}
-                        className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
-
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  <div className="mb-5 rounded-xl bg-secondary/60 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">{i.topUpAmount}</span>
-                      <span className="font-mono text-lg font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">{i.commission}</span>
-                      <span className="text-sm font-semibold text-primary">{i.free}</span>
-                    </div>
-                    <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">{i.total}</span>
-                      <span className="font-mono text-xl font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Pay Button */}
-                  <button
-                    disabled={!isTopUpValid}
-                    className={cn(
-                      "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                      isTopUpValid ?
-                      "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
-                      "bg-muted text-muted-foreground cursor-not-allowed"
-                    )}>
-
-                    <CreditCard className="h-4 w-4" />
-                    {i.payByCard}
-                  </button>
+                      {/* Pay Button */}
+                      <button
+                        disabled={!isGbValid}
+                        className={cn(
+                          "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                          isGbValid ?
+                          "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                          "bg-muted text-muted-foreground cursor-not-allowed"
+                        )}>
+                        <CreditCard className="h-4 w-4" />
+                        {i.payByCard}
+                      </button>
+                    </>
+                  )}
 
                   <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">

@@ -101,6 +101,8 @@ const translations = {
     buyGb_confirm: "Подтвердить",
     buyGb_cancel: "Отмена",
     buyGb_month: "/мес",
+    topup_tabBalance: "Пополнить баланс",
+    topup_tabBuyGb: "Купить гигабайты",
     // Change Plan page
     cp_title: "Сменить тариф",
     cp_subtitle: "Выберите новый тарифный план",
@@ -217,6 +219,8 @@ const translations = {
     buyGb_confirm: "Confirm",
     buyGb_cancel: "Cancel",
     buyGb_month: "/mo",
+    topup_tabBalance: "Top up balance",
+    topup_tabBuyGb: "Buy gigabytes",
     // Change Plan page
     cp_title: "Change Plan",
     cp_subtitle: "Choose a new plan",
