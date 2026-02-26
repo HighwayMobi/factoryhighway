@@ -55,6 +55,7 @@ const LoginPage = () => {
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [topUpMode, setTopUpMode] = useState<TopUpMode>("balance");
   const [selectedGbPkg, setSelectedGbPkg] = useState<typeof gbPackages[0] | null>(null);
+  const [paying, setPaying] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -83,6 +84,32 @@ const LoginPage = () => {
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
     setAmount(String(value));
+  };
+
+  const handlePublicPay = async (payAmount: number, payPhone: string, payEmail: string) => {
+    if (paying) return;
+    setPaying(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-topup-checkout`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+          body: JSON.stringify({ amount: payAmount, email: payEmail, phone: `+34${phoneDigits(payPhone)}` }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Payment error");
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL");
+      }
+    } catch {
+      toast({ title: i.topup_error, variant: "destructive" });
+    } finally {
+      setPaying(false);
+    }
   };
 
   // Format Spanish phone: starts with 6 or 7, max 9 digits, formatted as XXX XXX XXX
@@ -492,15 +519,16 @@ const LoginPage = () => {
 
                       {/* Pay Button */}
                       <button
-                      disabled={!isTopUpValid}
+                      disabled={!isTopUpValid || paying}
+                      onClick={() => handlePublicPay(displayAmount, topUpPhone, topUpEmail)}
                       className={cn(
                         "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                        isTopUpValid ?
+                        isTopUpValid && !paying ?
                         "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
                         "bg-muted text-muted-foreground cursor-not-allowed"
                       )}>
-                        <CreditCard className="h-4 w-4" />
-                        {i.payByCard}
+                        {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
+                        {paying ? i.topup_processing : i.payByCard}
                       </button>
                     </> :
 
@@ -572,15 +600,16 @@ const LoginPage = () => {
 
                       {/* Pay Button */}
                       <button
-                      disabled={!isGbValid}
+                      disabled={!isGbValid || paying}
+                      onClick={() => selectedGbPkg && handlePublicPay(selectedGbPkg.price, topUpPhone, topUpEmail)}
                       className={cn(
                         "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                        isGbValid ?
+                        isGbValid && !paying ?
                         "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
                         "bg-muted text-muted-foreground cursor-not-allowed"
                       )}>
-                        <CreditCard className="h-4 w-4" />
-                        {i.payByCard}
+                        {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
+                        {paying ? i.topup_processing : i.payByCard}
                       </button>
                     </>
                   }
