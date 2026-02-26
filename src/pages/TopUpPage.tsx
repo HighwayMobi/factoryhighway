@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { CreditCard, Shield, ArrowLeft, Pencil } from "lucide-react";
+import { CreditCard, Shield, ArrowLeft, Pencil, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const amountPresets = [5, 10, 20, 50];
 
@@ -15,6 +17,7 @@ const TopUpPage = () => {
   const [email, setEmail] = useState("");
   const [editingEmail, setEditingEmail] = useState(false);
   const [phone, setPhone] = useState("");
+  const [paying, setPaying] = useState(false);
   const { lang, setLang } = useLang();
   const navigate = useNavigate();
   const i = t(lang);
@@ -46,6 +49,26 @@ const TopUpPage = () => {
 
   const displayAmount = amount ? parseFloat(amount) : 0;
   const isValid = displayAmount >= 3;
+
+  const handlePay = async () => {
+    if (!isValid || paying) return;
+    setPaying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-topup-checkout", {
+        body: { amount: displayAmount, email, phone },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL");
+      }
+    } catch {
+      toast({ title: i.topup_error, variant: "destructive" });
+    } finally {
+      setPaying(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -161,16 +184,21 @@ const TopUpPage = () => {
 
           {/* Pay Button */}
           <button
-            disabled={!isValid}
+            disabled={!isValid || paying}
+            onClick={handlePay}
             className={cn(
               "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-              isValid
+              isValid && !paying
                 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
                 : "bg-muted text-muted-foreground cursor-not-allowed"
             )}
           >
-            <CreditCard className="h-4 w-4" />
-            {i.payByCard}
+            {paying ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CreditCard className="h-4 w-4" />
+            )}
+            {paying ? i.topup_processing : i.payByCard}
           </button>
 
           {/* Trust badges */}
