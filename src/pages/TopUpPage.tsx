@@ -6,7 +6,6 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser } from "@/lib/api";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 const amountPresets = [5, 10, 20, 50];
@@ -54,10 +53,16 @@ const TopUpPage = () => {
     if (!isValid || paying) return;
     setPaying(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-topup-checkout", {
-        body: { amount: displayAmount, email, phone },
-      });
-      if (error) throw error;
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-topup-checkout`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+          body: JSON.stringify({ amount: displayAmount, email, phone }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Payment error");
       if (data?.url) {
         window.location.href = data.url;
       } else {
