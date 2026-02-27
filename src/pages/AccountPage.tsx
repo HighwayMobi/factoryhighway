@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import {
   LogOut, User, Wifi, Phone as PhoneIcon,
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
+  ChevronLeft, Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useNavigate } from "react-router-dom";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, apiFetch, clearAuthToken, type UserClient } from "@/lib/api";
+import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient } from "@/lib/api";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -22,6 +23,11 @@ const AccountPage = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [cancellingPlan, setCancellingPlan] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [financeMonth, setFinanceMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() }; // 0-indexed
+  });
+  const [financeLoading, setFinanceLoading] = useState(false);
   const navigate = useNavigate();
   const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; topUp: number; used: number; remaining: number } | null>(null);
   const [user, setUser] = useState({
@@ -91,26 +97,8 @@ const AccountPage = () => {
         subscriberId: sub?.id ?? null,
       }));
 
-      // Fetch finance data
-      if (sub?.id) {
-        try {
-          const now = new Date();
-          const dateParam = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-          const finRes = await apiFetch(`api/finance?subscriber_id=${sub.id}&date=${dateParam}`);
-          if (finRes?.success !== false && finRes?.data) {
-            const d = finRes.data;
-            setFinance({
-              planFee: d.plan_fee ?? d.planFee ?? 0,
-              additionalServices: d.additional_services ?? d.additionalServices ?? 0,
-              topUp: d.top_up ?? d.topUp ?? d.topup ?? 0,
-              used: d.used ?? d.total_used ?? 0,
-              remaining: d.remaining ?? d.balance ?? 0,
-            });
-          }
-        } catch (e) {
-          console.error("Failed to fetch finance:", e);
-        }
-      }
+      // Finance is loaded separately via loadFinance
+
       if (c.lang === "en" || c.lang === "ru") {
         setLang(c.lang);
       }
@@ -122,9 +110,41 @@ const AccountPage = () => {
     }
   };
 
+  const loadFinance = async (year: number, month: number) => {
+    if (!user.subscriberId) return;
+    setFinanceLoading(true);
+    try {
+      const dateParam = `${year}-${String(month + 1).padStart(2, "0")}`;
+      const finRes = await apiFetch(`api/finance?subscriber_id=${user.subscriberId}&date=${dateParam}`);
+      if (finRes?.success !== false && finRes?.data) {
+        const d = finRes.data;
+        setFinance({
+          planFee: d.plan_fee ?? d.planFee ?? 0,
+          additionalServices: d.additional_services ?? d.additionalServices ?? 0,
+          topUp: d.top_up ?? d.topUp ?? d.topup ?? 0,
+          used: d.used ?? d.total_used ?? 0,
+          remaining: d.remaining ?? d.balance ?? 0,
+        });
+      } else {
+        setFinance(null);
+      }
+    } catch (e) {
+      console.error("Failed to fetch finance:", e);
+      setFinance(null);
+    } finally {
+      setFinanceLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadData().finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (user.subscriberId) {
+      loadFinance(financeMonth.year, financeMonth.month);
+    }
+  }, [financeMonth, user.subscriberId]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -307,29 +327,91 @@ const AccountPage = () => {
             <div className={cn("grid transition-all duration-300 ease-in-out", financesOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="border-t border-border">
-                  <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
-                    <span className="text-sm text-foreground">{i.acc_planFee}</span>
-                    <span className="text-sm font-semibold text-primary">- {finance?.planFee ?? user.monthlyFee}€</span>
+                  {/* Month selector */}
+                  <div className="px-6 py-3 flex items-center justify-between border-b border-border">
+                    <button
+                      onClick={() => {
+                        const prev = financeMonth.month === 0
+                          ? { year: financeMonth.year - 1, month: 11 }
+                          : { year: financeMonth.year, month: financeMonth.month - 1 };
+                        setFinanceMonth(prev);
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <span className="text-sm font-semibold text-foreground">
+                      {i.acc_months[financeMonth.month]} {financeMonth.year}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const now = new Date();
+                        const isCurrentMonth = financeMonth.year === now.getFullYear() && financeMonth.month === now.getMonth();
+                        if (isCurrentMonth) return;
+                        const next = financeMonth.month === 11
+                          ? { year: financeMonth.year + 1, month: 0 }
+                          : { year: financeMonth.year, month: financeMonth.month + 1 };
+                        setFinanceMonth(next);
+                      }}
+                      disabled={financeMonth.year === new Date().getFullYear() && financeMonth.month === new Date().getMonth()}
+                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
-                    <span className="text-sm text-foreground">{i.acc_additionalServices}</span>
-                    <span className="text-sm font-semibold text-primary">- {finance?.additionalServices ?? 0}€</span>
-                  </div>
-                  <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
-                    <span className="text-sm text-foreground">{i.acc_topUpBalance}</span>
-                    <span className="text-sm font-semibold text-primary">+ {finance?.topUp ?? 0}€</span>
-                  </div>
-                  <div className="flex items-stretch rounded-b-2xl bg-primary text-primary-foreground">
-                    <div className="flex-1 px-6 py-3 flex flex-col items-start justify-center">
-                      <span className="text-xs font-medium opacity-90">{i.acc_used}</span>
-                      <span className="text-lg font-bold">{finance?.used ?? 0}€</span>
+
+                  {financeLoading ? (
+                    <div className="px-6 py-8 flex justify-center">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     </div>
-                    <div className="w-px bg-primary-foreground/30 my-2" />
-                    <div className="flex-1 px-6 py-3 flex flex-col items-end justify-center">
-                      <span className="text-xs font-medium opacity-90">{i.acc_remaining}</span>
-                      <span className="text-lg font-bold">{finance?.remaining ?? user.balance}€</span>
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
+                        <span className="text-sm text-foreground">{i.acc_planFee}</span>
+                        <span className="text-sm font-semibold text-primary">- {finance?.planFee ?? user.monthlyFee}€</span>
+                      </div>
+                      <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
+                        <span className="text-sm text-foreground">{i.acc_additionalServices}</span>
+                        <span className="text-sm font-semibold text-primary">- {finance?.additionalServices ?? 0}€</span>
+                      </div>
+                      <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
+                        <span className="text-sm text-foreground">{i.acc_topUpBalance}</span>
+                        <span className="text-sm font-semibold text-primary">+ {finance?.topUp ?? 0}€</span>
+                      </div>
+                      {/* Invoice download for past months */}
+                      {(() => {
+                        const now = new Date();
+                        const isCurrentMonth = financeMonth.year === now.getFullYear() && financeMonth.month === now.getMonth();
+                        if (!isCurrentMonth && user.subscriberId) {
+                          const dateParam = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
+                          const invoiceUrl = `https://sim.highway.mobi/web/api/invoice?subscriber_id=${user.subscriberId}&date=${dateParam}&token=${getAuthToken()}`;
+                          return (
+                            <a
+                              href={invoiceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 px-6 py-3.5 border-b border-border text-sm font-semibold text-primary transition-colors hover:bg-secondary/50"
+                            >
+                              <Download className="h-4 w-4" />
+                              {i.acc_downloadInvoice}
+                            </a>
+                          );
+                        }
+                        return null;
+                      })()}
+                      <div className="flex items-stretch rounded-b-2xl bg-primary text-primary-foreground">
+                        <div className="flex-1 px-6 py-3 flex flex-col items-start justify-center">
+                          <span className="text-xs font-medium opacity-90">{i.acc_used}</span>
+                          <span className="text-lg font-bold">{finance?.used ?? 0}€</span>
+                        </div>
+                        <div className="w-px bg-primary-foreground/30 my-2" />
+                        <div className="flex-1 px-6 py-3 flex flex-col items-end justify-center">
+                          <span className="text-xs font-medium opacity-90">{i.acc_remaining}</span>
+                          <span className="text-lg font-bold">{finance?.remaining ?? user.balance}€</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
