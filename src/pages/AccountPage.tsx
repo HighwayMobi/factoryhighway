@@ -140,7 +140,7 @@ const AccountPage = () => {
     try {
       await apiFetch("api/paidPlan", {
         method: "PUT",
-        body: JSON.stringify({ subscriber_id: user.subscriberId, paid_plan_id: null }),
+        body: JSON.stringify({ subscriber_id: user.subscriberId, plan_id: null }),
       });
       await loadData();
     } catch (err) {
