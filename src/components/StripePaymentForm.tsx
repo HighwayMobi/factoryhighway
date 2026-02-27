@@ -39,17 +39,32 @@ const StripePaymentForm = ({
   const [error, setError] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
 
+  const toRelativePath = (value: string) => {
+    if (!value) return "/";
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      try {
+        const parsed = new URL(value);
+        return `${parsed.pathname}${parsed.search}${parsed.hash}` || "/";
+      } catch {
+        return "/";
+      }
+    }
+    return value.startsWith("/") ? value : `/${value}`;
+  };
+
   const handleComplete = useCallback(() => {
     setCompleted(true);
     onSuccess?.();
   }, [onSuccess]);
 
   const fetchClientSecret = useCallback(async () => {
+    const safeReturnPath = toRelativePath(`${window.location.pathname}${window.location.search}`);
+
     try {
       // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, backURL: "/", replenishment: false }),
+        body: JSON.stringify({ type, amount, phone, email, backURL: safeReturnPath, replenishment: false }),
       });
       if (!topUpResult.success) {
         throw new Error(topUpResult.message || "Failed to create top-up");
@@ -57,6 +72,16 @@ const StripePaymentForm = ({
 
       // Step 2: Init Stripe checkout using data from topUp response
       const { email: resEmail, name, amount: resAmount, product, metadata } = topUpResult.data;
+      const safeMetadata =
+        metadata && typeof metadata === "object"
+          ? {
+              ...(metadata as Record<string, unknown>),
+              backURL: safeReturnPath,
+              backUrl: safeReturnPath,
+              return_url: safeReturnPath,
+            }
+          : metadata;
+
       const checkoutResult = await apiFetch("api/checkout", {
         method: "POST",
         body: JSON.stringify({
@@ -64,8 +89,8 @@ const StripePaymentForm = ({
           email: resEmail,
           name,
           product,
-          return_url: `${window.location.origin}/`,
-          metadata,
+          return_url: safeReturnPath,
+          metadata: safeMetadata,
         }),
       });
       if (!checkoutResult.success) {
