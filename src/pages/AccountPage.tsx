@@ -249,28 +249,41 @@ const AccountPage = () => {
                 {i.acc_topUp}
               </button>
             </div>
-            <div className="bg-primary px-6 py-2.5 text-center text-xs font-medium text-primary-foreground">
-              {user.newPlan ? (
-                <div className="flex items-center justify-center gap-2 flex-wrap">
-                  <span>
-                    {lang === "ru"
-                      ? `С ${user.feeDate} тариф сменится на «${user.newPlan}» — €${user.newPlanPrice}/мес`
-                      : `From ${user.feeDate} plan changes to "${user.newPlan}" — €${user.newPlanPrice}/mo`}
-                  </span>
-                  <button
-                    onClick={() => setShowCancelConfirm(true)}
-                    disabled={cancellingPlan}
-                    className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
-                  >
-                    {cancellingPlan ? "..." : i.acc_cancelPlanChange}
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
-                </>
-              )}
-            </div>
+            {user.balance < 0 ? (
+              <div className="bg-destructive px-6 py-2.5 text-center text-xs font-medium text-destructive-foreground">
+                {i.acc_negativeBalance}{" "}
+                <button
+                  onClick={() => navigate("/topup")}
+                  className="underline font-semibold hover:opacity-80 transition-opacity"
+                >
+                  {i.acc_negativeBalanceLink}
+                </button>{" "}
+                {i.acc_negativeBalanceSuffix}
+              </div>
+            ) : (
+              <div className="bg-primary px-6 py-2.5 text-center text-xs font-medium text-primary-foreground">
+                {user.newPlan ? (
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <span>
+                      {lang === "ru"
+                        ? `С ${user.feeDate} тариф сменится на «${user.newPlan}» — €${user.newPlanPrice}/мес`
+                        : `From ${user.feeDate} plan changes to "${user.newPlan}" — €${user.newPlanPrice}/mo`}
+                    </span>
+                    <button
+                      onClick={() => setShowCancelConfirm(true)}
+                      disabled={cancellingPlan}
+                      className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
+                    >
+                      {cancellingPlan ? "..." : i.acc_cancelPlanChange}
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Data Usage */}
