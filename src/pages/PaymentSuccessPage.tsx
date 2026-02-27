@@ -14,7 +14,7 @@ const PaymentSuccessPage = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/account");
+      navigate("/account?refresh=1");
     }, REDIRECT_DELAY_MS);
     return () => clearTimeout(timer);
   }, [navigate]);
