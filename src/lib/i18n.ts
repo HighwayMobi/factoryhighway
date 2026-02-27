@@ -66,6 +66,7 @@ const translations = {
     acc_info: "Информация",
     acc_termsConditions: "Условия предоставления услуг",
     acc_privacyPolicy: "Политика конфиденциальности",
+    acc_cancelPlanChange: "Отменить",
     acc_logout: "Выйти",
     // Profile page
     prof_title: "Профиль",
@@ -189,6 +190,7 @@ const translations = {
     acc_info: "Information",
     acc_termsConditions: "Terms & conditions",
     acc_privacyPolicy: "Privacy policy",
+    acc_cancelPlanChange: "Cancel",
     acc_logout: "Log out",
     // Profile page
     prof_title: "Profile",

@@ -16,6 +16,7 @@ const AccountPage = () => {
   const [infoOpen, setInfoOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [cancellingPlan, setCancellingPlan] = useState(false);
   const navigate = useNavigate();
   const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; topUp: number; used: number; remaining: number } | null>(null);
   const [user, setUser] = useState({
@@ -128,6 +129,22 @@ const AccountPage = () => {
 
   const i = t(lang);
 
+  const handleCancelPlanChange = async () => {
+    if (!user.subscriberId) return;
+    setCancellingPlan(true);
+    try {
+      await apiFetch("api/paidPlan", {
+        method: "DELETE",
+        body: JSON.stringify({ subscriber_id: user.subscriberId }),
+      });
+      await loadData();
+    } catch (err) {
+      console.error("Failed to cancel plan change:", err);
+    } finally {
+      setCancellingPlan(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await apiFetch("api/logout");
@@ -208,11 +225,20 @@ const AccountPage = () => {
             </div>
             <div className="bg-primary px-6 py-2.5 text-center text-xs font-medium text-primary-foreground">
               {user.newPlan ? (
-                <>
-                  {lang === "ru"
-                    ? `С ${user.feeDate} тариф сменится на «${user.newPlan}» — €${user.newPlanPrice}/мес`
-                    : `From ${user.feeDate} plan changes to "${user.newPlan}" — €${user.newPlanPrice}/mo`}
-                </>
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <span>
+                    {lang === "ru"
+                      ? `С ${user.feeDate} тариф сменится на «${user.newPlan}» — €${user.newPlanPrice}/мес`
+                      : `From ${user.feeDate} plan changes to "${user.newPlan}" — €${user.newPlanPrice}/mo`}
+                  </span>
+                  <button
+                    onClick={handleCancelPlanChange}
+                    disabled={cancellingPlan}
+                    className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
+                  >
+                    {cancellingPlan ? "..." : i.acc_cancelPlanChange}
+                  </button>
+                </div>
               ) : (
                 <>
                   {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeDate} {user.feeDate}
