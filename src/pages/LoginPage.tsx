@@ -535,11 +535,7 @@ const LoginPage = () => {
                       amount={displayAmount}
                       email={topUpEmail}
                       phone={`+34${phoneDigits(topUpPhone)}`}
-                      onSuccess={() => setPaymentSuccess(true)}
-                      onError={(msg) => toast({ title: msg, variant: "destructive" })}
                       onCancel={() => setShowPaymentForm(false)}
-                      payLabel={i.payByCard}
-                      processingLabel={i.topup_processing}
                       secureLabel={i.securePayment}
                       cancelLabel={i.topup_back} /> :
 
@@ -639,11 +635,7 @@ const LoginPage = () => {
                       amount={selectedGbPkg!.price}
                       email={topUpEmail}
                       phone={`+34${phoneDigits(topUpPhone)}`}
-                      onSuccess={() => setPaymentSuccess(true)}
-                      onError={(msg) => toast({ title: msg, variant: "destructive" })}
                       onCancel={() => setShowPaymentForm(false)}
-                      payLabel={i.payByCard}
-                      processingLabel={i.topup_processing}
                       secureLabel={i.securePayment}
                       cancelLabel={i.topup_back} /> :
 

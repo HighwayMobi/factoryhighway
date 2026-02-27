@@ -24,7 +24,7 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Look up or skip customer
+    // Look up existing customer
     let customerId: string | undefined;
     if (email) {
       const customers = await stripe.customers.list({ email, limit: 1 });
@@ -36,6 +36,7 @@ serve(async (req) => {
     const origin = req.headers.get("origin") || "https://sim-highway.lovable.app";
 
     const session = await stripe.checkout.sessions.create({
+      ui_mode: "embedded",
       customer: customerId,
       customer_email: customerId ? undefined : email || undefined,
       line_items: [
@@ -52,18 +53,20 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${origin}/account?topup=success`,
-      cancel_url: `${origin}/top-up?topup=cancelled`,
+      return_url: `${origin}/account?topup=success`,
       metadata: {
         phone: phone || "",
         amount: String(amount),
       },
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({ clientSecret: session.client_secret }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ error: message }), {
