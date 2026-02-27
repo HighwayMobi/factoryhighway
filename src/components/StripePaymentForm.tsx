@@ -11,6 +11,8 @@ const stripePromise = loadStripe(
   "pk_test_51S7bGLQM5BJ4b1inXCowPXEgmkzDv5FTUew7zeTUEqzz9OSm4erZg8Pw5HUp8X3cfc2O64EIPEA43osR4Q0BjOvS00xLdjkHCZ"
 );
 
+const SUCCESS_REDIRECT_URL = "https://sim-highway.lovable.app/payment-success";
+
 interface StripePaymentFormProps {
   amount: number;
   email: string;
@@ -40,8 +42,9 @@ const StripePaymentForm = ({
   const [completed, setCompleted] = useState(false);
 
   const handleComplete = useCallback(() => {
-    setCompleted(true);
     onSuccess?.();
+    window.location.replace(SUCCESS_REDIRECT_URL);
+    setCompleted(true);
   }, [onSuccess]);
 
   const fetchClientSecret = useCallback(async () => {
