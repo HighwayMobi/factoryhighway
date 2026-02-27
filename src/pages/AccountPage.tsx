@@ -161,9 +161,9 @@ const AccountPage = () => {
     if (!user.subscriberId) return;
     setCancellingPlan(true);
     try {
-      await apiFetch("api/paidPlan", {
-        method: "PUT",
-        body: JSON.stringify({ subscriber_id: user.subscriberId, plan_id: null }),
+      await apiFetch("api/cancelService", {
+        method: "POST",
+        body: JSON.stringify({ service: "ChangePaidPlan", subscriber_id: user.subscriberId }),
       });
       await loadData();
     } catch (err) {
