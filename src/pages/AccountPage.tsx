@@ -207,7 +207,17 @@ const AccountPage = () => {
               </button>
             </div>
             <div className="bg-primary px-6 py-2.5 text-center text-xs font-medium text-primary-foreground">
-              {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeDate} {user.feeDate}
+              {user.newPlan ? (
+                <>
+                  {lang === "ru"
+                    ? `С ${user.feeDate} тариф сменится на «${user.newPlan}» — €${user.newPlanPrice}/мес`
+                    : `From ${user.feeDate} plan changes to "${user.newPlan}" — €${user.newPlanPrice}/mo`}
+                </>
+              ) : (
+                <>
+                  {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeDate} {user.feeDate}
+                </>
+              )}
             </div>
           </div>
 
