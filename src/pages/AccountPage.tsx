@@ -134,8 +134,8 @@ const AccountPage = () => {
     setCancellingPlan(true);
     try {
       await apiFetch("api/paidPlan", {
-        method: "DELETE",
-        body: JSON.stringify({ subscriber_id: user.subscriberId }),
+        method: "PUT",
+        body: JSON.stringify({ subscriber_id: user.subscriberId, paid_plan_id: null }),
       });
       await loadData();
     } catch (err) {
