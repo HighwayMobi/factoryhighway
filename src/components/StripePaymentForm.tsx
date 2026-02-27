@@ -32,14 +32,15 @@ const StripePaymentForm = ({
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
-  const backURL = `${window.location.origin}/account?topup=success`;
+  const returnPath = "/account?topup=success";
+  const fullReturnURL = `${window.location.origin}${returnPath}`;
 
   const fetchClientSecret = useCallback(async () => {
     try {
       // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, backURL, replenishment: false }),
+        body: JSON.stringify({ type, amount, phone, email, backURL: returnPath, replenishment: false }),
       });
       if (!topUpResult.success) {
         throw new Error(topUpResult.message || "Failed to create top-up");
@@ -54,7 +55,7 @@ const StripePaymentForm = ({
           email: resEmail,
           name,
           product,
-          return_url: backURL,
+          return_url: fullReturnURL,
           metadata,
         }),
       });
@@ -68,7 +69,7 @@ const StripePaymentForm = ({
       setError(msg);
       throw err;
     }
-  }, [amount, email, phone, type, backURL]);
+  }, [amount, email, phone, type, returnPath, fullReturnURL]);
 
   if (error) {
     return (
