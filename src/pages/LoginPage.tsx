@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
-  Smartphone, CreditCard, Shield, Loader2, Wifi } from
+  Smartphone, CreditCard, Shield, Loader2, Wifi, CheckCircle } from
 "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -12,6 +12,9 @@ import highwayLogo from "@/assets/highway-logo.png";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from
 "@/components/ui/dialog";
+import StripePaymentForm from "@/components/StripePaymentForm";
+
+
 
 type AuthTab = "email" | "phone";
 type ActiveSection = "login" | "topup";
@@ -56,6 +59,9 @@ const LoginPage = () => {
   const [topUpMode, setTopUpMode] = useState<TopUpMode>("balance");
   const [selectedGbPkg, setSelectedGbPkg] = useState<typeof gbPackages[0] | null>(null);
   const [paying, setPaying] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -517,19 +523,42 @@ const LoginPage = () => {
                         </div>
                       </div>
 
-                      {/* Pay Button */}
-                      <button
-                      disabled={!isTopUpValid || paying}
-                      onClick={() => handlePublicPay(displayAmount, topUpPhone, topUpEmail)}
-                      className={cn(
-                        "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                        isTopUpValid && !paying ?
-                        "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
-                        "bg-muted text-muted-foreground cursor-not-allowed"
-                      )}>
-                        {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                        {paying ? i.topup_processing : i.payByCard}
-                      </button>
+                      {/* Pay Button or Embedded Form */}
+                      {showPaymentForm && topUpMode === "balance" ? (
+                        paymentSuccess ? (
+                          <div className="flex flex-col items-center gap-3 py-6">
+                            <CheckCircle className="h-12 w-12 text-primary" />
+                            <p className="text-sm font-semibold text-foreground">{i.topup_paymentSuccess}</p>
+                          </div>
+                        ) : (
+                          <StripePaymentForm
+                            amount={displayAmount}
+                            email={topUpEmail}
+                            phone={`+34${phoneDigits(topUpPhone)}`}
+                            onSuccess={() => setPaymentSuccess(true)}
+                            onError={(msg) => toast({ title: msg, variant: "destructive" })}
+                            onCancel={() => setShowPaymentForm(false)}
+                            payLabel={i.payByCard}
+                            processingLabel={i.topup_processing}
+                            secureLabel={i.securePayment}
+                            cancelLabel={i.topup_back}
+                          />
+                        )
+                      ) : topUpMode === "balance" && (
+                        <button
+                          disabled={!isTopUpValid}
+                          onClick={() => { setPaymentAmount(displayAmount); setShowPaymentForm(true); setPaymentSuccess(false); }}
+                          className={cn(
+                            "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                            isTopUpValid
+                              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
+                              : "bg-muted text-muted-foreground cursor-not-allowed"
+                          )}
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          {i.payByCard}
+                        </button>
+                      )}
                     </> :
 
                   <>
@@ -598,19 +627,42 @@ const LoginPage = () => {
                         </div>
                     }
 
-                      {/* Pay Button */}
-                      <button
-                      disabled={!isGbValid || paying}
-                      onClick={() => selectedGbPkg && handlePublicPay(selectedGbPkg.price, topUpPhone, topUpEmail)}
-                      className={cn(
-                        "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                        isGbValid && !paying ?
-                        "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
-                        "bg-muted text-muted-foreground cursor-not-allowed"
-                      )}>
-                        {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                        {paying ? i.topup_processing : i.payByCard}
-                      </button>
+                      {/* Pay Button or Embedded Form */}
+                      {showPaymentForm && topUpMode === "buyGb" ? (
+                        paymentSuccess ? (
+                          <div className="flex flex-col items-center gap-3 py-6">
+                            <CheckCircle className="h-12 w-12 text-primary" />
+                            <p className="text-sm font-semibold text-foreground">{i.topup_paymentSuccess}</p>
+                          </div>
+                        ) : (
+                          <StripePaymentForm
+                            amount={selectedGbPkg!.price}
+                            email={topUpEmail}
+                            phone={`+34${phoneDigits(topUpPhone)}`}
+                            onSuccess={() => setPaymentSuccess(true)}
+                            onError={(msg) => toast({ title: msg, variant: "destructive" })}
+                            onCancel={() => setShowPaymentForm(false)}
+                            payLabel={i.payByCard}
+                            processingLabel={i.topup_processing}
+                            secureLabel={i.securePayment}
+                            cancelLabel={i.topup_back}
+                          />
+                        )
+                      ) : topUpMode === "buyGb" && (
+                        <button
+                          disabled={!isGbValid}
+                          onClick={() => { setShowPaymentForm(true); setPaymentSuccess(false); }}
+                          className={cn(
+                            "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                            isGbValid
+                              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
+                              : "bg-muted text-muted-foreground cursor-not-allowed"
+                          )}
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          {i.payByCard}
+                        </button>
+                      )}
                     </>
                   }
 
