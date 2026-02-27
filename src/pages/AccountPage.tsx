@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   LogOut, User, Wifi, Phone as PhoneIcon,
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
@@ -141,9 +142,19 @@ const AccountPage = () => {
     }
   };
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   useEffect(() => {
     loadData().finally(() => setLoading(false));
   }, []);
+
+  // Auto-refresh after payment redirect
+  useEffect(() => {
+    if (searchParams.get("refresh") === "1") {
+      setSearchParams({}, { replace: true });
+      loadData();
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (user.subscriberId) {
