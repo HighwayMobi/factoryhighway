@@ -25,7 +25,7 @@ const AccountPage = () => {
     plan: "",
     monthlyFee: 0,
     feeDate: "",
-    dataUsed: 0,
+    dataRemaining: 0,
     dataTotal: 0,
     minutesLimit: null as number | null,
     paymentType: "",
@@ -74,7 +74,7 @@ const AccountPage = () => {
         monthlyFee: plan?.price ?? 0,
         feeDate,
         dataTotal: Math.max(remains?.gb_initial ?? plan?.gb ?? 0, remains?.gb ?? 0),
-        dataUsed: remains?.gb ?? 0,
+        dataRemaining: remains?.gb ?? 0,
         minutesLimit: plan?.minutes === 0 ? null : (plan?.minutes ?? null),
         paymentType: sub?.payment_type ?? "",
         iccid: sub?.iccid ?? "",
@@ -228,7 +228,7 @@ const AccountPage = () => {
                 <Wifi className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-foreground">{i.acc_dataAvailable}</span>
               </div>
-              <span className="text-sm font-bold text-primary">{user.dataUsed} Gb {i.acc_of} {user.dataTotal} Gb</span>
+              <span className="text-sm font-bold text-primary">{user.dataRemaining} Gb {i.acc_of} {user.dataTotal} Gb</span>
             </div>
             <div className="border-t border-border px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
