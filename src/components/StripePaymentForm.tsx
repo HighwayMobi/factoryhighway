@@ -49,7 +49,7 @@ const StripePaymentForm = ({
       // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, backURL: "/topUp/success", replenishment: false }),
+        body: JSON.stringify({ type, amount, phone, email, backURL: "https://sim-highway.lovable.app/payment-success", replenishment: false }),
       });
       if (!topUpResult.success) {
         throw new Error(topUpResult.message || "Failed to create top-up");
