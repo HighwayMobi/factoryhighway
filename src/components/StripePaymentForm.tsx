@@ -36,14 +36,33 @@ const StripePaymentForm = ({
 
   const fetchClientSecret = useCallback(async () => {
     try {
-      const result = await apiFetch("api/topUp", {
+      // Step 1: Create top-up request
+      const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
         body: JSON.stringify({ type, amount, phone, email, backURL, replenishment: false }),
       });
-      if (!result.success) {
-        throw new Error(result.message || "Failed to create session");
+      if (!topUpResult.success) {
+        throw new Error(topUpResult.message || "Failed to create top-up");
       }
-      return result.data.session;
+
+      // Step 2: Init Stripe checkout using data from topUp response
+      const { email: resEmail, name, amount: resAmount, product, return_url, metadata } = topUpResult.data;
+      const checkoutResult = await apiFetch("api/checkout", {
+        method: "POST",
+        body: JSON.stringify({
+          amount: resAmount,
+          email: resEmail,
+          name,
+          product,
+          return_url: backURL,
+          metadata,
+        }),
+      });
+      if (!checkoutResult.success) {
+        throw new Error(checkoutResult.message || "Failed to init checkout");
+      }
+
+      return checkoutResult.data.clientSecret;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       setError(msg);
