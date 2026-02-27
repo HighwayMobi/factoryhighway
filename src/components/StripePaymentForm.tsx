@@ -5,6 +5,7 @@ import {
   EmbeddedCheckout,
 } from "@stripe/react-stripe-js";
 import { Loader2, Shield } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 const stripePromise = loadStripe(
   "pk_test_51S7bGLQM5BJ4b1inXCowPXEgmkzDv5FTUew7zeTUEqzz9OSm4erZg8Pw5HUp8X3cfc2O64EIPEA43osR4Q0BjOvS00xLdjkHCZ"
@@ -14,6 +15,7 @@ interface StripePaymentFormProps {
   amount: number;
   email: string;
   phone: string;
+  type: "Mobile" | "GB";
   onCancel: () => void;
   secureLabel: string;
   cancelLabel?: string;
@@ -23,28 +25,31 @@ const StripePaymentForm = ({
   amount,
   email,
   phone,
+  type,
   onCancel,
   secureLabel,
   cancelLabel = "← Back",
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
+  const backURL = `${window.location.origin}/account?topup=success`;
+
   const fetchClientSecret = useCallback(async () => {
-    const res = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-topup-checkout`,
-      {
+    try {
+      const result = await apiFetch("api/topUp", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({ amount, email, phone }),
+        body: JSON.stringify({ type, amount, phone, email, backURL }),
+      });
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create session");
       }
-    );
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to create session");
-    return data.clientSecret;
-  }, [amount, email, phone]);
+      return result.data.session;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setError(msg);
+      throw err;
+    }
+  }, [amount, email, phone, type, backURL]);
 
   if (error) {
     return (

@@ -535,6 +535,7 @@ const LoginPage = () => {
                       amount={displayAmount}
                       email={topUpEmail}
                       phone={`+34${phoneDigits(topUpPhone)}`}
+                      type="Mobile"
                       onCancel={() => setShowPaymentForm(false)}
                       secureLabel={i.securePayment}
                       cancelLabel={i.topup_back} /> :
@@ -635,6 +636,7 @@ const LoginPage = () => {
                       amount={selectedGbPkg!.price}
                       email={topUpEmail}
                       phone={`+34${phoneDigits(topUpPhone)}`}
+                      type="GB"
                       onCancel={() => setShowPaymentForm(false)}
                       secureLabel={i.securePayment}
                       cancelLabel={i.topup_back} /> :
