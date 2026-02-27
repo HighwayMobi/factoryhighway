@@ -63,13 +63,14 @@ const StripePaymentForm = ({
 
       const checkoutResult = await apiFetch("api/checkout", {
         method: "POST",
-        body: JSON.stringify({
-          amount: resAmount,
-          email: resEmail,
-          name,
-          product,
-          metadata,
-        }),
+      body: JSON.stringify({
+        amount: resAmount,
+        email: resEmail,
+        name,
+        product,
+        metadata,
+        backURL: SUCCESS_REDIRECT_URL,
+      }),
       });
       if (!checkoutResult.success) {
         throw new Error(checkoutResult.message || "Failed to init checkout");
