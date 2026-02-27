@@ -118,9 +118,11 @@ const translations = {
     cp_confirmNote: "Новый тариф будет применён в начале следующего расчётного периода. Текущий пакет данных сохранится до конца периода.",
     cp_cancel: "Отмена",
     cp_confirm: "Подтвердить",
-    topup_processing: "Переход к оплате...",
+    topup_processing: "Обработка оплаты...",
     topup_error: "Ошибка при создании платежа",
     topup_success: "Баланс успешно пополнен!",
+    topup_back: "← Назад",
+    topup_paymentSuccess: "Оплата прошла успешно!",
   },
   en: {
     loginTitle: "Sign in to your account",
@@ -239,9 +241,11 @@ const translations = {
     cp_confirmNote: "The new plan will take effect at the start of the next billing cycle. Your current data package will remain until the end of the period.",
     cp_cancel: "Cancel",
     cp_confirm: "Confirm",
-    topup_processing: "Redirecting to payment...",
+    topup_processing: "Processing payment...",
     topup_error: "Failed to create payment",
     topup_success: "Balance topped up successfully!",
+    topup_back: "← Back",
+    topup_paymentSuccess: "Payment successful!",
   },
 } as const;
 
