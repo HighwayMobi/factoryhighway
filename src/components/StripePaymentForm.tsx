@@ -38,7 +38,7 @@ const StripePaymentForm = ({
     try {
       const result = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, backURL }),
+        body: JSON.stringify({ type, amount, phone, email, backURL, replenishment: false }),
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create session");
