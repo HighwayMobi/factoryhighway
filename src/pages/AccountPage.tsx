@@ -48,6 +48,7 @@ const AccountPage = () => {
     newPlan: "",
     newPlanPrice: null as number | null,
     subscriberId: null as number | null,
+    clientId: null as number | null,
   });
 
   const loadData = async () => {
@@ -96,6 +97,7 @@ const AccountPage = () => {
         newPlan: sub?.new_paid_plan?.local_name?.[lang] || sub?.new_paid_plan?.name || "",
         newPlanPrice: sub?.new_paid_plan?.price ?? null,
         subscriberId: sub?.id ?? null,
+        clientId: c.id ?? null,
       }));
 
       // Finance is loaded separately via loadFinance
@@ -201,7 +203,7 @@ const AccountPage = () => {
 
           {/* User Header */}
           <div className="flex items-center gap-4 mb-2">
-            <UserAvatar />
+            <UserAvatar userId={user.clientId} />
             <div>
               <h1 className="text-xl font-bold text-foreground">{user.name}</h1>
               <p className="text-sm font-medium text-primary">{user.phone}</p>
