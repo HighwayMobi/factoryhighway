@@ -10,6 +10,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useNavigate } from "react-router-dom";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient } from "@/lib/api";
+import UserAvatar from "@/components/UserAvatar";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -200,9 +201,7 @@ const AccountPage = () => {
 
           {/* User Header */}
           <div className="flex items-center gap-4 mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-              <User className="h-6 w-6 text-primary" />
-            </div>
+            <UserAvatar />
             <div>
               <h1 className="text-xl font-bold text-foreground">{user.name}</h1>
               <p className="text-sm font-medium text-primary">{user.phone}</p>
