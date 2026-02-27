@@ -327,7 +327,7 @@ const AccountPage = () => {
               </div>
               <span className="text-sm font-bold text-primary">{user.minutesLimit ?? i.acc_unlimited}</span>
             </div>
-            {true && (
+            {user.dataRemaining < 1 && (
               <div className="bg-destructive/10 px-6 py-2.5 text-center text-xs font-medium text-destructive">
                 {i.acc_noData}{" "}
                 <button onClick={() => navigate("/buy-gb")} className="underline font-semibold hover:text-destructive/80">{i.acc_buyHere}</button>
