@@ -175,42 +175,43 @@ const StripePaymentForm = ({
         options={{
           clientSecret,
           appearance: {
-            theme: "night",
+            theme: "flat",
             variables: {
               colorPrimary: "hsl(24, 95%, 53%)",
-              colorBackground: "hsl(220, 25%, 8%)",
-              colorText: "hsl(220, 10%, 90%)",
+              colorBackground: "hsl(0, 0%, 100%)",
+              colorText: "hsl(220, 25%, 10%)",
               colorDanger: "hsl(0, 72%, 51%)",
               fontFamily: "Inter, system-ui, sans-serif",
               borderRadius: "12px",
               colorTextSecondary: "hsl(220, 10%, 50%)",
-              colorTextPlaceholder: "hsl(220, 10%, 40%)",
+              colorTextPlaceholder: "hsl(220, 10%, 50%)",
             },
             rules: {
               ".Input": {
-                backgroundColor: "hsl(220, 20%, 14%)",
-                border: "1px solid hsl(220, 15%, 16%)",
-                color: "hsl(220, 10%, 90%)",
+                backgroundColor: "hsl(220, 20%, 97%)",
+                border: "1px solid hsl(220, 15%, 91%)",
+                color: "hsl(220, 25%, 10%)",
+                boxShadow: "none",
               },
               ".Input:focus": {
                 borderColor: "hsl(24, 95%, 53%)",
                 boxShadow: "0 0 0 2px hsla(24, 95%, 53%, 0.2)",
               },
               ".Tab": {
-                backgroundColor: "hsl(220, 20%, 14%)",
-                border: "1px solid hsl(220, 15%, 16%)",
-                color: "hsl(220, 10%, 75%)",
+                backgroundColor: "hsl(220, 15%, 94%)",
+                border: "1px solid hsl(220, 15%, 91%)",
+                color: "hsl(220, 25%, 10%)",
               },
               ".Tab:hover": {
-                backgroundColor: "hsl(220, 20%, 18%)",
+                backgroundColor: "hsl(220, 15%, 90%)",
               },
               ".Tab--selected": {
-                backgroundColor: "hsl(220, 25%, 8%)",
+                backgroundColor: "hsl(0, 0%, 100%)",
                 borderColor: "hsl(24, 95%, 53%)",
-                color: "hsl(0, 0%, 100%)",
+                color: "hsl(220, 25%, 10%)",
               },
               ".Label": {
-                color: "hsl(220, 10%, 75%)",
+                color: "hsl(220, 10%, 50%)",
               },
             },
           },
