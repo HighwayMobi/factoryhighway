@@ -24,7 +24,7 @@ const PaymentSuccessPage = () => {
               : "Funds will be credited within a few minutes."}
           </p>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/account")}
             className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 transition-all"
           >
             {i.back || "← Назад"}
