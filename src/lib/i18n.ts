@@ -67,6 +67,10 @@ const translations = {
     acc_termsConditions: "Условия предоставления услуг",
     acc_privacyPolicy: "Политика конфиденциальности",
     acc_cancelPlanChange: "Отменить",
+    acc_cancelPlanConfirmTitle: "Отмена смены тарифа",
+    acc_cancelPlanConfirmDesc: "Вы уверены, что хотите отменить запланированную смену тарифа?",
+    acc_cancelPlanConfirmYes: "Да, отменить",
+    acc_cancelPlanConfirmNo: "Нет",
     acc_logout: "Выйти",
     // Profile page
     prof_title: "Профиль",
@@ -191,6 +195,10 @@ const translations = {
     acc_termsConditions: "Terms & conditions",
     acc_privacyPolicy: "Privacy policy",
     acc_cancelPlanChange: "Cancel",
+    acc_cancelPlanConfirmTitle: "Cancel plan change",
+    acc_cancelPlanConfirmDesc: "Are you sure you want to cancel the scheduled plan change?",
+    acc_cancelPlanConfirmYes: "Yes, cancel",
+    acc_cancelPlanConfirmNo: "No",
     acc_logout: "Log out",
     // Profile page
     prof_title: "Profile",

@@ -9,6 +9,10 @@ import { useLang } from "@/contexts/LangContext";
 import { useNavigate } from "react-router-dom";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, apiFetch, clearAuthToken, type UserClient } from "@/lib/api";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const AccountPage = () => {
   const { lang, setLang } = useLang();
@@ -17,6 +21,7 @@ const AccountPage = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [cancellingPlan, setCancellingPlan] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const navigate = useNavigate();
   const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; topUp: number; used: number; remaining: number } | null>(null);
   const [user, setUser] = useState({
@@ -232,7 +237,7 @@ const AccountPage = () => {
                       : `From ${user.feeDate} plan changes to "${user.newPlan}" — €${user.newPlanPrice}/mo`}
                   </span>
                   <button
-                    onClick={handleCancelPlanChange}
+                    onClick={() => setShowCancelConfirm(true)}
                     disabled={cancellingPlan}
                     className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
                   >
@@ -387,6 +392,19 @@ const AccountPage = () => {
         </div>
       </main>
 
+      {/* Cancel Plan Change Confirmation */}
+      <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{i.acc_cancelPlanConfirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{i.acc_cancelPlanConfirmDesc}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{i.acc_cancelPlanConfirmNo}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelPlanChange}>{i.acc_cancelPlanConfirmYes}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {/* Footer */}
       <footer className="border-t border-border bg-card">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
