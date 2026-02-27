@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   LogOut, User, Wifi, Phone as PhoneIcon,
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
-  ChevronLeft, Download,
+  ChevronLeft, Download, ShieldOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -49,6 +49,7 @@ const AccountPage = () => {
     newPlanPrice: null as number | null,
     subscriberId: null as number | null,
     clientId: null as number | null,
+    status: "" as string,
   });
 
   const loadData = async () => {
@@ -98,6 +99,7 @@ const AccountPage = () => {
         newPlanPrice: sub?.new_paid_plan?.price ?? null,
         subscriberId: sub?.id ?? null,
         clientId: c.id ?? null,
+        status: sub?.status ?? c.status ?? "",
       }));
 
       // Finance is loaded separately via loadFinance
@@ -195,8 +197,20 @@ const AccountPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background relative">
       <InternalHeader lang={lang} onLangChange={setLang} />
+
+      {user.status === "blocked" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md">
+          <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-8 py-10 shadow-2xl text-center max-w-sm mx-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+              <ShieldOff className="h-8 w-8 text-destructive" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground">{i.acc_blocked}</h2>
+            <p className="text-sm text-muted-foreground">{i.acc_blockedDesc}</p>
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 flex flex-col items-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-2xl space-y-4">

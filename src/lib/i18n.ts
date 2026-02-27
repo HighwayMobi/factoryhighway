@@ -78,6 +78,8 @@ const translations = {
     acc_cancelPlanConfirmYes: "Да, отменить",
     acc_cancelPlanConfirmNo: "Нет",
     acc_logout: "Выйти",
+    acc_blocked: "Ваш аккаунт заблокирован",
+    acc_blockedDesc: "Обратитесь в поддержку, если у вас есть вопросы.",
     // Profile page
     prof_title: "Профиль",
     prof_language: "Язык",
@@ -212,6 +214,8 @@ const translations = {
     acc_cancelPlanConfirmYes: "Yes, cancel",
     acc_cancelPlanConfirmNo: "No",
     acc_logout: "Log out",
+    acc_blocked: "Your account is blocked",
+    acc_blockedDesc: "Please contact support if you have any questions.",
     // Profile page
     prof_title: "Profile",
     prof_language: "Language",
