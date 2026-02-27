@@ -46,10 +46,10 @@ const StripePaymentForm = ({
 
   const fetchClientSecret = useCallback(async () => {
     try {
-      // Step 1: Create top-up request (no backURL — let backend use its default)
+      // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, replenishment: false }),
+        body: JSON.stringify({ type, amount, phone, email, backURL: "/topUp/success", replenishment: false }),
       });
       if (!topUpResult.success) {
         throw new Error(topUpResult.message || "Failed to create top-up");
