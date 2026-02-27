@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, CreditCard, Shield, Pencil, CheckCircle } from "lucide-react";
+import { ArrowLeft, CreditCard, Shield, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -18,7 +18,6 @@ const TopUpPage = () => {
   const [editingEmail, setEditingEmail] = useState(false);
   const [phone, setPhone] = useState("");
   const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const { lang, setLang } = useLang();
   const navigate = useNavigate();
   const i = t(lang);
@@ -71,18 +70,6 @@ const TopUpPage = () => {
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
           {showPaymentForm ? (
-            paymentSuccess ? (
-              <div className="flex flex-col items-center gap-3 py-8">
-                <CheckCircle className="h-14 w-14 text-primary" />
-                <p className="text-lg font-semibold text-foreground">{i.topup_paymentSuccess}</p>
-                <button
-                  onClick={() => navigate("/account")}
-                  className="mt-2 text-sm font-medium text-primary hover:underline"
-                >
-                  {i.back}
-                </button>
-              </div>
-            ) : (
               <StripePaymentForm
                 amount={displayAmount}
                 email={email}
@@ -91,8 +78,9 @@ const TopUpPage = () => {
                 onCancel={() => setShowPaymentForm(false)}
                 secureLabel={i.securePayment}
                 cancelLabel={i.topup_back}
+                successLabel={i.topup_paymentSuccess}
+                backLabel={i.back}
               />
-            )
           ) : (
             <>
               {/* Phone (read-only) */}
@@ -178,7 +166,7 @@ const TopUpPage = () => {
               {/* Pay Button */}
               <button
                 disabled={!isValid}
-                onClick={() => { setShowPaymentForm(true); setPaymentSuccess(false); }}
+                onClick={() => setShowPaymentForm(true)}
                 className={cn(
                   "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
                   isValid
