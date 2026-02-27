@@ -13,7 +13,7 @@ const stripePromise = loadStripe(
   "pk_test_51S7bGLQM5BJ4b1inXCowPXEgmkzDv5FTUew7zeTUEqzz9OSm4erZg8Pw5HUp8X3cfc2O64EIPEA43osR4Q0BjOvS00xLdjkHCZ"
 );
 
-const SUCCESS_REDIRECT_PATH = "/account";
+const SUCCESS_REDIRECT_PATH = "/payment-success";
 const SUCCESS_DELAY_MS = 2500;
 
 interface StripePaymentFormProps {
