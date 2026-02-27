@@ -11,7 +11,7 @@ const stripePromise = loadStripe(
   "pk_test_51S7bGLQM5BJ4b1inXCowPXEgmkzDv5FTUew7zeTUEqzz9OSm4erZg8Pw5HUp8X3cfc2O64EIPEA43osR4Q0BjOvS00xLdjkHCZ"
 );
 
-const SUCCESS_REDIRECT_URL = "https://sim-highway.lovable.app/payment-success";
+const SUCCESS_REDIRECT_PATH = "/account";
 
 interface StripePaymentFormProps {
   amount: number;
@@ -48,10 +48,12 @@ const StripePaymentForm = ({
 
   const fetchClientSecret = useCallback(async () => {
     try {
+      const successRedirectUrl = `${window.location.origin}${SUCCESS_REDIRECT_PATH}`;
+
       // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, backURL: "https://sim-highway.lovable.app/payment-success", replenishment: false }),
+        body: JSON.stringify({ type, amount, phone, email, backURL: successRedirectUrl, replenishment: false }),
       });
       if (!topUpResult.success) {
         throw new Error(topUpResult.message || "Failed to create top-up");
@@ -68,8 +70,8 @@ const StripePaymentForm = ({
           name,
           product,
           metadata,
-          return_url: SUCCESS_REDIRECT_URL,
-          backURL: SUCCESS_REDIRECT_URL,
+          return_url: successRedirectUrl,
+          backURL: successRedirectUrl,
         }),
       });
       if (!checkoutResult.success) {
