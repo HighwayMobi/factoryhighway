@@ -42,9 +42,8 @@ const StripePaymentForm = ({
   const [completed, setCompleted] = useState(false);
 
   const handleComplete = useCallback(() => {
-    onSuccess?.();
-    window.location.replace(SUCCESS_REDIRECT_URL);
     setCompleted(true);
+    onSuccess?.();
   }, [onSuccess]);
 
   const fetchClientSecret = useCallback(async () => {
