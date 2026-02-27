@@ -267,7 +267,7 @@ const AccountPage = () => {
                 </div>
               ) : (
                 <>
-                  {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeDate} {user.feeDate}
+                  {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
                 </>
               )}
             </div>
