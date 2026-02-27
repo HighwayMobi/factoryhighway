@@ -41,22 +41,21 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
       const form = new FormData();
       form.append("avatar", file);
 
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const res = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/upload-avatar`,
-        {
-          method: "POST",
-          headers: {
-            "x-highway-token": getAuthToken() || "",
-            "x-highway-user-id": String(userId),
-          },
-          body: form,
-        }
-      );
+      const { data, error } = await supabase.functions.invoke("upload-avatar", {
+        body: form,
+        headers: {
+          "x-highway-token": getAuthToken() || "",
+          "x-highway-user-id": String(userId),
+        },
+      });
 
-      const json = await res.json();
-      if (json.url) {
-        setAvatarUrl(json.url + "?t=" + Date.now());
+      if (error) {
+        console.error("Avatar upload error:", error);
+        return;
+      }
+
+      if (data?.url) {
+        setAvatarUrl(data.url + "?t=" + Date.now());
       }
     } catch (err) {
       console.error("Avatar upload failed:", err);
