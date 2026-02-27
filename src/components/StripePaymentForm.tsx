@@ -4,7 +4,7 @@ import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout,
 } from "@stripe/react-stripe-js";
-import { Loader2, Shield } from "lucide-react";
+import { Shield, CheckCircle } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
 const stripePromise = loadStripe(
@@ -17,8 +17,11 @@ interface StripePaymentFormProps {
   phone: string;
   type: "mobile" | "gb";
   onCancel: () => void;
+  onSuccess?: () => void;
   secureLabel: string;
   cancelLabel?: string;
+  successLabel?: string;
+  backLabel?: string;
 }
 
 const StripePaymentForm = ({
@@ -27,27 +30,33 @@ const StripePaymentForm = ({
   phone,
   type,
   onCancel,
+  onSuccess,
   secureLabel,
   cancelLabel = "← Back",
+  successLabel = "Payment successful!",
+  backLabel = "← Back",
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
+  const [completed, setCompleted] = useState(false);
 
-  const returnPath = "/account?topup=success";
-  const fullReturnURL = `${window.location.origin}${returnPath}`;
+  const handleComplete = useCallback(() => {
+    setCompleted(true);
+    onSuccess?.();
+  }, [onSuccess]);
 
   const fetchClientSecret = useCallback(async () => {
     try {
       // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, backURL: returnPath, replenishment: false }),
+        body: JSON.stringify({ type, amount, phone, email, backURL: "/", replenishment: false }),
       });
       if (!topUpResult.success) {
         throw new Error(topUpResult.message || "Failed to create top-up");
       }
 
       // Step 2: Init Stripe checkout using data from topUp response
-      const { email: resEmail, name, amount: resAmount, product, return_url, metadata } = topUpResult.data;
+      const { email: resEmail, name, amount: resAmount, product, metadata } = topUpResult.data;
       const checkoutResult = await apiFetch("api/checkout", {
         method: "POST",
         body: JSON.stringify({
@@ -55,7 +64,7 @@ const StripePaymentForm = ({
           email: resEmail,
           name,
           product,
-          return_url: fullReturnURL,
+          return_url: `${window.location.origin}/`,
           metadata,
         }),
       });
@@ -69,7 +78,22 @@ const StripePaymentForm = ({
       setError(msg);
       throw err;
     }
-  }, [amount, email, phone, type, returnPath, fullReturnURL]);
+  }, [amount, email, phone, type]);
+
+  if (completed) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-8">
+        <CheckCircle className="h-14 w-14 text-primary" />
+        <p className="text-lg font-semibold text-foreground">{successLabel}</p>
+        <button
+          onClick={onCancel}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          {backLabel}
+        </button>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -98,7 +122,7 @@ const StripePaymentForm = ({
 
       <EmbeddedCheckoutProvider
         stripe={stripePromise}
-        options={{ fetchClientSecret }}
+        options={{ fetchClientSecret, onComplete: handleComplete }}
       >
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>
