@@ -87,11 +87,7 @@ const TopUpPage = () => {
                 amount={displayAmount}
                 email={email}
                 phone={phone}
-                onSuccess={() => setPaymentSuccess(true)}
-                onError={(msg) => toast({ title: msg, variant: "destructive" })}
                 onCancel={() => setShowPaymentForm(false)}
-                payLabel={i.payByCard}
-                processingLabel={i.topup_processing}
                 secureLabel={i.securePayment}
                 cancelLabel={i.topup_back}
               />
