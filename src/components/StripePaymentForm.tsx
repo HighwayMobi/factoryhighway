@@ -15,7 +15,7 @@ interface StripePaymentFormProps {
   amount: number;
   email: string;
   phone: string;
-  type: "Mobile" | "GB";
+  type: "mobile" | "gb";
   onCancel: () => void;
   secureLabel: string;
   cancelLabel?: string;
