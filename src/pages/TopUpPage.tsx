@@ -87,7 +87,7 @@ const TopUpPage = () => {
                 amount={displayAmount}
                 email={email}
                 phone={phone}
-                type="Mobile"
+                type="mobile"
                 onCancel={() => setShowPaymentForm(false)}
                 secureLabel={i.securePayment}
                 cancelLabel={i.topup_back}
