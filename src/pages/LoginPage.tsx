@@ -101,7 +101,7 @@ const LoginPage = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-          body: JSON.stringify({ amount: payAmount, email: payEmail, phone: `+34${phoneDigits(payPhone)}` }),
+          body: JSON.stringify({ amount: payAmount, email: payEmail, phone: `+34${phoneDigits(payPhone)}` })
         }
       );
       const data = await res.json();
@@ -524,41 +524,41 @@ const LoginPage = () => {
                       </div>
 
                       {/* Pay Button or Embedded Form */}
-                      {showPaymentForm && topUpMode === "balance" ? (
-                        paymentSuccess ? (
-                          <div className="flex flex-col items-center gap-3 py-6">
+                      {showPaymentForm && topUpMode === "balance" ?
+                    paymentSuccess ?
+                    <div className="flex flex-col items-center gap-3 py-6">
                             <CheckCircle className="h-12 w-12 text-primary" />
                             <p className="text-sm font-semibold text-foreground">{i.topup_paymentSuccess}</p>
-                          </div>
-                        ) : (
-                          <StripePaymentForm
-                            amount={displayAmount}
-                            email={topUpEmail}
-                            phone={`+34${phoneDigits(topUpPhone)}`}
-                            onSuccess={() => setPaymentSuccess(true)}
-                            onError={(msg) => toast({ title: msg, variant: "destructive" })}
-                            onCancel={() => setShowPaymentForm(false)}
-                            payLabel={i.payByCard}
-                            processingLabel={i.topup_processing}
-                            secureLabel={i.securePayment}
-                            cancelLabel={i.topup_back}
-                          />
-                        )
-                      ) : topUpMode === "balance" && (
-                        <button
-                          disabled={!isTopUpValid}
-                          onClick={() => { setPaymentAmount(displayAmount); setShowPaymentForm(true); setPaymentSuccess(false); }}
-                          className={cn(
-                            "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                            isTopUpValid
-                              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
-                              : "bg-muted text-muted-foreground cursor-not-allowed"
-                          )}
-                        >
+                          </div> :
+
+                    <StripePaymentForm
+                      amount={displayAmount}
+                      email={topUpEmail}
+                      phone={`+34${phoneDigits(topUpPhone)}`}
+                      onSuccess={() => setPaymentSuccess(true)}
+                      onError={(msg) => toast({ title: msg, variant: "destructive" })}
+                      onCancel={() => setShowPaymentForm(false)}
+                      payLabel={i.payByCard}
+                      processingLabel={i.topup_processing}
+                      secureLabel={i.securePayment}
+                      cancelLabel={i.topup_back} /> :
+
+
+                    topUpMode === "balance" &&
+                    <button
+                      disabled={!isTopUpValid}
+                      onClick={() => {setPaymentAmount(displayAmount);setShowPaymentForm(true);setPaymentSuccess(false);}}
+                      className={cn(
+                        "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                        isTopUpValid ?
+                        "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                        "bg-muted text-muted-foreground cursor-not-allowed"
+                      )}>
+
                           <CreditCard className="h-4 w-4" />
                           {i.payByCard}
                         </button>
-                      )}
+                    }
                     </> :
 
                   <>
@@ -628,54 +628,54 @@ const LoginPage = () => {
                     }
 
                       {/* Pay Button or Embedded Form */}
-                      {showPaymentForm && topUpMode === "buyGb" ? (
-                        paymentSuccess ? (
-                          <div className="flex flex-col items-center gap-3 py-6">
+                      {showPaymentForm && topUpMode === "buyGb" ?
+                    paymentSuccess ?
+                    <div className="flex flex-col items-center gap-3 py-6">
                             <CheckCircle className="h-12 w-12 text-primary" />
                             <p className="text-sm font-semibold text-foreground">{i.topup_paymentSuccess}</p>
-                          </div>
-                        ) : (
-                          <StripePaymentForm
-                            amount={selectedGbPkg!.price}
-                            email={topUpEmail}
-                            phone={`+34${phoneDigits(topUpPhone)}`}
-                            onSuccess={() => setPaymentSuccess(true)}
-                            onError={(msg) => toast({ title: msg, variant: "destructive" })}
-                            onCancel={() => setShowPaymentForm(false)}
-                            payLabel={i.payByCard}
-                            processingLabel={i.topup_processing}
-                            secureLabel={i.securePayment}
-                            cancelLabel={i.topup_back}
-                          />
-                        )
-                      ) : topUpMode === "buyGb" && (
-                        <button
-                          disabled={!isGbValid}
-                          onClick={() => { setShowPaymentForm(true); setPaymentSuccess(false); }}
-                          className={cn(
-                            "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                            isGbValid
-                              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
-                              : "bg-muted text-muted-foreground cursor-not-allowed"
-                          )}
-                        >
+                          </div> :
+
+                    <StripePaymentForm
+                      amount={selectedGbPkg!.price}
+                      email={topUpEmail}
+                      phone={`+34${phoneDigits(topUpPhone)}`}
+                      onSuccess={() => setPaymentSuccess(true)}
+                      onError={(msg) => toast({ title: msg, variant: "destructive" })}
+                      onCancel={() => setShowPaymentForm(false)}
+                      payLabel={i.payByCard}
+                      processingLabel={i.topup_processing}
+                      secureLabel={i.securePayment}
+                      cancelLabel={i.topup_back} /> :
+
+
+                    topUpMode === "buyGb" &&
+                    <button
+                      disabled={!isGbValid}
+                      onClick={() => {setShowPaymentForm(true);setPaymentSuccess(false);}}
+                      className={cn(
+                        "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                        isGbValid ?
+                        "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]" :
+                        "bg-muted text-muted-foreground cursor-not-allowed"
+                      )}>
+
                           <CreditCard className="h-4 w-4" />
                           {i.payByCard}
                         </button>
-                      )}
+                    }
                     </>
                   }
 
-                  <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Shield className="h-3.5 w-3.5" />
-                      {i.securePayment}
-                    </div>
-                    <span>•</span>
-                    <span>Stripe</span>
-                    <span>•</span>
-                    <span>SSL</span>
-                  </div>
+                  
+
+
+
+
+
+
+
+
+
                 </div>
               </div>
             </div>
