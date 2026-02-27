@@ -337,7 +337,12 @@ const AccountPage = () => {
                           : { year: financeMonth.year, month: financeMonth.month - 1 };
                         setFinanceMonth(prev);
                       }}
-                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground"
+                      disabled={(() => {
+                        if (!user.activationDate) return false;
+                        const act = new Date(user.activationDate);
+                        return financeMonth.year === act.getFullYear() && financeMonth.month === act.getMonth();
+                      })()}
+                      className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </button>
