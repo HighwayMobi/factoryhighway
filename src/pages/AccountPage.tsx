@@ -291,8 +291,8 @@ const AccountPage = () => {
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <span>
                       {lang === "ru"
-                        ? `С ${user.feeDate} тариф сменится на «${user.newPlan}» — €${user.newPlanPrice}/мес`
-                        : `From ${user.feeDate} plan changes to "${user.newPlan}" — €${user.newPlanPrice}/mo`}
+                        ? <>С {user.feeDate} тариф сменится на<br />«{user.newPlan}» — €{user.newPlanPrice}/мес</>
+                        : <>From {user.feeDate} plan changes to<br />"{user.newPlan}" — €{user.newPlanPrice}/mo</>}
                     </span>
                     <button
                       onClick={() => setShowCancelConfirm(true)}
