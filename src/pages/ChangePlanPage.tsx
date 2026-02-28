@@ -222,35 +222,49 @@ const ChangePlanPage = () => {
           <DialogHeader>
             <DialogTitle>{i.cp_confirmTitle}</DialogTitle>
           </DialogHeader>
-          {selectedPlan && (
-            <div className="space-y-4 py-2">
-              <div className="rounded-xl border border-border bg-secondary/30 p-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{i.cp_newPlan}</span>
-                  <span className="font-semibold text-foreground">
-                    {selectedPlan.local_name?.[lang] || selectedPlan.name}
-                  </span>
+          {selectedPlan && (() => {
+            const isFreeze = selectedPlan.gb === 0;
+            const isUpgrade = !isFreeze && currentPlanPrice !== null && selectedPlan.price > currentPlanPrice;
+            const feeDate = nextPaymentDate ? nextPaymentDate.split("-").reverse().join(".") : getNextFeeDate();
+            let noteText = "";
+            if (isFreeze) {
+              noteText = i.cp_freezeNote.replace("{date}", feeDate).replace("{price}", String(selectedPlan.price));
+            } else if (isUpgrade) {
+              noteText = i.cp_upgradeNote.replace("{price}", String(selectedPlan.price));
+            } else {
+              noteText = i.cp_downgradeNote.replace("{date}", feeDate);
+            }
+            return (
+              <div className="space-y-4 py-2">
+                <div className="rounded-xl border border-border bg-secondary/30 p-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{i.cp_newPlan}</span>
+                    <span className="font-semibold text-foreground">
+                      {selectedPlan.local_name?.[lang] || selectedPlan.name}
+                    </span>
+                  </div>
+                  {!isFreeze && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{i.cp_data}</span>
+                      <span className="font-semibold text-foreground">{selectedPlan.gb} GB</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{i.cp_monthlyFee}</span>
+                    <span className="font-bold text-primary">€{selectedPlan.price}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{i.cp_data}</span>
-                  <span className="font-semibold text-foreground">{selectedPlan.gb} GB</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{i.cp_monthlyFee}</span>
-                  <span className="font-bold text-primary">€{selectedPlan.price}</span>
+                <div className={cn(
+                  "rounded-xl border p-4 text-sm text-foreground",
+                  isFreeze ? "bg-orange-50/50 border-orange-300/50 dark:bg-orange-950/20 dark:border-orange-500/30" :
+                  isUpgrade ? "bg-green-50/50 border-green-300/50 dark:bg-green-950/20 dark:border-green-500/30" :
+                  "bg-primary/5 border-primary/20"
+                )}>
+                  <p>{noteText}</p>
                 </div>
               </div>
-              <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-sm text-foreground">
-                <p>
-                  {i.cp_confirmText1} <strong>€{selectedPlan.price}</strong> {i.cp_confirmText2}{" "}
-                  <strong>{getNextFeeDate()}</strong>.
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {i.cp_confirmNote}
-                </p>
-              </div>
-            </div>
-          )}
+            );
+          })()}
           <DialogFooter className="flex gap-2 sm:gap-2">
             <button
               onClick={() => setConfirmOpen(false)}
