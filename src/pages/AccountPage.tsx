@@ -254,7 +254,8 @@ const AccountPage = () => {
               </div>
               <button
                 onClick={() => navigate("/change-plan")}
-                className="w-[130px] rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground text-center"
+                disabled={!!user.newPlan}
+                className="w-[130px] rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground text-center disabled:opacity-40 disabled:pointer-events-none"
               >
                 {i.acc_changePlan}
               </button>
