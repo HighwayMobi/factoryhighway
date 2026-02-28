@@ -103,7 +103,7 @@ const translations = {
     prof_changePassword: "Сменить пароль",
     // Buy GB page
     buyGb_title: "Купить GB",
-    buyGb_subtitle: "Выберите подходящий пакет данных",
+    buyGb_subtitle: "Выберите подходящий пакет мобильных данных. Дополнительные пакеты можно использовать до конца текущего календарного месяца.",
     buyGb_popular: "Популярный",
     buyGb_buy: "Купить",
     buyGb_success: "Пакет успешно подключён!",
@@ -243,7 +243,7 @@ const translations = {
     prof_changePassword: "Change password",
     // Buy GB page
     buyGb_title: "Buy GB",
-    buyGb_subtitle: "Choose a data package that suits you",
+    buyGb_subtitle: "Choose a suitable mobile data package. Additional packages can be used until the end of the current calendar month.",
     buyGb_popular: "Popular",
     buyGb_buy: "Buy",
     buyGb_success: "Package activated successfully!",
