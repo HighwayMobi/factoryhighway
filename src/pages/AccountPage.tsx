@@ -51,6 +51,7 @@ const AccountPage = () => {
     subscriberId: null as number | null,
     clientId: null as number | null,
     status: "" as string,
+    isUpgrade: false,
   });
 
   const loadData = async () => {
@@ -83,6 +84,10 @@ const AccountPage = () => {
         feeDate = `${String(payDay).padStart(2, "0")}.${String(m).padStart(2, "0")}.${year}`;
       }
 
+      const isUpgrade = sub?.new_paid_plan && plan
+        ? (plan.gb === 0 || (sub.new_paid_plan.price > (plan.price ?? 0)))
+        : false;
+
       setUser((prev) => ({
         ...prev,
         name: `${c.first_name || ""} ${c.second_name || ""}`.trim(),
@@ -103,6 +108,7 @@ const AccountPage = () => {
         subscriberId: sub?.id ?? null,
         clientId: c.id ?? null,
         status: sub?.status ?? c.status ?? "",
+        isUpgrade,
       }));
 
       // Finance is loaded separately via loadFinance
@@ -293,9 +299,14 @@ const AccountPage = () => {
                 {user.newPlan ? (
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <span>
-                      {lang === "ru"
-                        ? <>С {user.feeDate} тариф сменится на<br />«{user.newPlan}» — €{user.newPlanPrice}/мес</>
-                        : <>From {user.feeDate} plan changes to<br />"{user.newPlan}" — €{user.newPlanPrice}/mo</>}
+                      {(() => {
+                        const showDate = user.isUpgrade
+                          ? (() => { const d = new Date(); d.setDate(d.getDate() + 1); return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`; })()
+                          : user.feeDate;
+                        return lang === "ru"
+                          ? <>С {showDate} тариф сменится на<br />«{user.newPlan}» — €{user.newPlanPrice}/мес</>
+                          : <>From {showDate} plan changes to<br />"{user.newPlan}" — €{user.newPlanPrice}/mo</>;
+                      })()}
                     </span>
                     <button
                       onClick={() => setShowCancelConfirm(true)}
