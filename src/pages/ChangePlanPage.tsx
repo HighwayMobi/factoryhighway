@@ -225,11 +225,12 @@ const ChangePlanPage = () => {
             const isFreeze = selectedPlan.gb === 0;
             const isUpgrade = !isFreeze && currentPlanPrice !== null && selectedPlan.price > currentPlanPrice;
             const feeDate = nextPaymentDate ? nextPaymentDate.split("-").reverse().join(".") : getNextFeeDate();
+            const tomorrow = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`; })();
             let noteText = "";
             if (isFreeze) {
               noteText = i.cp_freezeNote.replace("{date}", feeDate).replace("{price}", String(selectedPlan.price));
             } else if (isUpgrade) {
-              noteText = i.cp_upgradeNote.replace("{price}", String(selectedPlan.price));
+              noteText = i.cp_upgradeNote.replace("{date}", tomorrow).replace("{price}", String(selectedPlan.price));
             } else {
               noteText = i.cp_downgradeNote.replace("{date}", feeDate);
             }
