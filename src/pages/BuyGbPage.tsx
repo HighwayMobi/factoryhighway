@@ -55,7 +55,7 @@ const BuyGbPage = () => {
         setConfirmPkg(null);
         // Small delay to let the server update remains
         await new Promise((r) => setTimeout(r, 1500));
-        navigate("/account");
+        navigate("/account?refresh=1");
       } else {
         toast({
           title: res?.message?.includes("Not enough funds") ? i.buyGb_noFunds : i.buyGb_error,
