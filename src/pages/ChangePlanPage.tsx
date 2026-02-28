@@ -153,7 +153,6 @@ const ChangePlanPage = () => {
                     </div>
                     <div>
                       <span className="text-base font-bold text-foreground">{name}</span>
-                      <p className="text-xs text-muted-foreground">{plan.gb} GB</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
