@@ -71,10 +71,12 @@ const AccountPage = () => {
       }
 
       const planName = plan?.local_name?.[lang] || plan?.name || "";
-      const payDay = sub?.paymentDay;
-      const now = new Date();
       let feeDate = "";
-      if (payDay) {
+      if (sub?.nextPaymentDate) {
+        feeDate = sub.nextPaymentDate.split("-").reverse().join(".");
+      } else if (sub?.paymentDay) {
+        const payDay = sub.paymentDay;
+        const now = new Date();
         const month = now.getDate() > payDay ? now.getMonth() + 2 : now.getMonth() + 1;
         const year = now.getFullYear() + (month > 12 ? 1 : 0);
         const m = ((month - 1) % 12) + 1;
