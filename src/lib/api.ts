@@ -73,6 +73,7 @@ export interface Subscriber {
   activation_date: string;
   paymentDay: number;
   new_paid_plan_id: number | null;
+  nextPaymentDate: string | null;
   iccid: string;
   contract_number: string | null;
   notifications: number;
