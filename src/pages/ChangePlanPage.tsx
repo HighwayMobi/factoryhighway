@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Signal, Loader2, Check } from "lucide-react";
+import { ArrowLeft, Signal, Loader2, Check, Snowflake, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -28,6 +28,8 @@ const ChangePlanPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [subscriberId, setSubscriberId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [freezePlan, setFreezePlan] = useState<PaidPlan | null>(null);
+  const [nextPaymentDate, setNextPaymentDate] = useState<string>("");
 
   useEffect(() => {
     Promise.all([
@@ -41,11 +43,13 @@ const ChangePlanPage = () => {
         setCurrentPlanPrice(sub.paid_plan?.price ?? null);
         setPaymentDay(sub.paymentDay);
         setSubscriberId(sub.id);
+        setNextPaymentDate(sub.nextPaymentDate || "");
 
         const allPlans: PaidPlan[] = Array.isArray(plansRes.data)
           ? plansRes.data
           : Object.values(plansRes.data || {});
-        // Filter out current plan and FREEZE (gb=0)
+        const freeze = allPlans.find((p) => p.gb === 0);
+        setFreezePlan(freeze && freeze.id !== sub.paid_plan_id ? freeze : null);
         setPlans(allPlans.filter((p) => p.id !== sub.paid_plan_id && p.gb > 0));
       })
       .catch((err) => {
@@ -166,6 +170,37 @@ const ChangePlanPage = () => {
             );
           })}
         </div>
+        {/* FREEZE option */}
+        {freezePlan && (
+          <div className="mt-8">
+            <div className="rounded-2xl border border-orange-300/50 bg-orange-50/50 dark:bg-orange-950/20 dark:border-orange-500/30 p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-900/40">
+                  <Snowflake className="h-5 w-5 text-orange-500" />
+                </div>
+                <div className="flex-1">
+                  <span className="text-base font-bold text-foreground">{i.cp_freezeTitle}</span>
+                  <p className="text-xs text-muted-foreground">€{freezePlan.price}{i.cp_perMonth}</p>
+                </div>
+                <button
+                  onClick={() => handleSelectPlan(freezePlan)}
+                  className="rounded-xl border border-orange-400 px-5 py-2.5 text-sm font-semibold text-orange-600 dark:text-orange-400 transition-all hover:bg-orange-500 hover:text-white active:scale-[0.98]"
+                >
+                  {i.cp_select}
+                </button>
+              </div>
+              <div className="flex items-start gap-2 rounded-xl bg-orange-100/60 dark:bg-orange-900/30 px-3 py-2.5">
+                <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-orange-700 dark:text-orange-300">
+                  {i.cp_freezeWarning}
+                  {nextPaymentDate && (
+                    <> — <strong>{nextPaymentDate.split("-").reverse().join(".")}</strong></>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <footer className="mt-auto border-t border-border bg-card">
