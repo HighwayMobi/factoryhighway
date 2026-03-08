@@ -8,7 +8,7 @@ export const getAuthToken = (): string | null => {
 };
 
 export const setAuthToken = (token: string) => {
-  document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}`;
+  document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 10}`;
   localStorage.setItem("auth_token", token);
 };
 
