@@ -34,6 +34,12 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
   return res.json();
 };
 
+export interface GbPackage {
+  id: string;
+  size: number;
+  price: number | string;
+}
+
 export interface PaidPlan {
   id: number;
   name: string;
@@ -45,7 +51,8 @@ export interface PaidPlan {
   sms: number;
   isFiber: boolean;
   isMobile: boolean;
-  services: unknown[];
+  services: string[];
+  gbPackages?: GbPackage[];
 }
 
 export interface Remains {
