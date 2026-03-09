@@ -30,6 +30,7 @@ const BuyGbPage = () => {
   const navigate = useNavigate();
   const i = t(lang);
   const [subscriberId, setSubscriberId] = useState<number | null>(null);
+  const [balance, setBalance] = useState<number>(0);
   const [packages, setPackages] = useState<DisplayPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingGb, setBuyingGb] = useState<number | null>(null);
