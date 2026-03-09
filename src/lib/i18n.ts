@@ -249,6 +249,7 @@ const translations = {
     buyGb_buy: "Buy",
     buyGb_success: "Package activated successfully!",
     buyGb_noFunds: "Not enough funds",
+    buyGb_noFundsRedirect: "Redirecting to top up…",
     buyGb_error: "Purchase failed",
     buyGb_confirmTitle: "Confirm purchase",
     buyGb_confirmDesc: "Do you want to activate the {gb} GB package for €{price}?",
