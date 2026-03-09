@@ -108,6 +108,7 @@ const translations = {
     buyGb_buy: "Купить",
     buyGb_success: "Пакет успешно подключён!",
     buyGb_noFunds: "Недостаточно средств",
+    buyGb_noFundsRedirect: "Перенаправляем на пополнение баланса…",
     buyGb_error: "Ошибка при покупке",
     buyGb_confirmTitle: "Подтвердите покупку",
     buyGb_confirmDesc: "Вы хотите подключить пакет {gb} GB за €{price}?",
