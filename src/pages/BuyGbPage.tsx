@@ -71,9 +71,18 @@ const BuyGbPage = () => {
         setConfirmPkg(null);
         await new Promise((r) => setTimeout(r, 1500));
         navigate("/account?refresh=1");
+      } else if (res?.message?.includes("Not enough funds") || res?.message?.includes("Insufficient")) {
+        const shortage = Math.ceil(confirmPkg.price - balance);
+        const topUpAmount = Math.max(shortage, 3); // minimum 3€
+        setConfirmPkg(null);
+        toast({
+          title: i.buyGb_noFunds,
+          description: i.buyGb_noFundsRedirect,
+        });
+        setTimeout(() => navigate(`/topup?amount=${topUpAmount}`), 1500);
       } else {
         toast({
-          title: res?.message?.includes("Not enough funds") ? i.buyGb_noFunds : i.buyGb_error,
+          title: i.buyGb_error,
           variant: "destructive",
         });
       }

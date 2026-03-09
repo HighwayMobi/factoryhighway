@@ -12,8 +12,13 @@ import StripePaymentForm from "@/components/StripePaymentForm";
 const amountPresets = [5, 10, 20, 50];
 
 const TopUpPage = () => {
-  const [amount, setAmount] = useState("");
-  const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
+  const [searchParams] = useSearchParams();
+  const initialAmount = searchParams.get("amount") || "";
+  const initialNum = parseFloat(initialAmount);
+  const [amount, setAmount] = useState(initialAmount);
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(
+    amountPresets.includes(initialNum) ? initialNum : null
+  );
   const [email, setEmail] = useState("");
   const [editingEmail, setEditingEmail] = useState(false);
   const [phone, setPhone] = useState("");
