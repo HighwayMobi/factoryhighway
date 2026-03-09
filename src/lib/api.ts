@@ -102,7 +102,7 @@ export interface UserClient {
   apartment: string;
   postal_code: string;
   city: string;
-  subscribers: Subscriber;
+  subscribers: Subscriber[];
 }
 
 export interface UserResponse {

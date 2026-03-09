@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, type GbPackage } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -18,25 +18,39 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
-const gbPackages = [
-  { gb: 1, price: 3 },
-  { gb: 5, price: 6 },
-  { gb: 20, price: 10, popular: true },
-];
+interface DisplayPackage {
+  gb: number;
+  price: number;
+  id: string;
+  popular?: boolean;
+}
 
 const BuyGbPage = () => {
   const { lang, setLang } = useLang();
   const navigate = useNavigate();
   const i = t(lang);
   const [subscriberId, setSubscriberId] = useState<number | null>(null);
+  const [packages, setPackages] = useState<DisplayPackage[]>([]);
+  const [loading, setLoading] = useState(true);
   const [buyingGb, setBuyingGb] = useState<number | null>(null);
-  const [confirmPkg, setConfirmPkg] = useState<typeof gbPackages[0] | null>(null);
+  const [confirmPkg, setConfirmPkg] = useState<DisplayPackage | null>(null);
 
   useEffect(() => {
     apiFetch("api/user").then((res) => {
-      const sub = res?.data?.client?.subscribers;
+      const sub = Array.isArray(res?.data?.client?.subscribers)
+        ? res.data.client.subscribers[0]
+        : res?.data?.client?.subscribers;
       if (sub?.id) setSubscriberId(sub.id);
-    });
+
+      const gbPkgs: GbPackage[] = sub?.paid_plan?.gbPackages || [];
+      const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
+        gb: p.size,
+        price: Number(p.price),
+        id: p.id,
+        popular: idx === gbPkgs.length - 1 && gbPkgs.length > 1,
+      }));
+      setPackages(mapped);
+    }).finally(() => setLoading(false));
   }, []);
 
   const handleBuy = async () => {
@@ -53,7 +67,6 @@ const BuyGbPage = () => {
       if (res?.success) {
         toast({ title: i.buyGb_success });
         setConfirmPkg(null);
-        // Small delay to let the server update remains
         await new Promise((r) => setTimeout(r, 1500));
         navigate("/account?refresh=1");
       } else {
@@ -91,50 +104,60 @@ const BuyGbPage = () => {
           </p>
         </div>
 
-        <div className="space-y-3">
-          {gbPackages.map((pkg) => (
-            <div
-              key={pkg.gb}
-              className={cn(
-                "relative rounded-2xl border bg-card p-5 shadow-sm transition-all",
-                pkg.popular
-                  ? "border-primary ring-2 ring-primary/20"
-                  : "border-border hover:border-primary/40"
-              )}
-            >
-              {pkg.popular && (
-                <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
-                  {i.buyGb_popular}
-                </span>
-              )}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                    <Wifi className="h-5 w-5 text-primary" />
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : packages.length === 0 ? (
+          <p className="text-center text-sm text-muted-foreground py-12">
+            {lang === "ru" ? "Дополнительные пакеты недоступны для вашего тарифа" : "No additional packages available for your plan"}
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {packages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={cn(
+                  "relative rounded-2xl border bg-card p-5 shadow-sm transition-all",
+                  pkg.popular
+                    ? "border-primary ring-2 ring-primary/20"
+                    : "border-border hover:border-primary/40"
+                )}
+              >
+                {pkg.popular && (
+                  <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
+                    {i.buyGb_popular}
+                  </span>
+                )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                      <Wifi className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <span className="text-lg font-bold text-foreground">{pkg.gb} GB</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-lg font-bold text-foreground">{pkg.gb} GB</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold text-primary">€{pkg.price}</span>
+                    <button
+                      disabled={buyingGb !== null}
+                      onClick={() => setConfirmPkg(pkg)}
+                      className={cn(
+                        "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-60",
+                        pkg.popular
+                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:brightness-110"
+                          : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      )}
+                    >
+                      {i.buyGb_buy}
+                    </button>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-lg font-bold text-primary">€{pkg.price}</span>
-                  <button
-                    disabled={buyingGb !== null}
-                    onClick={() => setConfirmPkg(pkg)}
-                    className={cn(
-                      "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-60",
-                      pkg.popular
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:brightness-110"
-                        : "border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                    )}
-                  >
-                    {i.buyGb_buy}
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
 
       <AlertDialog open={!!confirmPkg} onOpenChange={(open) => !open && setConfirmPkg(null)}>

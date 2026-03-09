@@ -58,7 +58,7 @@ const AccountPage = () => {
     try {
       const { data } = await fetchUser();
       const c = data.client;
-      const sub = c.subscribers;
+      const sub = Array.isArray(c.subscribers) ? c.subscribers[0] : c.subscribers;
       const plan = sub?.paid_plan;
 
       let remains = sub?.remains;
