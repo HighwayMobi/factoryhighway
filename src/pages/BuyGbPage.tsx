@@ -42,6 +42,7 @@ const BuyGbPage = () => {
         ? res.data.client.subscribers[0]
         : res?.data?.client?.subscribers;
       if (sub?.id) setSubscriberId(sub.id);
+      setBalance(sub?.balance ?? 0);
 
       const gbPkgs: GbPackage[] = sub?.paid_plan?.gbPackages || [];
       const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
