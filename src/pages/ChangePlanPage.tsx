@@ -37,7 +37,7 @@ const ChangePlanPage = () => {
       apiFetch("api/paidPlans/1"),
     ])
       .then(([userRes, plansRes]) => {
-        const sub = userRes.data.client.subscribers;
+        const sub = Array.isArray(userRes.data.client.subscribers) ? userRes.data.client.subscribers[0] : userRes.data.client.subscribers;
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
         setCurrentPlanPrice(sub.paid_plan?.price ?? null);
