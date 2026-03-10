@@ -31,7 +31,7 @@ const AccountPage = () => {
   });
   const [financeLoading, setFinanceLoading] = useState(false);
   const navigate = useNavigate();
-  const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; topUp: number; used: number; remaining: number } | null>(null);
+  const [finance, setFinance] = useState<{ planFee: number; prepaidPlanChange: number; topUp: number; withdrawal: number } | null>(null);
   const [user, setUser] = useState({
     name: "",
     phone: "",
@@ -133,11 +133,10 @@ const AccountPage = () => {
       if (finRes?.success !== false && finRes?.data) {
         const d = finRes.data;
         setFinance({
-          planFee: d.monthlyFee ?? d.plan_fee ?? d.planFee ?? 0,
-          additionalServices: d.blocked ?? d.additional_services ?? d.additionalServices ?? 0,
-          topUp: d.deposit ?? d.top_up ?? d.topUp ?? d.topup ?? 0,
-          used: d.withdrawal ?? d.used ?? d.total_used ?? 0,
-          remaining: d.balance ?? d.remaining ?? 0,
+          planFee: d.monthlyFee ?? 0,
+          prepaidPlanChange: d.blocked ?? 0,
+          topUp: d.deposit ?? 0,
+          withdrawal: d.withdrawal ?? 0,
         });
       } else {
         setFinance(null);
@@ -428,10 +427,12 @@ const AccountPage = () => {
                         <span className="text-sm text-foreground">{i.acc_planFee}</span>
                         <span className="text-sm font-semibold text-primary">- {finance?.planFee ?? user.monthlyFee}€</span>
                       </div>
-                      <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
-                        <span className="text-sm text-foreground">{i.acc_additionalServices}</span>
-                        <span className="text-sm font-semibold text-primary">- {finance?.additionalServices ?? 0}€</span>
-                      </div>
+                      {(finance?.prepaidPlanChange ?? 0) > 0 && (
+                        <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
+                          <span className="text-sm text-foreground">{i.acc_prepaidPlanChange}</span>
+                          <span className="text-sm font-semibold text-primary">- {finance.prepaidPlanChange}€</span>
+                        </div>
+                      )}
                       <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
                         <span className="text-sm text-foreground">{i.acc_topUpBalance}</span>
                         <span className="text-sm font-semibold text-primary">+ {finance?.topUp ?? 0}€</span>
@@ -460,12 +461,12 @@ const AccountPage = () => {
                       <div className="flex items-stretch rounded-b-2xl bg-primary text-primary-foreground">
                         <div className="flex-1 px-6 py-3 flex flex-col items-start justify-center">
                           <span className="text-xs font-medium opacity-90">{i.acc_used}</span>
-                          <span className="text-lg font-bold">{finance?.used ?? 0}€</span>
+                          <span className="text-lg font-bold">{finance?.withdrawal ?? 0}€</span>
                         </div>
                         <div className="w-px bg-primary-foreground/30 my-2" />
                         <div className="flex-1 px-6 py-3 flex flex-col items-end justify-center">
-                          <span className="text-xs font-medium opacity-90">{i.acc_remaining}</span>
-                          <span className="text-lg font-bold">{finance?.remaining ?? user.balance}€</span>
+                          <span className="text-xs font-medium opacity-90">{i.acc_topUpBalance}</span>
+                          <span className="text-lg font-bold">{finance?.topUp ?? 0}€</span>
                         </div>
                       </div>
                     </>
