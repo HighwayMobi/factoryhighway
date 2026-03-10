@@ -55,33 +55,36 @@ const BuyGbPage = () => {
     }).finally(() => setLoading(false));
   }, []);
 
+  const rawFetch = async (url: string, method: string, body: object) => {
+    const token = getAuthToken();
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const raw = await fetch(url, { method, headers, body: JSON.stringify(body) });
+    return raw.json();
+  };
+
   const handleBuy = async () => {
     if (!subscriberId || !confirmPkg || buyingGb !== null) return;
     setBuyingGb(confirmPkg.gb);
     try {
-      const token = (await import("@/lib/api")).getAuthToken();
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
+      // 1. Check funds first
+      const checkRes = await rawFetch(
+        "https://sim.highway.mobi/web/api/checkFunds",
+        "POST",
+        {
+          data: {
+            service: "addGB",
+            price: confirmPkg.price,
+            subscriber_id: subscriberId,
+            return_url: "/payment-success",
+          },
+        }
+      );
 
-      const raw = await fetch(`https://sim.highway.mobi/web/api/addGB`, {
-        method: "PUT",
-        headers,
-        body: JSON.stringify({
-          subscriber_id: subscriberId,
-          size: confirmPkg.gb,
-        }),
-      });
-      const res = await raw.json();
-
-      if (res?.success) {
-        toast({ title: i.buyGb_success });
-        setConfirmPkg(null);
-        await new Promise((r) => setTimeout(r, 1500));
-        navigate("/account?refresh=1");
-      } else if (res?.message?.includes("Not enough funds") || res?.message?.includes("Insufficient")) {
+      if (!checkRes?.success) {
         const shortage = Math.ceil(confirmPkg.price - balance);
         const topUpAmount = Math.max(shortage, 3);
         setConfirmPkg(null);
@@ -90,11 +93,23 @@ const BuyGbPage = () => {
           description: i.buyGb_noFundsRedirect,
         });
         setTimeout(() => navigate(`/topup?amount=${topUpAmount}`), 1500);
+        return;
+      }
+
+      // 2. Purchase
+      const res = await rawFetch(
+        "https://sim.highway.mobi/web/api/addGB",
+        "PUT",
+        { subscriber_id: subscriberId, size: confirmPkg.gb }
+      );
+
+      if (res?.success) {
+        toast({ title: i.buyGb_success });
+        setConfirmPkg(null);
+        await new Promise((r) => setTimeout(r, 1500));
+        navigate("/account?refresh=1");
       } else {
-        toast({
-          title: i.buyGb_error,
-          variant: "destructive",
-        });
+        toast({ title: i.buyGb_error, variant: "destructive" });
       }
     } catch {
       toast({ title: i.buyGb_error, variant: "destructive" });
