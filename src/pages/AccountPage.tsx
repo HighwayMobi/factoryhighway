@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import {
   LogOut, User, Wifi, Phone as PhoneIcon,
@@ -19,6 +20,7 @@ import {
 
 const AccountPage = () => {
   const { lang, setLang } = useLang();
+  const { toast } = useToast();
   const [financesOpen, setFinancesOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -448,18 +450,36 @@ const AccountPage = () => {
                         const now = new Date();
                         const isCurrentMonth = financeMonth.year === now.getFullYear() && financeMonth.month === now.getMonth();
                         if (!isCurrentMonth && user.subscriberId) {
-                          const dateParam = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
-                          const invoiceUrl = `https://sim.highway.mobi/web/api/invoice?subscriber_id=${user.subscriberId}&date=${dateParam}&token=${getAuthToken()}`;
+                          const handleDownloadInvoice = async () => {
+                            const dateParam = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
+                            const token = getAuthToken();
+                            try {
+                              const res = await fetch(`https://sim.highway.mobi/web/api/invoice?subscriber_id=${user.subscriberId}&date=${dateParam}`, {
+                                headers: {
+                                  "Authorization": `Bearer ${token}`,
+                                  "Accept": "application/json",
+                                },
+                              });
+                              if (!res.ok) throw new Error("Failed");
+                              const blob = await res.blob();
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement("a");
+                              a.href = url;
+                              a.download = `invoice-${dateParam}.pdf`;
+                              a.click();
+                              URL.revokeObjectURL(url);
+                            } catch {
+                              toast({ title: "Error", description: "Failed to download invoice", variant: "destructive" });
+                            }
+                          };
                           return (
-                            <a
-                              href={invoiceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 px-6 py-3.5 border-b border-border text-sm font-semibold text-primary transition-colors hover:bg-secondary/50"
+                            <button
+                              onClick={handleDownloadInvoice}
+                              className="flex items-center gap-2 px-6 py-3.5 border-b border-border text-sm font-semibold text-primary transition-colors hover:bg-secondary/50 w-full text-left"
                             >
                               <Download className="h-4 w-4" />
                               {i.acc_downloadInvoice}
-                            </a>
+                            </button>
                           );
                         }
                         return null;
