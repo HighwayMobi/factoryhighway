@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import {
   LogOut, User, Wifi, Phone as PhoneIcon,
