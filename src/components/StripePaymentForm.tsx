@@ -55,7 +55,7 @@ const StripePaymentForm = ({
 
   const fetchClientSecret = useCallback(async () => {
     try {
-      const successRedirectUrl = `${window.location.origin}${SUCCESS_REDIRECT_PATH}`;
+      const successRedirectUrl = `${window.location.origin}${successPath}`;
 
       // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {
