@@ -264,6 +264,12 @@ const translations = {
     buyGb_month: "/mo",
     topup_tabBalance: "Top up balance",
     topup_tabBuyGb: "Buy gigabytes",
+    // Notifications
+    notif_title: "Notifications",
+    notif_empty: "No notifications",
+    notif_markRead: "Read",
+    notif_loadMore: "Load more",
+    notif_noMore: "No more notifications",
     // Change Plan page
     cp_title: "Change Plan",
     cp_subtitle: "Choose a new plan",
