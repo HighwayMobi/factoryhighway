@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { apiFetch, type GbPackage } from "@/lib/api";
+import { apiFetch, getAuthToken, type GbPackage } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import {
   AlertDialog,
