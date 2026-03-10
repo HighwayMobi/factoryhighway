@@ -59,13 +59,23 @@ const BuyGbPage = () => {
     if (!subscriberId || !confirmPkg || buyingGb !== null) return;
     setBuyingGb(confirmPkg.gb);
     try {
-      const res = await apiFetch("api/addGB", {
+      const token = (await import("@/lib/api")).getAuthToken();
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const raw = await fetch(`https://sim.highway.mobi/web/api/addGB`, {
         method: "PUT",
+        headers,
         body: JSON.stringify({
           subscriber_id: subscriberId,
           size: confirmPkg.gb,
         }),
       });
+      const res = await raw.json();
+
       if (res?.success) {
         toast({ title: i.buyGb_success });
         setConfirmPkg(null);
@@ -73,7 +83,7 @@ const BuyGbPage = () => {
         navigate("/account?refresh=1");
       } else if (res?.message?.includes("Not enough funds") || res?.message?.includes("Insufficient")) {
         const shortage = Math.ceil(confirmPkg.price - balance);
-        const topUpAmount = Math.max(shortage, 3); // minimum 3€
+        const topUpAmount = Math.max(shortage, 3);
         setConfirmPkg(null);
         toast({
           title: i.buyGb_noFunds,
