@@ -31,7 +31,7 @@ const AccountPage = () => {
   });
   const [financeLoading, setFinanceLoading] = useState(false);
   const navigate = useNavigate();
-  const [finance, setFinance] = useState<{ planFee: number; prepaidPlanChange: number; topUp: number; withdrawal: number } | null>(null);
+  const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; prepaidPlanChange: number; topUp: number } | null>(null);
   const [user, setUser] = useState({
     name: "",
     phone: "",
