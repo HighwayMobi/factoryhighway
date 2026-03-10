@@ -17,12 +17,12 @@ interface Notification {
 interface NotificationsPanelProps {
   open: boolean;
   onClose: () => void;
-  i: Translations;
-  lang: "ru" | "en";
+  lang: Lang;
   onUnreadCountChange?: (count: number) => void;
 }
 
-const NotificationsPanel = ({ open, onClose, i, lang, onUnreadCountChange }: NotificationsPanelProps) => {
+const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: NotificationsPanelProps) => {
+  const i = t(lang);
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);

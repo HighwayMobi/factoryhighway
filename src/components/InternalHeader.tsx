@@ -79,7 +79,6 @@ const InternalHeader = ({ lang, onLangChange, showBack }: InternalHeaderProps) =
             <NotificationsPanel
               open={notifOpen}
               onClose={() => setNotifOpen(false)}
-              i={i}
               lang={lang}
               onUnreadCountChange={handleUnreadChange}
             />
