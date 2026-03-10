@@ -117,6 +117,12 @@ const translations = {
     buyGb_month: "/мес",
     topup_tabBalance: "Пополнить баланс",
     topup_tabBuyGb: "Купить гигабайты",
+    // Notifications
+    notif_title: "Уведомления",
+    notif_empty: "Нет уведомлений",
+    notif_markRead: "Прочитано",
+    notif_loadMore: "Загрузить ещё",
+    notif_noMore: "Больше нет уведомлений",
     // Change Plan page
     cp_title: "Сменить тариф",
     cp_subtitle: "Выберите новый тарифный план",
@@ -258,6 +264,12 @@ const translations = {
     buyGb_month: "/mo",
     topup_tabBalance: "Top up balance",
     topup_tabBuyGb: "Buy gigabytes",
+    // Notifications
+    notif_title: "Notifications",
+    notif_empty: "No notifications",
+    notif_markRead: "Read",
+    notif_loadMore: "Load more",
+    notif_noMore: "No more notifications",
     // Change Plan page
     cp_title: "Change Plan",
     cp_subtitle: "Choose a new plan",
