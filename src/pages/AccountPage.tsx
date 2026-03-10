@@ -20,6 +20,7 @@ import {
 
 const AccountPage = () => {
   const { lang, setLang } = useLang();
+  const { toast } = useToast();
   const [financesOpen, setFinancesOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [loading, setLoading] = useState(true);
