@@ -134,9 +134,9 @@ const AccountPage = () => {
         const d = finRes.data;
         setFinance({
           planFee: d.monthlyFee ?? 0,
+          additionalServices: d.withdrawal ?? 0,
           prepaidPlanChange: d.blocked ?? 0,
           topUp: d.deposit ?? 0,
-          withdrawal: d.withdrawal ?? 0,
         });
       } else {
         setFinance(null);
