@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { CheckCircle, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLang } from "@/contexts/LangContext";
 import { t } from "@/lib/i18n";
 import InternalHeader from "@/components/InternalHeader";
@@ -10,14 +10,16 @@ const REDIRECT_DELAY_MS = 2500;
 const PaymentSuccessPage = () => {
   const { lang, setLang } = useLang();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const i = t(lang);
+  const returnTo = searchParams.get("returnTo");
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate("/account?refresh=1");
+      navigate(returnTo || "/account?refresh=1");
     }, REDIRECT_DELAY_MS);
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, returnTo]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

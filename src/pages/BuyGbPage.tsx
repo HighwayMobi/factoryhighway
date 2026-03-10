@@ -92,7 +92,7 @@ const BuyGbPage = () => {
           title: i.buyGb_noFunds,
           description: i.buyGb_noFundsRedirect,
         });
-        setTimeout(() => navigate(`/topup?amount=${topUpAmount}`), 1500);
+        setTimeout(() => navigate(`/topup?amount=${topUpAmount}&returnTo=/buy-gb`), 1500);
         return;
       }
 

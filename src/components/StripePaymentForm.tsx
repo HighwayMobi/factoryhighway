@@ -25,6 +25,7 @@ interface StripePaymentFormProps {
   cancelLabel?: string;
   successLabel?: string;
   backLabel?: string;
+  returnTo?: string;
 }
 
 const StripePaymentForm = ({
@@ -38,18 +39,23 @@ const StripePaymentForm = ({
   cancelLabel = "← Back",
   successLabel = "Payment successful!",
   backLabel = "← Back",
+  returnTo,
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  const successPath = returnTo
+    ? `${SUCCESS_REDIRECT_PATH}?returnTo=${encodeURIComponent(returnTo)}`
+    : SUCCESS_REDIRECT_PATH;
+
   const handleComplete = useCallback(() => {
     onSuccess?.();
-    navigate(SUCCESS_REDIRECT_PATH);
-  }, [navigate, onSuccess]);
+    navigate(successPath);
+  }, [navigate, onSuccess, successPath]);
 
   const fetchClientSecret = useCallback(async () => {
     try {
-      const successRedirectUrl = `${window.location.origin}${SUCCESS_REDIRECT_PATH}`;
+      const successRedirectUrl = `${window.location.origin}${successPath}`;
 
       // Step 1: Create top-up request
       const topUpResult = await apiFetch("api/topUp", {

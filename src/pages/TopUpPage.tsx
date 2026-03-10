@@ -14,6 +14,7 @@ const amountPresets = [5, 10, 20, 50];
 const TopUpPage = () => {
   const [searchParams] = useSearchParams();
   const initialAmount = searchParams.get("amount") || "";
+  const returnTo = searchParams.get("returnTo") || undefined;
   const initialNum = parseFloat(initialAmount);
   const [amount, setAmount] = useState(initialAmount);
   const [selectedPreset, setSelectedPreset] = useState<number | null>(
@@ -85,6 +86,7 @@ const TopUpPage = () => {
                 cancelLabel={i.topup_back}
                 successLabel={i.topup_paymentSuccess}
                 backLabel={i.back}
+                returnTo={returnTo}
               />
           ) : (
             <>
