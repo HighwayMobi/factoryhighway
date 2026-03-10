@@ -133,11 +133,11 @@ const AccountPage = () => {
       if (finRes?.success !== false && finRes?.data) {
         const d = finRes.data;
         setFinance({
-          planFee: d.plan_fee ?? d.planFee ?? 0,
-          additionalServices: d.additional_services ?? d.additionalServices ?? 0,
-          topUp: d.top_up ?? d.topUp ?? d.topup ?? 0,
-          used: d.used ?? d.total_used ?? 0,
-          remaining: d.remaining ?? d.balance ?? 0,
+          planFee: d.monthlyFee ?? d.plan_fee ?? d.planFee ?? 0,
+          additionalServices: d.blocked ?? d.additional_services ?? d.additionalServices ?? 0,
+          topUp: d.deposit ?? d.top_up ?? d.topUp ?? d.topup ?? 0,
+          used: d.withdrawal ?? d.used ?? d.total_used ?? 0,
+          remaining: d.balance ?? d.remaining ?? 0,
         });
       } else {
         setFinance(null);
