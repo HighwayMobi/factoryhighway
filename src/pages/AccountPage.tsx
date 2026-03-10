@@ -427,10 +427,14 @@ const AccountPage = () => {
                         <span className="text-sm text-foreground">{i.acc_planFee}</span>
                         <span className="text-sm font-semibold text-primary">- {finance?.planFee ?? user.monthlyFee}€</span>
                       </div>
+                      <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
+                        <span className="text-sm text-foreground">{i.acc_additionalServices}</span>
+                        <span className="text-sm font-semibold text-primary">- {finance?.additionalServices ?? 0}€</span>
+                      </div>
                       {(finance?.prepaidPlanChange ?? 0) > 0 && (
                         <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
                           <span className="text-sm text-foreground">{i.acc_prepaidPlanChange}</span>
-                          <span className="text-sm font-semibold text-primary">- {finance.prepaidPlanChange}€</span>
+                          <span className="text-sm font-semibold text-primary">- {finance!.prepaidPlanChange}€</span>
                         </div>
                       )}
                       <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
