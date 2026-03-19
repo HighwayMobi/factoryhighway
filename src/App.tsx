@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage";
 import BuyGbPage from "./pages/BuyGbPage";
 import ChangePlanPage from "./pages/ChangePlanPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import TokenLoginPage from "./pages/TokenLoginPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
