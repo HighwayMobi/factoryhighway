@@ -214,7 +214,7 @@ const translations = {
     acc_additionalServices: "Additional services",
     acc_prepaidPlanChange: "New plan prepayment",
     acc_topUpBalance: "INCOME",
-    acc_used: "I have used",
+    acc_used: "COST",
     acc_remaining: "I still have",
     acc_downloadInvoice: "Download invoice",
     acc_months: ["January","February","March","April","May","June","July","August","September","October","November","December"] as readonly string[],
