@@ -64,7 +64,7 @@ const translations = {
     acc_planFee: "Ваш тариф (абон. плата)",
     acc_additionalServices: "Доп. услуги",
     acc_prepaidPlanChange: "Предоплата нового тарифа",
-    acc_topUpBalance: "Пополнение баланса",
+    acc_topUpBalance: "INCOME",
     acc_used: "Потрачено",
     acc_remaining: "Остаток",
     acc_downloadInvoice: "Скачать фактуру",
