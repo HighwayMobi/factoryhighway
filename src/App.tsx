@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage";
 import BuyGbPage from "./pages/BuyGbPage";
 import ChangePlanPage from "./pages/ChangePlanPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import TokenLoginPage from "./pages/TokenLoginPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/buy-gb" element={<BuyGbPage />} />
             <Route path="/change-plan" element={<ChangePlanPage />} />
             <Route path="/payment-success" element={<PaymentSuccessPage />} />
+            <Route path="/token-login/:token" element={<TokenLoginPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
