@@ -213,7 +213,7 @@ const translations = {
     acc_planFee: "Your Plan (monthly fee)",
     acc_additionalServices: "Additional services",
     acc_prepaidPlanChange: "New plan prepayment",
-    acc_topUpBalance: "Top up balance",
+    acc_topUpBalance: "INCOME",
     acc_used: "I have used",
     acc_remaining: "I still have",
     acc_downloadInvoice: "Download invoice",
