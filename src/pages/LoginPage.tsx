@@ -118,12 +118,10 @@ const LoginPage = () => {
     }
   };
 
-  // Format Spanish phone: starts with 6 or 7, max 9 digits, formatted as XXX XXX XXX
+  // Format phone: max 9 digits, formatted as XXX XXX XXX (mask temporarily disabled)
   const formatSpanishPhone = (raw: string): string => {
     const digits = raw.replace(/\D/g, "").slice(0, 9);
     if (digits.length === 0) return "";
-    // Only allow first digit to be 6 or 7
-    if (digits[0] !== "6" && digits[0] !== "7") return "";
     const parts = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 9)].filter(Boolean);
     return parts.join(" ");
   };
