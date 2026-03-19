@@ -10,6 +10,7 @@ const TokenLoginPage = () => {
   useEffect(() => {
     if (token) {
       setAuthToken(token);
+      sessionStorage.setItem("inapp", "1");
       navigate("/account", { replace: true });
     } else {
       navigate("/", { replace: true });

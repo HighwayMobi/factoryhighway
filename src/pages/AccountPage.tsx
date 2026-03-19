@@ -546,16 +546,18 @@ const AccountPage = () => {
             </div>
           </div>
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="w-full rounded-2xl border border-destructive/30 bg-card shadow-sm px-6 py-4 flex items-center gap-3 transition-colors hover:bg-destructive/5"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10">
-              <LogOut className="h-4 w-4 text-destructive" />
-            </div>
-            <span className="text-base font-semibold text-destructive">{i.acc_logout}</span>
-          </button>
+          {/* Logout — hidden when opened from mobile app via token-login */}
+          {!sessionStorage.getItem("inapp") && (
+            <button
+              onClick={handleLogout}
+              className="w-full rounded-2xl border border-destructive/30 bg-card shadow-sm px-6 py-4 flex items-center gap-3 transition-colors hover:bg-destructive/5"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10">
+                <LogOut className="h-4 w-4 text-destructive" />
+              </div>
+              <span className="text-base font-semibold text-destructive">{i.acc_logout}</span>
+            </button>
+          )}
         </div>
       </main>
 
