@@ -129,12 +129,28 @@ const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: Notifi
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-sm font-semibold text-foreground">{i.notif_title}</h3>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            {items.some(isUnread) && (
+              <button
+                onClick={handleMarkAllRead}
+                disabled={markingAllRead}
+                className="rounded-lg px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-secondary disabled:opacity-50"
+                title={i.notif_markAllRead}
+              >
+                {markingAllRead ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <CheckCheck className="h-4 w-4" />
+                )}
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         {/* List */}
