@@ -70,21 +70,8 @@ const BuyGbPage = () => {
     if (!subscriberId || !confirmPkg || buyingGb !== null) return;
     setBuyingGb(confirmPkg.gb);
     try {
-      // 1. Check funds first
-      const checkRes = await rawFetch(
-        "https://sim.highway.mobi/web/api/checkFunds",
-        "POST",
-        {
-          data: {
-            service: "addGB",
-            price: confirmPkg.price,
-            subscriber_id: subscriberId,
-            return_url: "/payment-success",
-          },
-        }
-      );
-
-      if (!checkRes?.success) {
+      // Client-side balance check
+      if (balance < confirmPkg.price) {
         const shortage = Math.ceil(confirmPkg.price - balance);
         const topUpAmount = Math.max(shortage, 3);
         setConfirmPkg(null);
@@ -96,7 +83,7 @@ const BuyGbPage = () => {
         return;
       }
 
-      // 2. Purchase
+      // Purchase
       const res = await rawFetch(
         "https://sim.highway.mobi/web/api/addGB",
         "PUT",
