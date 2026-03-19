@@ -99,7 +99,7 @@ const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: Notifi
       <div className="fixed inset-0 z-40" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed right-2 left-2 top-16 z-50 max-h-[480px] rounded-xl border border-border bg-card shadow-xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-200 sm:fixed sm:right-4 sm:left-auto sm:top-auto sm:absolute sm:right-0 sm:top-full sm:mt-2 sm:w-[360px]">
+      <div className="fixed inset-x-2 top-16 z-50 max-h-[480px] rounded-xl border border-border bg-card shadow-xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-200 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[360px]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-sm font-semibold text-foreground">{i.notif_title}</h3>
