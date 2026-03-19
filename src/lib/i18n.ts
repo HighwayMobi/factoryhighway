@@ -271,6 +271,7 @@ const translations = {
     notif_title: "Notifications",
     notif_empty: "No notifications",
     notif_markRead: "Read",
+    notif_markAllRead: "Read all",
     notif_loadMore: "Load more",
     notif_noMore: "No more notifications",
     // Change Plan page
