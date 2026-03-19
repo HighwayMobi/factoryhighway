@@ -79,6 +79,31 @@ const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: Notifi
     }
   };
 
+  const handleMarkAllRead = async () => {
+    const unreadItems = items.filter(isUnread);
+    if (unreadItems.length === 0) return;
+    setMarkingAllRead(true);
+    try {
+      const results = await Promise.all(
+        unreadItems.map((n) =>
+          apiFetch("api/readNotification", {
+            method: "PUT",
+            body: JSON.stringify({ id: n.id }),
+          })
+        )
+      );
+      const successCount = results.filter((r) => r?.success).length;
+      if (successCount > 0) {
+        setItems((prev) => prev.map((n) => ({ ...n, is_read: true })));
+        onUnreadCountChange?.(-successCount);
+      }
+    } catch {
+      // silent
+    } finally {
+      setMarkingAllRead(false);
+    }
+  };
+
   const isUnread = (n: Notification) => !n.is_read || n.is_read === "";
 
   const formatDate = (dateStr: string) => {
