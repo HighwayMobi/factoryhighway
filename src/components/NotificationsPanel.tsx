@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Bell, Check, Loader2, X } from "lucide-react";
+import { Bell, Check, CheckCheck, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api";
 import { type Lang, t } from "@/lib/i18n";
@@ -28,6 +28,7 @@ const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: Notifi
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
   const [markingRead, setMarkingRead] = useState<number | null>(null);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
 
   const loadNotifications = useCallback(async (p: number, append = false) => {
     setLoading(true);
@@ -78,6 +79,31 @@ const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: Notifi
     }
   };
 
+  const handleMarkAllRead = async () => {
+    const unreadItems = items.filter(isUnread);
+    if (unreadItems.length === 0) return;
+    setMarkingAllRead(true);
+    try {
+      const results = await Promise.all(
+        unreadItems.map((n) =>
+          apiFetch("api/readNotification", {
+            method: "PUT",
+            body: JSON.stringify({ id: n.id }),
+          })
+        )
+      );
+      const successCount = results.filter((r) => r?.success).length;
+      if (successCount > 0) {
+        setItems((prev) => prev.map((n) => ({ ...n, is_read: true })));
+        onUnreadCountChange?.(-successCount);
+      }
+    } catch {
+      // silent
+    } finally {
+      setMarkingAllRead(false);
+    }
+  };
+
   const isUnread = (n: Notification) => !n.is_read || n.is_read === "";
 
   const formatDate = (dateStr: string) => {
@@ -103,12 +129,28 @@ const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: Notifi
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-sm font-semibold text-foreground">{i.notif_title}</h3>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            {items.some(isUnread) && (
+              <button
+                onClick={handleMarkAllRead}
+                disabled={markingAllRead}
+                className="rounded-lg px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-secondary disabled:opacity-50"
+                title={i.notif_markAllRead}
+              >
+                {markingAllRead ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <CheckCheck className="h-4 w-4" />
+                )}
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         {/* List */}

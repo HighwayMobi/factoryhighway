@@ -122,6 +122,7 @@ const translations = {
     notif_title: "Уведомления",
     notif_empty: "Нет уведомлений",
     notif_markRead: "Прочитано",
+    notif_markAllRead: "Прочитать все",
     notif_loadMore: "Загрузить ещё",
     notif_noMore: "Больше нет уведомлений",
     // Change Plan page
@@ -270,6 +271,7 @@ const translations = {
     notif_title: "Notifications",
     notif_empty: "No notifications",
     notif_markRead: "Read",
+    notif_markAllRead: "Read all",
     notif_loadMore: "Load more",
     notif_noMore: "No more notifications",
     // Change Plan page
