@@ -28,6 +28,7 @@ const NotificationsPanel = ({ open, onClose, lang, onUnreadCountChange }: Notifi
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
   const [markingRead, setMarkingRead] = useState<number | null>(null);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
 
   const loadNotifications = useCallback(async (p: number, append = false) => {
     setLoading(true);
