@@ -24,6 +24,7 @@ const TopUpPage = () => {
   const [email, setEmail] = useState("");
   const [editingEmail, setEditingEmail] = useState(false);
   const [phone, setPhone] = useState("");
+  const [isAuthed, setIsAuthed] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const { lang, setLang } = useLang();
   const navigate = useLangNavigate();
@@ -35,8 +36,11 @@ const TopUpPage = () => {
         const c = data.client;
         setEmail(c.email || "");
         setPhone(c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "");
+        setIsAuthed(true);
       })
-      .catch(() => {});
+      .catch(() => {
+        setIsAuthed(false);
+      });
   }, []);
 
   const handlePresetClick = (value: number) => {
@@ -55,7 +59,7 @@ const TopUpPage = () => {
   };
 
   const displayAmount = amount ? parseFloat(amount) : 0;
-  const isValid = displayAmount >= 3;
+  const isValid = displayAmount >= 3 && phone.length >= 5 && email.length >= 3;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -91,10 +95,20 @@ const TopUpPage = () => {
               />
           ) : (
             <>
-              {/* Phone (read-only) */}
-              <div className="mb-6 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+              {/* Phone */}
+              <div className="mb-6 rounded-xl bg-secondary/60 px-4 py-3">
                 <span className="text-sm text-muted-foreground">{i.phoneLabel}</span>
-                <span className="text-sm font-semibold text-foreground">{phone}</span>
+                {isAuthed ? (
+                  <span className="mt-1 block text-sm font-semibold text-foreground">{phone}</span>
+                ) : (
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder={i.phonePlaceholder}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                )}
               </div>
 
               {/* Amount */}
@@ -131,23 +145,26 @@ const TopUpPage = () => {
                 </div>
               </div>
 
-              {/* Email (editable) */}
+              {/* Email */}
               <div className="mb-8 rounded-xl bg-secondary/60 px-4 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">{i.emailReceipt}</span>
-                  {editingEmail ? (
-                    <button onClick={() => setEditingEmail(false)} className="text-xs font-medium text-primary hover:underline">OK</button>
-                  ) : (
-                    <button onClick={() => setEditingEmail(true)} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                      <Pencil className="h-3 w-3" />
-                    </button>
+                  {isAuthed && (
+                    editingEmail ? (
+                      <button onClick={() => setEditingEmail(false)} className="text-xs font-medium text-primary hover:underline">OK</button>
+                    ) : (
+                      <button onClick={() => setEditingEmail(true)} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                    )
                   )}
                 </div>
-                {editingEmail ? (
+                {(!isAuthed || editingEmail) ? (
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email@example.com"
                     className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 ) : (
