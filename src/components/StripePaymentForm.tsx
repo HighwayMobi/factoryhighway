@@ -37,6 +37,8 @@ const StripePaymentForm = ({
   email,
   phone,
   type,
+  size,
+  packageId,
   onCancel,
   onSuccess,
   secureLabel,
