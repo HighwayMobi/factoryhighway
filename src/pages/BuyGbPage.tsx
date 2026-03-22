@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
+import { ArrowLeft, Wifi, Loader2, LogIn } from "lucide-react";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
