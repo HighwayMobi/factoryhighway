@@ -7,6 +7,7 @@ import {
 import { Shield } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
+import { useLang } from "@/contexts/LangContext";
 
 const stripePromise = loadStripe(
   "pk_test_51S7bGLQM5BJ4b1inXCowPXEgmkzDv5FTUew7zeTUEqzz9OSm4erZg8Pw5HUp8X3cfc2O64EIPEA43osR4Q0BjOvS00xLdjkHCZ"
@@ -43,10 +44,12 @@ const StripePaymentForm = ({
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useLangNavigate();
+  const { lang } = useLang();
 
-  const successPath = returnTo
-    ? `${SUCCESS_REDIRECT_PATH}?returnTo=${encodeURIComponent(returnTo)}`
-    : SUCCESS_REDIRECT_PATH;
+  const successParams = new URLSearchParams();
+  successParams.set("lang", lang);
+  if (returnTo) successParams.set("returnTo", returnTo);
+  const successPath = `${SUCCESS_REDIRECT_PATH}?${successParams.toString()}`;
 
   const handleComplete = useCallback(() => {
     onSuccess?.();
