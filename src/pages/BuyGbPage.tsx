@@ -25,6 +25,12 @@ interface DisplayPackage {
   popular?: boolean;
 }
 
+const DEFAULT_PACKAGES: DisplayPackage[] = [
+  { gb: 1, price: 3, id: "default-1" },
+  { gb: 5, price: 6, id: "default-5" },
+  { gb: 20, price: 10, id: "default-20", popular: true },
+];
+
 const BuyGbPage = () => {
   const { lang, setLang } = useLang();
   const navigate = useLangNavigate();
