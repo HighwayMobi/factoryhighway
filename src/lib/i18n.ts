@@ -19,6 +19,7 @@ const translations = {
     phoneLabel: "Номер телефона",
     amountLabel: "Сумма",
     phonePlaceholder: "6XX XXX XXX",
+    phoneInvalid: "Введите 9 цифр, начиная с 6 или 7",
     otherAmount: "Другая сумма (мин. 3€)",
     emailReceipt: "Email для чека",
     topUpAmount: "Сумма пополнения",
