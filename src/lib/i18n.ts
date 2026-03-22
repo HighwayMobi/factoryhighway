@@ -116,6 +116,8 @@ const translations = {
     buyGb_confirm: "Подтвердить",
     buyGb_cancel: "Отмена",
     buyGb_month: "/мес",
+    buyGb_loginRequired: "Для просмотра доступных пакетов необходимо войти в личный кабинет",
+    buyGb_loginButton: "Войти",
     topup_tabBalance: "Пополнить баланс",
     topup_tabBuyGb: "Купить гигабайты",
     // Notifications
@@ -265,6 +267,8 @@ const translations = {
     buyGb_confirm: "Confirm",
     buyGb_cancel: "Cancel",
     buyGb_month: "/mo",
+    buyGb_loginRequired: "Please log in to view available packages",
+    buyGb_loginButton: "Log in",
     topup_tabBalance: "Top up balance",
     topup_tabBuyGb: "Buy gigabytes",
     // Notifications

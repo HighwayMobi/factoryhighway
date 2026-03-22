@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
+import { ArrowLeft, Wifi, Loader2, LogIn } from "lucide-react";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -35,24 +35,30 @@ const BuyGbPage = () => {
   const [loading, setLoading] = useState(true);
   const [buyingGb, setBuyingGb] = useState<number | null>(null);
   const [confirmPkg, setConfirmPkg] = useState<DisplayPackage | null>(null);
+  const [isAuthed, setIsAuthed] = useState(true);
 
   useEffect(() => {
-    apiFetch("api/user").then((res) => {
-      const sub = Array.isArray(res?.data?.client?.subscribers)
-        ? res.data.client.subscribers[0]
-        : res?.data?.client?.subscribers;
-      if (sub?.id) setSubscriberId(sub.id);
-      setBalance(sub?.balance ?? 0);
+    apiFetch("api/user")
+      .then((res) => {
+        const sub = Array.isArray(res?.data?.client?.subscribers)
+          ? res.data.client.subscribers[0]
+          : res?.data?.client?.subscribers;
+        if (sub?.id) setSubscriberId(sub.id);
+        setBalance(sub?.balance ?? 0);
 
-      const gbPkgs: GbPackage[] = sub?.paid_plan?.gbPackages || [];
-      const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
-        gb: p.size,
-        price: Number(p.price),
-        id: p.id,
-        popular: idx === gbPkgs.length - 1 && gbPkgs.length > 1,
-      }));
-      setPackages(mapped);
-    }).finally(() => setLoading(false));
+        const gbPkgs: GbPackage[] = sub?.paid_plan?.gbPackages || [];
+        const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
+          gb: p.size,
+          price: Number(p.price),
+          id: p.id,
+          popular: idx === gbPkgs.length - 1 && gbPkgs.length > 1,
+        }));
+        setPackages(mapped);
+      })
+      .catch(() => {
+        setIsAuthed(false);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const rawFetch = async (url: string, method: string, body: object) => {
@@ -130,6 +136,19 @@ const BuyGbPage = () => {
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : !isAuthed ? (
+          <div className="flex flex-col items-center gap-4 py-12">
+            <LogIn className="h-10 w-10 text-muted-foreground" />
+            <p className="text-center text-sm text-muted-foreground">
+              {i.buyGb_loginRequired}
+            </p>
+            <button
+              onClick={() => navigate("/")}
+              className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow hover:brightness-110 transition-all"
+            >
+              {i.buyGb_loginButton}
+            </button>
           </div>
         ) : packages.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-12">
