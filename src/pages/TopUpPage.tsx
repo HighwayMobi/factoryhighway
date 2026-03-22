@@ -90,14 +90,21 @@ const TopUpPage = () => {
     }
   };
 
+  const isPhoneValid = /^[67]\d{8}$/.test(phone.replace(/\s/g, ""));
   const displayAmount = amount ? parseFloat(amount) : 0;
-  const isBalanceValid = displayAmount >= 3 && phone.length >= 5 && email.length >= 3;
-  const isGbValid = !!selectedPkg && phone.length >= 5 && email.length >= 3;
+  const isBalanceValid = displayAmount >= 3 && isPhoneValid && email.length >= 3;
+  const isGbValid = !!selectedPkg && isPhoneValid && email.length >= 3;
+  const showPhoneError = phone.length > 0 && !isPhoneValid;
 
   const handleTabChange = (tab: "balance" | "gb") => {
     setActiveTab(tab);
     setShowPaymentForm(false);
     setSelectedPkg(null);
+  };
+
+  const handlePhoneChange = (val: string) => {
+    const digits = val.replace(/\D/g, "");
+    setPhone(digits.slice(0, 9));
   };
 
   const renderPhoneField = () => (
@@ -106,13 +113,27 @@ const TopUpPage = () => {
       {isAuthed ? (
         <span className="mt-1 block text-sm font-semibold text-foreground">{phone}</span>
       ) : (
-        <input
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder={i.phonePlaceholder}
-          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-        />
+        <>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="text-sm font-semibold text-muted-foreground">+34</span>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              placeholder={i.phonePlaceholder}
+              className={cn(
+                "w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 transition-all",
+                showPhoneError
+                  ? "border-destructive focus:border-destructive focus:ring-destructive/20"
+                  : "border-border focus:border-primary focus:ring-primary/20"
+              )}
+              maxLength={9}
+            />
+          </div>
+          {showPhoneError && (
+            <p className="mt-1 text-xs text-destructive">{i.phoneInvalid}</p>
+          )}
+        </>
       )}
     </div>
   );
@@ -164,7 +185,7 @@ const TopUpPage = () => {
         <StripePaymentForm
           amount={displayAmount}
           email={email}
-          phone={phone}
+          phone={isAuthed ? phone : `+34${phone}`}
           type="mobile"
           onCancel={() => setShowPaymentForm(false)}
           secureLabel={i.securePayment}
@@ -263,7 +284,7 @@ const TopUpPage = () => {
           <StripePaymentForm
             amount={selectedPkg.price}
             email={email}
-            phone={phone}
+            phone={isAuthed ? phone : `+34${phone}`}
             type="gb"
             onCancel={() => setShowPaymentForm(false)}
             secureLabel={i.securePayment}
