@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
