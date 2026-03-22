@@ -82,10 +82,10 @@ const BuyGbPage = () => {
   const handleBuy = async () => {
     if (!confirmPkg || buyingGb !== null) return;
 
-    // If not authenticated, redirect to login
+    // If not authenticated, redirect to topup with package price
     if (!isAuthed || !subscriberId) {
       setConfirmPkg(null);
-      navigate("/");
+      navigate(`/topup?amount=${confirmPkg.price}&returnTo=/buy-gb`);
       return;
     }
 
