@@ -59,7 +59,7 @@ const TopUpPage = () => {
   };
 
   const displayAmount = amount ? parseFloat(amount) : 0;
-  const isValid = displayAmount >= 3;
+  const isValid = displayAmount >= 3 && phone.length >= 5 && email.length >= 3;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
