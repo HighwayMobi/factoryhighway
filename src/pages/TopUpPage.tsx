@@ -36,8 +36,11 @@ const TopUpPage = () => {
         const c = data.client;
         setEmail(c.email || "");
         setPhone(c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "");
+        setIsAuthed(true);
       })
-      .catch(() => {});
+      .catch(() => {
+        setIsAuthed(false);
+      });
   }, []);
 
   const handlePresetClick = (value: number) => {
