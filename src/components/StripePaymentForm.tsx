@@ -92,7 +92,12 @@ const StripePaymentForm = ({
       return checkoutResult.data.clientSecret;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
-      setError(msg);
+      console.error("[StripePaymentForm] Error:", msg);
+      setError(lang === "ru" ? "Ошибка, проверьте данные" : "Error, check your data");
+      toast({
+        title: lang === "ru" ? "Ошибка, проверьте данные" : "Error, check your data",
+        variant: "destructive",
+      });
       throw err;
     }
   }, [amount, email, phone, type]);
