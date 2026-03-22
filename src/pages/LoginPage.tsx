@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
