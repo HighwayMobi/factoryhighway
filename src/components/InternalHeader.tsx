@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { Globe, ChevronDown, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type Lang, t } from "@/lib/i18n";
