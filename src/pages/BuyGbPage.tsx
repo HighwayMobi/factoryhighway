@@ -85,10 +85,7 @@ const BuyGbPage = () => {
     // If not authenticated, redirect to login
     if (!isAuthed || !subscriberId) {
       setConfirmPkg(null);
-      toast({
-        title: i.buyGb_loginRequired,
-      });
-      setTimeout(() => navigate("/"), 1000);
+      navigate("/");
       return;
     }
 
