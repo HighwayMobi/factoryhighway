@@ -80,7 +80,18 @@ const BuyGbPage = () => {
   };
 
   const handleBuy = async () => {
-    if (!subscriberId || !confirmPkg || buyingGb !== null) return;
+    if (!confirmPkg || buyingGb !== null) return;
+
+    // If not authenticated, redirect to login
+    if (!isAuthed || !subscriberId) {
+      setConfirmPkg(null);
+      toast({
+        title: i.buyGb_loginRequired,
+      });
+      setTimeout(() => navigate("/"), 1000);
+      return;
+    }
+
     setBuyingGb(confirmPkg.gb);
     try {
       // Client-side balance check
