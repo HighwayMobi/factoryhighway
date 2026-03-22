@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { toast } from "@/hooks/use-toast";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   EmbeddedCheckoutProvider,
