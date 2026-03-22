@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Wifi, Loader2, LogIn } from "lucide-react";
+import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -24,6 +24,12 @@ interface DisplayPackage {
   id: string;
   popular?: boolean;
 }
+
+const DEFAULT_PACKAGES: DisplayPackage[] = [
+  { gb: 1, price: 3, id: "default-1" },
+  { gb: 5, price: 6, id: "default-5" },
+  { gb: 20, price: 10, id: "default-20", popular: true },
+];
 
 const BuyGbPage = () => {
   const { lang, setLang } = useLang();
@@ -53,10 +59,11 @@ const BuyGbPage = () => {
           id: p.id,
           popular: idx === gbPkgs.length - 1 && gbPkgs.length > 1,
         }));
-        setPackages(mapped);
+        setPackages(mapped.length > 0 ? mapped : DEFAULT_PACKAGES);
       })
       .catch(() => {
         setIsAuthed(false);
+        setPackages(DEFAULT_PACKAGES);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -73,7 +80,18 @@ const BuyGbPage = () => {
   };
 
   const handleBuy = async () => {
-    if (!subscriberId || !confirmPkg || buyingGb !== null) return;
+    if (!confirmPkg || buyingGb !== null) return;
+
+    // If not authenticated, redirect to login
+    if (!isAuthed || !subscriberId) {
+      setConfirmPkg(null);
+      toast({
+        title: i.buyGb_loginRequired,
+      });
+      setTimeout(() => navigate("/"), 1000);
+      return;
+    }
+
     setBuyingGb(confirmPkg.gb);
     try {
       // Client-side balance check
@@ -136,19 +154,6 @@ const BuyGbPage = () => {
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : !isAuthed ? (
-          <div className="flex flex-col items-center gap-4 py-12">
-            <LogIn className="h-10 w-10 text-muted-foreground" />
-            <p className="text-center text-sm text-muted-foreground">
-              {i.buyGb_loginRequired}
-            </p>
-            <button
-              onClick={() => navigate("/")}
-              className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow hover:brightness-110 transition-all"
-            >
-              {i.buyGb_loginButton}
-            </button>
           </div>
         ) : packages.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-12">
