@@ -59,10 +59,11 @@ const BuyGbPage = () => {
           id: p.id,
           popular: idx === gbPkgs.length - 1 && gbPkgs.length > 1,
         }));
-        setPackages(mapped);
+        setPackages(mapped.length > 0 ? mapped : DEFAULT_PACKAGES);
       })
       .catch(() => {
         setIsAuthed(false);
+        setPackages(DEFAULT_PACKAGES);
       })
       .finally(() => setLoading(false));
   }, []);
