@@ -95,10 +95,20 @@ const TopUpPage = () => {
               />
           ) : (
             <>
-              {/* Phone (read-only) */}
-              <div className="mb-6 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+              {/* Phone */}
+              <div className="mb-6 rounded-xl bg-secondary/60 px-4 py-3">
                 <span className="text-sm text-muted-foreground">{i.phoneLabel}</span>
-                <span className="text-sm font-semibold text-foreground">{phone}</span>
+                {isAuthed ? (
+                  <span className="mt-1 block text-sm font-semibold text-foreground">{phone}</span>
+                ) : (
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder={i.phonePlaceholder}
+                    className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                )}
               </div>
 
               {/* Amount */}
