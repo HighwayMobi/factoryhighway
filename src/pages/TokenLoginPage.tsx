@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 
 const TokenLoginPage = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
 
   useEffect(() => {
     if (token) {

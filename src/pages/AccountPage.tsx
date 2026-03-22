@@ -32,7 +32,7 @@ const AccountPage = () => {
     return { year: now.getFullYear(), month: now.getMonth() }; // 0-indexed
   });
   const [financeLoading, setFinanceLoading] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; prepaidPlanChange: number; topUp: number } | null>(null);
   const [user, setUser] = useState({
     name: "",

@@ -25,7 +25,7 @@ const InternalHeader = ({ lang, onLangChange, showBack }: InternalHeaderProps) =
   const [unreadCount, setUnreadCount] = useState(0);
   const langRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const location = useLocation();
   const i = t(lang);
 

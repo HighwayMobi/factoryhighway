@@ -9,7 +9,7 @@ import { fetchUser, apiFetch } from "@/lib/api";
 const ProfilePage = () => {
   const { lang, setLang } = useLang();
   const i = t(lang);
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
 
   const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState("");

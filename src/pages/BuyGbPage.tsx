@@ -27,7 +27,7 @@ interface DisplayPackage {
 
 const BuyGbPage = () => {
   const { lang, setLang } = useLang();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const i = t(lang);
   const [subscriberId, setSubscriberId] = useState<number | null>(null);
   const [balance, setBalance] = useState<number>(0);

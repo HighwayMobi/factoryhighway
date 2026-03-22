@@ -10,7 +10,7 @@ const REDIRECT_DELAY_MS = 2500;
 
 const PaymentSuccessPage = () => {
   const { lang, setLang } = useLang();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const [searchParams] = useSearchParams();
   const i = t(lang);
   const returnTo = searchParams.get("returnTo");

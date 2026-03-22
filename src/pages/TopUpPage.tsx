@@ -26,7 +26,7 @@ const TopUpPage = () => {
   const [phone, setPhone] = useState("");
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const { lang, setLang } = useLang();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const i = t(lang);
 
   useEffect(() => {

@@ -16,7 +16,7 @@ import {
 
 const ChangePlanPage = () => {
   const { lang, setLang } = useLang();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const i = t(lang);
   const [plans, setPlans] = useState<PaidPlan[]>([]);
   const [currentPlanId, setCurrentPlanId] = useState<number | null>(null);
