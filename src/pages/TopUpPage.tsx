@@ -155,13 +155,23 @@ const TopUpPage = () => {
         )}
       </div>
       {(!isAuthed || editingEmail) ? (
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="email@example.com"
-          className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-        />
+        <>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@example.com"
+            className={cn(
+              "mt-2 w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 transition-all",
+              showEmailError
+                ? "border-destructive focus:border-destructive focus:ring-destructive/20"
+                : "border-border focus:border-primary focus:ring-primary/20"
+            )}
+          />
+          {showEmailError && (
+            <p className="mt-1 text-xs text-destructive">{i.emailInvalid}</p>
+          )}
+        </>
       ) : (
         <span className="mt-1 block text-sm font-semibold text-foreground">{email}</span>
       )}

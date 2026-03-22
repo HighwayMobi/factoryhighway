@@ -173,6 +173,7 @@ const translations = {
     amountLabel: "Amount",
     phonePlaceholder: "6XX XXX XXX",
     phoneInvalid: "Enter 9 digits starting with 6 or 7",
+    emailInvalid: "Enter a valid email address",
     otherAmount: "Other amount (min. €3)",
     emailReceipt: "Email for receipt",
     topUpAmount: "Top-up amount",
