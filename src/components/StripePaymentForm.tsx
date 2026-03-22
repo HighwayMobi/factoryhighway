@@ -44,10 +44,12 @@ const StripePaymentForm = ({
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useLangNavigate();
+  const { lang } = useLang();
 
-  const successPath = returnTo
-    ? `${SUCCESS_REDIRECT_PATH}?returnTo=${encodeURIComponent(returnTo)}`
-    : SUCCESS_REDIRECT_PATH;
+  const successParams = new URLSearchParams();
+  successParams.set("lang", lang);
+  if (returnTo) successParams.set("returnTo", returnTo);
+  const successPath = `${SUCCESS_REDIRECT_PATH}?${successParams.toString()}`;
 
   const handleComplete = useCallback(() => {
     onSuccess?.();
