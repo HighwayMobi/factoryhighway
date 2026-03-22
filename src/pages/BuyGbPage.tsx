@@ -155,19 +155,6 @@ const BuyGbPage = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : !isAuthed ? (
-          <div className="flex flex-col items-center gap-4 py-12">
-            <LogIn className="h-10 w-10 text-muted-foreground" />
-            <p className="text-center text-sm text-muted-foreground">
-              {i.buyGb_loginRequired}
-            </p>
-            <button
-              onClick={() => navigate("/")}
-              className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow hover:brightness-110 transition-all"
-            >
-              {i.buyGb_loginButton}
-            </button>
-          </div>
         ) : packages.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-12">
             {lang === "ru" ? "Дополнительные пакеты недоступны для вашего тарифа" : "No additional packages available for your plan"}
