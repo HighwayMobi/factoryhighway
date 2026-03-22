@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { CheckCircle, Loader2 } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { useLang } from "@/contexts/LangContext";
 import { t } from "@/lib/i18n";
 import InternalHeader from "@/components/InternalHeader";
