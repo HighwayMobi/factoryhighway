@@ -145,23 +145,26 @@ const TopUpPage = () => {
                 </div>
               </div>
 
-              {/* Email (editable) */}
+              {/* Email */}
               <div className="mb-8 rounded-xl bg-secondary/60 px-4 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">{i.emailReceipt}</span>
-                  {editingEmail ? (
-                    <button onClick={() => setEditingEmail(false)} className="text-xs font-medium text-primary hover:underline">OK</button>
-                  ) : (
-                    <button onClick={() => setEditingEmail(true)} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                      <Pencil className="h-3 w-3" />
-                    </button>
+                  {isAuthed && (
+                    editingEmail ? (
+                      <button onClick={() => setEditingEmail(false)} className="text-xs font-medium text-primary hover:underline">OK</button>
+                    ) : (
+                      <button onClick={() => setEditingEmail(true)} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                    )
                   )}
                 </div>
-                {editingEmail ? (
+                {(!isAuthed || editingEmail) ? (
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email@example.com"
                     className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 ) : (
