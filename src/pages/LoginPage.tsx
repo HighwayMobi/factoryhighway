@@ -37,7 +37,9 @@ const LoginPage = () => {
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
 
-  const [activeSection, setActiveSection] = useState<ActiveSection>("login");
+  const [searchParams] = useSearchParams();
+  const sectionParam = searchParams.get("section");
+  const [activeSection, setActiveSection] = useState<ActiveSection>(sectionParam === "topup" ? "topup" : "login");
   const [activeTab, setActiveTab] = useState<AuthTab>("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
