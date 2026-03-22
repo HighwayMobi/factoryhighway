@@ -91,10 +91,12 @@ const TopUpPage = () => {
   };
 
   const isPhoneValid = /^[67]\d{8}$/.test(phone.replace(/\s/g, ""));
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const displayAmount = amount ? parseFloat(amount) : 0;
-  const isBalanceValid = displayAmount >= 3 && isPhoneValid && email.length >= 3;
-  const isGbValid = !!selectedPkg && isPhoneValid && email.length >= 3;
+  const isBalanceValid = displayAmount >= 3 && isPhoneValid && isEmailValid;
+  const isGbValid = !!selectedPkg && isPhoneValid && isEmailValid;
   const showPhoneError = phone.length > 0 && !isPhoneValid;
+  const showEmailError = email.length > 0 && !isEmailValid;
 
   const handleTabChange = (tab: "balance" | "gb") => {
     setActiveTab(tab);
