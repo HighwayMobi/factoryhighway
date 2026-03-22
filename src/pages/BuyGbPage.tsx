@@ -35,24 +35,30 @@ const BuyGbPage = () => {
   const [loading, setLoading] = useState(true);
   const [buyingGb, setBuyingGb] = useState<number | null>(null);
   const [confirmPkg, setConfirmPkg] = useState<DisplayPackage | null>(null);
+  const [isAuthed, setIsAuthed] = useState(true);
 
   useEffect(() => {
-    apiFetch("api/user").then((res) => {
-      const sub = Array.isArray(res?.data?.client?.subscribers)
-        ? res.data.client.subscribers[0]
-        : res?.data?.client?.subscribers;
-      if (sub?.id) setSubscriberId(sub.id);
-      setBalance(sub?.balance ?? 0);
+    apiFetch("api/user")
+      .then((res) => {
+        const sub = Array.isArray(res?.data?.client?.subscribers)
+          ? res.data.client.subscribers[0]
+          : res?.data?.client?.subscribers;
+        if (sub?.id) setSubscriberId(sub.id);
+        setBalance(sub?.balance ?? 0);
 
-      const gbPkgs: GbPackage[] = sub?.paid_plan?.gbPackages || [];
-      const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
-        gb: p.size,
-        price: Number(p.price),
-        id: p.id,
-        popular: idx === gbPkgs.length - 1 && gbPkgs.length > 1,
-      }));
-      setPackages(mapped);
-    }).finally(() => setLoading(false));
+        const gbPkgs: GbPackage[] = sub?.paid_plan?.gbPackages || [];
+        const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
+          gb: p.size,
+          price: Number(p.price),
+          id: p.id,
+          popular: idx === gbPkgs.length - 1 && gbPkgs.length > 1,
+        }));
+        setPackages(mapped);
+      })
+      .catch(() => {
+        setIsAuthed(false);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const rawFetch = async (url: string, method: string, body: object) => {

@@ -267,6 +267,8 @@ const translations = {
     buyGb_confirm: "Confirm",
     buyGb_cancel: "Cancel",
     buyGb_month: "/mo",
+    buyGb_loginRequired: "Please log in to view available packages",
+    buyGb_loginButton: "Log in",
     topup_tabBalance: "Top up balance",
     topup_tabBuyGb: "Buy gigabytes",
     // Notifications
