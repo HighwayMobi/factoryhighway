@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { setAuthToken } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 
 const TokenLoginPage = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
 
   useEffect(() => {
     if (token) {

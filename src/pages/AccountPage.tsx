@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
-import { useNavigate } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient } from "@/lib/api";
 import UserAvatar from "@/components/UserAvatar";
@@ -32,7 +32,7 @@ const AccountPage = () => {
     return { year: now.getFullYear(), month: now.getMonth() }; // 0-indexed
   });
   const [financeLoading, setFinanceLoading] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; prepaidPlanChange: number; topUp: number } | null>(null);
   const [user, setUser] = useState({
     name: "",

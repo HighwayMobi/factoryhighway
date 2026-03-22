@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
@@ -27,7 +27,7 @@ interface DisplayPackage {
 
 const BuyGbPage = () => {
   const { lang, setLang } = useLang();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const i = t(lang);
   const [subscriberId, setSubscriberId] = useState<number | null>(null);
   const [balance, setBalance] = useState<number>(0);

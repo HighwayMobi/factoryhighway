@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Eye, EyeOff, Loader2, Globe, Lock, User, MapPin, Mail } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
@@ -9,7 +9,7 @@ import { fetchUser, apiFetch } from "@/lib/api";
 const ProfilePage = () => {
   const { lang, setLang } = useLang();
   const i = t(lang);
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
 
   const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState("");

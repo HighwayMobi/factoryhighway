@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
   Smartphone, CreditCard, Shield, Loader2, Wifi, CheckCircle } from
@@ -64,7 +64,7 @@ const LoginPage = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const i = t(lang);
 
   // Close dropdown on outside click

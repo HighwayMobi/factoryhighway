@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { CheckCircle, Loader2 } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { useLang } from "@/contexts/LangContext";
 import { t } from "@/lib/i18n";
 import InternalHeader from "@/components/InternalHeader";
@@ -9,7 +10,7 @@ const REDIRECT_DELAY_MS = 2500;
 
 const PaymentSuccessPage = () => {
   const { lang, setLang } = useLang();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const [searchParams] = useSearchParams();
   const i = t(lang);
   const returnTo = searchParams.get("returnTo");

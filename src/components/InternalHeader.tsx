@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { Globe, ChevronDown, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type Lang, t } from "@/lib/i18n";
@@ -24,7 +25,7 @@ const InternalHeader = ({ lang, onLangChange, showBack }: InternalHeaderProps) =
   const [unreadCount, setUnreadCount] = useState(0);
   const langRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const location = useLocation();
   const i = t(lang);
 
