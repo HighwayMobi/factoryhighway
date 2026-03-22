@@ -24,6 +24,7 @@ const TopUpPage = () => {
   const [email, setEmail] = useState("");
   const [editingEmail, setEditingEmail] = useState(false);
   const [phone, setPhone] = useState("");
+  const [isAuthed, setIsAuthed] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const { lang, setLang } = useLang();
   const navigate = useLangNavigate();
