@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, CreditCard, Shield, Pencil } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
