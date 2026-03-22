@@ -6,7 +6,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Shield } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-import { useNavigate } from "react-router-dom";
+import { useLangNavigate } from "@/hooks/use-lang-navigate";
 
 const stripePromise = loadStripe(
   "pk_test_51S7bGLQM5BJ4b1inXCowPXEgmkzDv5FTUew7zeTUEqzz9OSm4erZg8Pw5HUp8X3cfc2O64EIPEA43osR4Q0BjOvS00xLdjkHCZ"
