@@ -40,6 +40,11 @@ const LoginPage = () => {
   const [searchParams] = useSearchParams();
   const sectionParam = searchParams.get("section");
   const [activeSection, setActiveSection] = useState<ActiveSection>(sectionParam === "topup" ? "topup" : "login");
+
+  useEffect(() => {
+    if (sectionParam === "topup") setActiveSection("topup");
+    else if (sectionParam === "login") setActiveSection("login");
+  }, [sectionParam]);
   const [activeTab, setActiveTab] = useState<AuthTab>("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
