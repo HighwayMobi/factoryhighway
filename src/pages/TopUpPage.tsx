@@ -298,6 +298,8 @@ const TopUpPage = () => {
             email={email}
             phone={isAuthed ? phone : `+34${phone}`}
             type="gb"
+            size={selectedPkg.gb}
+            packageId={selectedPkg.id}
             onCancel={() => setShowPaymentForm(false)}
             secureLabel={i.securePayment}
             cancelLabel={i.topup_back}

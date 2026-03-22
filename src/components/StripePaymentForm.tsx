@@ -21,6 +21,8 @@ interface StripePaymentFormProps {
   email: string;
   phone: string;
   type: "mobile" | "gb";
+  size?: number;
+  packageId?: string;
   onCancel: () => void;
   onSuccess?: () => void;
   secureLabel: string;
@@ -35,6 +37,8 @@ const StripePaymentForm = ({
   email,
   phone,
   type,
+  size,
+  packageId,
   onCancel,
   onSuccess,
   secureLabel,
@@ -62,9 +66,13 @@ const StripePaymentForm = ({
       const successRedirectUrl = `${window.location.origin}${successPath}`;
 
       // Step 1: Create top-up request
+      const topUpBody: Record<string, unknown> = { type, amount, phone, email, backURL: successRedirectUrl, replenishment: false };
+      if (type === "gb" && size) topUpBody.size = size;
+      if (type === "gb" && packageId) topUpBody.packageId = packageId;
+
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
-        body: JSON.stringify({ type, amount, phone, email, backURL: successRedirectUrl, replenishment: false }),
+        body: JSON.stringify(topUpBody),
       });
       if (!topUpResult.success) {
         throw new Error(topUpResult.message || "Failed to create top-up");
