@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Wifi, Loader2 } from "lucide-react";
+import { ArrowLeft, Wifi, Loader2, CreditCard, Shield, Pencil } from "lucide-react";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
@@ -7,6 +7,7 @@ import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { apiFetch, getAuthToken, type GbPackage } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import StripePaymentForm from "@/components/StripePaymentForm";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -43,6 +44,12 @@ const BuyGbPage = () => {
   const [confirmPkg, setConfirmPkg] = useState<DisplayPackage | null>(null);
   const [isAuthed, setIsAuthed] = useState(true);
 
+  // Payment form state (for unauthenticated users)
+  const [selectedPkg, setSelectedPkg] = useState<DisplayPackage | null>(null);
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+
   useEffect(() => {
     apiFetch("api/user")
       .then((res) => {
@@ -51,6 +58,10 @@ const BuyGbPage = () => {
           : res?.data?.client?.subscribers;
         if (sub?.id) setSubscriberId(sub.id);
         setBalance(sub?.balance ?? 0);
+
+        const c = res?.data?.client;
+        if (c?.email) setEmail(c.email);
+        if (c?.phone) setPhone(c.phone.startsWith("+") ? c.phone : `+${c.phone}`);
 
         const gbPkgs: GbPackage[] = sub?.paid_plan?.gbPackages || [];
         const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
@@ -79,19 +90,21 @@ const BuyGbPage = () => {
     return raw.json();
   };
 
-  const handleBuy = async () => {
-    if (!confirmPkg || buyingGb !== null) return;
-
-    // If not authenticated, redirect to topup with package price
-    if (!isAuthed || !subscriberId) {
-      setConfirmPkg(null);
-      navigate(`/topup?amount=${confirmPkg.price}&returnTo=/buy-gb`);
-      return;
+  const handlePackageClick = (pkg: DisplayPackage) => {
+    if (!isAuthed) {
+      // For unauthenticated users, show payment form
+      setSelectedPkg(pkg);
+    } else {
+      // For authenticated users, show confirmation dialog
+      setConfirmPkg(pkg);
     }
+  };
+
+  const handleBuy = async () => {
+    if (!confirmPkg || buyingGb !== null || !subscriberId) return;
 
     setBuyingGb(confirmPkg.gb);
     try {
-      // Client-side balance check
       if (balance < confirmPkg.price) {
         const shortage = Math.ceil(confirmPkg.price - balance);
         const topUpAmount = Math.max(shortage, 3);
@@ -104,7 +117,6 @@ const BuyGbPage = () => {
         return;
       }
 
-      // Purchase
       const res = await rawFetch(
         "https://sim.highway.mobi/web/api/addGB",
         "PUT",
@@ -126,13 +138,140 @@ const BuyGbPage = () => {
     }
   };
 
+  const isPaymentFormValid = phone.length >= 5 && email.length >= 3;
+
+  // Render payment form for unauthenticated user who selected a package
+  const renderPaymentForm = () => {
+    if (!selectedPkg) return null;
+
+    if (showPaymentForm) {
+      return (
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+          <div className="mb-4 rounded-xl bg-secondary/60 px-4 py-3">
+            <span className="text-sm text-muted-foreground">{i.buyGb_title}</span>
+            <span className="mt-1 block text-sm font-semibold text-foreground">
+              {selectedPkg.gb} GB — €{selectedPkg.price}
+            </span>
+          </div>
+          <StripePaymentForm
+            amount={selectedPkg.price}
+            email={email}
+            phone={phone}
+            type="gb"
+            onCancel={() => setShowPaymentForm(false)}
+            secureLabel={i.securePayment}
+            cancelLabel={i.topup_back}
+            successLabel={i.topup_paymentSuccess}
+            backLabel={i.back}
+            returnTo="/buy-gb"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+        {/* Selected package */}
+        <div className="mb-6 flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+          <div>
+            <span className="text-sm text-muted-foreground">{i.buyGb_title}</span>
+            <span className="mt-1 block text-sm font-semibold text-foreground">
+              {selectedPkg.gb} GB — €{selectedPkg.price}
+            </span>
+          </div>
+          <button
+            onClick={() => setSelectedPkg(null)}
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            {i.buyGb_cancel}
+          </button>
+        </div>
+
+        {/* Phone */}
+        <div className="mb-6 rounded-xl bg-secondary/60 px-4 py-3">
+          <span className="text-sm text-muted-foreground">{i.phoneLabel}</span>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder={i.phonePlaceholder}
+            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+          />
+        </div>
+
+        {/* Email */}
+        <div className="mb-8 rounded-xl bg-secondary/60 px-4 py-3">
+          <span className="text-sm text-muted-foreground">{i.emailReceipt}</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@example.com"
+            className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+          />
+        </div>
+
+        {/* Summary */}
+        <div className="mb-6 rounded-xl bg-secondary/60 p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">{selectedPkg.gb} GB</span>
+            <span className="font-mono text-lg font-bold text-foreground">€{selectedPkg.price.toFixed(2)}</span>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">{i.commission}</span>
+            <span className="text-sm font-semibold text-success">{i.free}</span>
+          </div>
+          <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
+            <span className="text-sm font-semibold text-foreground">{i.total}</span>
+            <span className="font-mono text-xl font-bold text-foreground">€{selectedPkg.price.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* Pay Button */}
+        <button
+          disabled={!isPaymentFormValid}
+          onClick={() => setShowPaymentForm(true)}
+          className={cn(
+            "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+            isPaymentFormValid
+              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
+              : "bg-muted text-muted-foreground cursor-not-allowed"
+          )}
+        >
+          <CreditCard className="h-4 w-4" />
+          {i.payByCard}
+        </button>
+
+        {/* Trust badges */}
+        <div className="mt-5 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Shield className="h-3.5 w-3.5" />
+            {i.securePayment}
+          </div>
+          <span>•</span>
+          <span>Stripe</span>
+          <span>•</span>
+          <span>SSL</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <InternalHeader lang={lang} onLangChange={setLang} />
 
       <main className="mx-auto w-full max-w-lg px-4 py-8 sm:py-12">
         <button
-          onClick={() => navigate("/account")}
+          onClick={() => {
+            if (selectedPkg && !showPaymentForm) {
+              setSelectedPkg(null);
+            } else if (showPaymentForm) {
+              setShowPaymentForm(false);
+            } else {
+              navigate("/account");
+            }
+          }}
           className="mb-6 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -152,6 +291,8 @@ const BuyGbPage = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
+        ) : !isAuthed && selectedPkg ? (
+          renderPaymentForm()
         ) : packages.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-12">
             {lang === "ru" ? "Дополнительные пакеты недоступны для вашего тарифа" : "No additional packages available for your plan"}
@@ -186,7 +327,7 @@ const BuyGbPage = () => {
                     <span className="text-lg font-bold text-primary">€{pkg.price}</span>
                     <button
                       disabled={buyingGb !== null}
-                      onClick={() => setConfirmPkg(pkg)}
+                      onClick={() => handlePackageClick(pkg)}
                       className={cn(
                         "rounded-xl px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-60",
                         pkg.popular
@@ -204,6 +345,7 @@ const BuyGbPage = () => {
         )}
       </main>
 
+      {/* Confirmation dialog for authenticated users */}
       <AlertDialog open={!!confirmPkg} onOpenChange={(open) => !open && setConfirmPkg(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
