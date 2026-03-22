@@ -64,7 +64,7 @@ const LoginPage = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
   const i = t(lang);
 
   // Close dropdown on outside click

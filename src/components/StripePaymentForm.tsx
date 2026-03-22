@@ -42,7 +42,7 @@ const StripePaymentForm = ({
   returnTo,
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const navigate = useLangNavigate();
 
   const successPath = returnTo
     ? `${SUCCESS_REDIRECT_PATH}?returnTo=${encodeURIComponent(returnTo)}`
