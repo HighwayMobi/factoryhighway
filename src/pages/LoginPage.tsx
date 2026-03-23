@@ -23,9 +23,9 @@ type TopUpMode = "balance" | "buyGb";
 
 const amountPresets = [5, 10, 20, 50];
 const gbPackages = [
-{ gb: 1, price: 3 },
-{ gb: 5, price: 6 },
-{ gb: 20, price: 10, popular: true }];
+{ gb: 1, price: 3, id: "default-1" },
+{ gb: 5, price: 6, id: "default-5" },
+{ gb: 20, price: 10, popular: true, id: "default-20" }];
 
 const languages: {code: "ru" | "en";label: string;}[] = [
 { code: "ru", label: "RU" },
@@ -644,6 +644,8 @@ const LoginPage = () => {
                       email={topUpEmail}
                       phone={`34${phoneDigits(topUpPhone)}`}
                       type="gb"
+                      size={selectedGbPkg!.gb}
+                      packageId={selectedGbPkg!.id}
                       onCancel={() => setShowPaymentForm(false)}
                       secureLabel={i.securePayment}
                       cancelLabel={i.topup_back} /> :
