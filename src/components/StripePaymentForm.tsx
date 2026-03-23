@@ -70,6 +70,7 @@ const StripePaymentForm = ({
       if (type === "gb" && size != null) {
         // For GB packages: amount = package size (GB count), not the price
         topUpBody.amount = Math.round(size);
+        topUpBody.size = Math.round(size);
       } else {
         topUpBody.amount = amount;
       }
