@@ -68,7 +68,7 @@ const StripePaymentForm = ({
       // Step 1: Create top-up request
       const topUpBody: Record<string, unknown> = { type, amount, phone, email, backURL: successRedirectUrl, replenishment: false };
       if (type === "gb" && size) topUpBody.size = size;
-      if (type === "gb" && packageId) topUpBody.packageId = packageId;
+      if (type === "gb" && packageId && !packageId.startsWith("default-")) topUpBody.packageId = packageId;
 
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
