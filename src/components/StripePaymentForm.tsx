@@ -67,12 +67,9 @@ const StripePaymentForm = ({
 
       // Step 1: Create top-up request
       const topUpBody: Record<string, unknown> = { type, phone, email, backURL: successRedirectUrl, replenishment: false };
+      topUpBody.amount = amount;
       if (type === "gb" && size != null) {
-        // For GB packages: amount = package size (GB count), not the price
-        topUpBody.amount = Math.round(size);
         topUpBody.size = Math.round(size);
-      } else {
-        topUpBody.amount = amount;
       }
       if (type === "gb" && packageId && !packageId.startsWith("default-")) topUpBody.packageId = packageId;
 
