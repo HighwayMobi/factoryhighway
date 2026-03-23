@@ -109,7 +109,7 @@ const LoginPage = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-          body: JSON.stringify({ amount: payAmount, email: payEmail, phone: `+34${phoneDigits(payPhone)}` })
+          body: JSON.stringify({ amount: payAmount, email: payEmail, phone: `34${phoneDigits(payPhone)}` })
         }
       );
       const data = await res.json();
@@ -541,7 +541,7 @@ const LoginPage = () => {
                     <StripePaymentForm
                       amount={displayAmount}
                       email={topUpEmail}
-                      phone={`+34${phoneDigits(topUpPhone)}`}
+                       phone={`34${phoneDigits(topUpPhone)}`}
                       type="mobile"
                       onCancel={() => setShowPaymentForm(false)}
                       secureLabel={i.securePayment}
@@ -642,7 +642,7 @@ const LoginPage = () => {
                     <StripePaymentForm
                       amount={selectedGbPkg!.price}
                       email={topUpEmail}
-                      phone={`+34${phoneDigits(topUpPhone)}`}
+                      phone={`34${phoneDigits(topUpPhone)}`}
                       type="gb"
                       onCancel={() => setShowPaymentForm(false)}
                       secureLabel={i.securePayment}

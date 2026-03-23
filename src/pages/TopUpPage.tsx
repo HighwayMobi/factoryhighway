@@ -197,7 +197,7 @@ const TopUpPage = () => {
         <StripePaymentForm
           amount={displayAmount}
           email={email}
-          phone={isAuthed ? phone : `+34${phone}`}
+          phone={isAuthed ? phone : `34${phone}`}
           type="mobile"
           onCancel={() => setShowPaymentForm(false)}
           secureLabel={i.securePayment}
@@ -296,7 +296,7 @@ const TopUpPage = () => {
           <StripePaymentForm
             amount={selectedPkg.price}
             email={email}
-            phone={isAuthed ? phone : `+34${phone}`}
+            phone={isAuthed ? phone : `34${phone}`}
             type="gb"
             size={selectedPkg.gb}
             packageId={selectedPkg.id}
