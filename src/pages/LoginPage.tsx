@@ -644,6 +644,8 @@ const LoginPage = () => {
                       email={topUpEmail}
                       phone={`34${phoneDigits(topUpPhone)}`}
                       type="gb"
+                      size={selectedGbPkg!.gb}
+                      packageId={selectedGbPkg!.id}
                       onCancel={() => setShowPaymentForm(false)}
                       secureLabel={i.securePayment}
                       cancelLabel={i.topup_back} /> :
