@@ -29,6 +29,9 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
   }
   const res = await fetch(`${API_BASE}/${path}`, { ...options, headers });
   if (!res.ok) {
+    let errorBody = "";
+    try { errorBody = await res.text(); } catch {}
+    console.error(`[apiFetch] ${options.method || "GET"} ${path} → ${res.status}`, errorBody);
     throw new Error(`API error ${res.status}`);
   }
   return res.json();
