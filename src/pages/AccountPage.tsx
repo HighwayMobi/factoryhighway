@@ -220,7 +220,7 @@ const AccountPage = () => {
     <div className="min-h-screen flex flex-col bg-background relative">
       <InternalHeader lang={lang} onLangChange={setLang} />
 
-      {user.status === "NOT ACTIVATED" && (
+      {user.status.toLowerCase().replace(/[\s_-]+/g, "") === "notactivated" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md">
           <div className="flex flex-col items-center gap-5 rounded-2xl border border-border bg-card px-8 py-10 shadow-2xl text-center max-w-sm mx-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
