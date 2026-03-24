@@ -236,6 +236,8 @@ const translations = {
     acc_cancelPlanConfirmYes: "Yes, cancel",
     acc_cancelPlanConfirmNo: "No",
     acc_logout: "Log out",
+    acc_notActivated: "Your line is not activated yet!",
+    acc_notActivatedDesc: "Please wait a few minutes and refresh the page.",
     acc_blocked: "Your account is blocked",
     acc_blockedDesc: "Please contact support if you have any questions.",
     // Profile page
