@@ -81,6 +81,8 @@ const translations = {
     acc_cancelPlanConfirmYes: "Да, отменить",
     acc_cancelPlanConfirmNo: "Нет",
     acc_logout: "Выйти",
+    acc_notActivated: "Ваша линия ещё не активирована!",
+    acc_notActivatedDesc: "Подождите несколько минут и обновите страницу.",
     acc_blocked: "Ваш аккаунт заблокирован",
     acc_blockedDesc: "Обратитесь в поддержку, если у вас есть вопросы.",
     // Profile page
