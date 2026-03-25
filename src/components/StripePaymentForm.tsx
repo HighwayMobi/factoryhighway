@@ -92,6 +92,7 @@ const StripePaymentForm = ({
         amount: resAmount,
         email: resEmail,
         name,
+        title: type === "gb" ? "ADD GB" : "TOP UP",
         metadata,
         return_url: successRedirectUrl,
         backURL: successRedirectUrl,
