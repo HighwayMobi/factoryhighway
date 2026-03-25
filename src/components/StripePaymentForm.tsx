@@ -88,17 +88,19 @@ const StripePaymentForm = ({
       // Step 2: Init Stripe checkout — pass data as-is from topUp, no return_url override
       const { email: resEmail, name, amount: resAmount, product, metadata } = topUpResult.data;
 
+      const checkoutBody: Record<string, unknown> = {
+        amount: resAmount,
+        email: resEmail,
+        name,
+        metadata,
+        return_url: successRedirectUrl,
+        backURL: successRedirectUrl,
+      };
+      if (product != null) checkoutBody.product = product;
+
       const checkoutResult = await apiFetch("api/checkout", {
         method: "POST",
-        body: JSON.stringify({
-          amount: resAmount,
-          email: resEmail,
-          name,
-          product,
-          metadata,
-          return_url: successRedirectUrl,
-          backURL: successRedirectUrl,
-        }),
+        body: JSON.stringify(checkoutBody),
       });
       if (!checkoutResult.success) {
         throw new Error(checkoutResult.message || "Failed to init checkout");
