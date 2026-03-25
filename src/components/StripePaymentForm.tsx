@@ -92,11 +92,11 @@ const StripePaymentForm = ({
         amount: resAmount,
         email: resEmail,
         name,
+        product,
         metadata,
         return_url: successRedirectUrl,
         backURL: successRedirectUrl,
       };
-      if (product != null) checkoutBody.product = product;
 
       const checkoutResult = await apiFetch("api/checkout", {
         method: "POST",
