@@ -66,7 +66,7 @@ const StripePaymentForm = ({
       const successRedirectUrl = `${window.location.origin}${successPath}`;
 
       // Step 1: Create top-up request
-      const topUpBody: Record<string, unknown> = { type, phone, email, backURL: successRedirectUrl, replenishment: false };
+      const topUpBody: Record<string, unknown> = { type, phone, email, backURL: successRedirectUrl, replenishment: false, title: type === "gb" ? "ADD GB" : "TOP UP" };
       topUpBody.amount = amount;
       if (type === "gb" && size != null) {
         topUpBody.gb = Math.round(size);
