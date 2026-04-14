@@ -6,7 +6,7 @@ import {
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
   ChevronLeft, Download, ShieldOff,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
@@ -292,10 +292,10 @@ const AccountPage = () => {
             <div className="border-t border-border px-6 py-3 flex items-center justify-between">
               <div>
                 <span className="text-sm text-muted-foreground">{i.acc_balance}</span>
-                <span className="ml-2 text-sm font-bold text-primary">€{user.balance}</span>
+                <span className="ml-2 text-sm font-bold text-primary">€{fmtPrice(user.balance)}</span>
                 <br />
                 <span className="text-xs text-muted-foreground">{i.acc_monthlyFee}</span>
-                <span className="ml-1 text-xs font-semibold text-primary">€{user.monthlyFee}</span>
+                <span className="ml-1 text-xs font-semibold text-primary">€{fmtPrice(user.monthlyFee)}</span>
               </div>
               <button
                 onClick={() => navigate("/topup")}
@@ -325,8 +325,8 @@ const AccountPage = () => {
                           ? (() => { const d = new Date(); d.setDate(d.getDate() + 1); return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`; })()
                           : user.feeDate;
                         return lang === "ru"
-                          ? <>С {showDate} тариф сменится на<br />«{user.newPlan}» — €{user.newPlanPrice}/мес</>
-                          : <>From {showDate} plan changes to<br />"{user.newPlan}" — €{user.newPlanPrice}/mo</>;
+                          ? <>С {showDate} тариф сменится на<br />«{user.newPlan}» — €{fmtPrice(user.newPlanPrice)}/мес</>
+                          : <>From {showDate} plan changes to<br />"{user.newPlan}" — €{fmtPrice(user.newPlanPrice)}/mo</>;
                       })()}
                     </span>
                     <button
@@ -339,7 +339,7 @@ const AccountPage = () => {
                   </div>
                 ) : (
                   <>
-                    {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
+                    {i.acc_feeNotice} €{fmtPrice(user.monthlyFee)} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
                   </>
                 )}
               </div>
@@ -447,23 +447,23 @@ const AccountPage = () => {
                     <>
                       <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
                         <span className="text-sm text-foreground">{i.acc_planFee}</span>
-                        <span className="text-sm font-semibold text-primary">- {finance?.planFee ?? user.monthlyFee}€</span>
+                        <span className="text-sm font-semibold text-primary">- {fmtPrice(finance?.planFee ?? user.monthlyFee)}€</span>
                       </div>
                       {(finance?.additionalServices ?? 0) > 0 && (
                         <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
                           <span className="text-sm text-foreground">{i.acc_additionalServices}</span>
-                          <span className="text-sm font-semibold text-primary">- {finance!.additionalServices}€</span>
+                          <span className="text-sm font-semibold text-primary">- {fmtPrice(finance!.additionalServices)}€</span>
                         </div>
                       )}
                       {(finance?.prepaidPlanChange ?? 0) > 0 && (
                         <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
                           <span className="text-sm text-foreground">{i.acc_prepaidPlanChange}</span>
-                          <span className="text-sm font-semibold text-primary">- {finance!.prepaidPlanChange}€</span>
+                          <span className="text-sm font-semibold text-primary">- {fmtPrice(finance!.prepaidPlanChange)}€</span>
                         </div>
                       )}
                       <div className="px-6 py-3.5 flex items-center justify-between border-b border-border">
                         <span className="text-sm text-foreground">{i.acc_topUpBalance}</span>
-                        <span className="text-sm font-semibold text-primary">+ {finance?.topUp ?? 0}€</span>
+                        <span className="text-sm font-semibold text-primary">+ {fmtPrice(finance?.topUp ?? 0)}€</span>
                       </div>
                       {/* Invoice download for past months */}
                       {(() => {
@@ -507,12 +507,12 @@ const AccountPage = () => {
                       <div className="flex items-stretch rounded-b-2xl bg-primary text-primary-foreground">
                         <div className="flex-1 px-6 py-3 flex flex-col items-start justify-center">
                           <span className="text-xs font-medium opacity-90">{i.acc_used}</span>
-                          <span className="text-lg font-bold">{(finance?.planFee ?? 0) + (finance?.additionalServices ?? 0) + (finance?.prepaidPlanChange ?? 0)}€</span>
+                          <span className="text-lg font-bold">{fmtPrice((finance?.planFee ?? 0) + (finance?.additionalServices ?? 0) + (finance?.prepaidPlanChange ?? 0))}€</span>
                         </div>
                         <div className="w-px bg-primary-foreground/30 my-2" />
                         <div className="flex-1 px-6 py-3 flex flex-col items-end justify-center">
                           <span className="text-xs font-medium opacity-90">{i.acc_topUpBalance}</span>
-                          <span className="text-lg font-bold">{finance?.topUp ?? 0}€</span>
+                          <span className="text-lg font-bold">{fmtPrice(finance?.topUp ?? 0)}€</span>
                         </div>
                       </div>
                     </>
