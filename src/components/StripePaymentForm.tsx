@@ -73,8 +73,6 @@ const StripePaymentForm = ({
       }
       if (type === "gb" && packageId && !packageId.startsWith("default-")) topUpBody.packageId = packageId;
 
-      console.log("[StripePaymentForm] topUp request body:", JSON.stringify(topUpBody));
-
       const topUpResult = await apiFetch("api/topUp", {
         method: "POST",
         body: JSON.stringify(topUpBody),
@@ -83,7 +81,7 @@ const StripePaymentForm = ({
         throw new Error(topUpResult.message || "Failed to create top-up");
       }
 
-      console.log("[StripePaymentForm] topUp response:", JSON.stringify(topUpResult));
+      
 
       // Step 2: Init Stripe checkout — pass data as-is from topUp, no return_url override
       const { email: resEmail, name, amount: resAmount, product, metadata } = topUpResult.data;
