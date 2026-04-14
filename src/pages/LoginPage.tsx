@@ -518,7 +518,7 @@ const LoginPage = () => {
                       <div className="mb-5 rounded-xl bg-secondary/60 p-4">
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">{i.topUpAmount}</span>
-                          <span className="font-mono text-lg font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
+                          <span className="font-mono text-lg font-bold text-foreground">€{fmtPrice(displayAmount)}</span>
                         </div>
                         <div className="mt-2 flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">{i.commission}</span>
@@ -526,7 +526,7 @@ const LoginPage = () => {
                         </div>
                         <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
                           <span className="text-sm font-semibold text-foreground">{i.total}</span>
-                          <span className="font-mono text-xl font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
+                          <span className="font-mono text-xl font-bold text-foreground">€{fmtPrice(displayAmount)}</span>
                         </div>
                       </div>
 
@@ -593,7 +593,7 @@ const LoginPage = () => {
                                 </div>
                                 <span className="text-lg font-bold text-foreground">{pkg.gb} GB</span>
                               </div>
-                              <span className="text-lg font-bold text-primary">€{pkg.price}</span>
+                              <span className="text-lg font-bold text-primary">€{fmtPrice(pkg.price)}</span>
                             </div>
                           </div>
                       )}
@@ -618,7 +618,7 @@ const LoginPage = () => {
                     <div className="mb-5 rounded-xl bg-secondary/60 p-4">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">{selectedGbPkg.gb} GB</span>
-                            <span className="font-mono text-lg font-bold text-foreground">€{selectedGbPkg.price.toFixed(2)}</span>
+                            <span className="font-mono text-lg font-bold text-foreground">€{fmtPrice(selectedGbPkg.price)}</span>
                           </div>
                           <div className="mt-2 flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">{i.commission}</span>
@@ -626,7 +626,7 @@ const LoginPage = () => {
                           </div>
                           <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
                             <span className="text-sm font-semibold text-foreground">{i.total}</span>
-                            <span className="font-mono text-xl font-bold text-foreground">€{selectedGbPkg.price.toFixed(2)}</span>
+                            <span className="font-mono text-xl font-bold text-foreground">€{fmtPrice(selectedGbPkg.price)}</span>
                           </div>
                         </div>
                     }
