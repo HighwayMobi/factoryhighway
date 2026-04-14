@@ -5,7 +5,7 @@ import {
   Mail, Phone, Eye, EyeOff, ChevronDown, Globe, Lock, User,
   Smartphone, CreditCard, Shield, Loader2, Wifi, CheckCircle } from
 "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useToast } from "@/hooks/use-toast";
