@@ -134,7 +134,7 @@ const ChangePlanPage = () => {
             <p className="text-sm font-bold text-foreground">{currentPlanName}</p>
           </div>
           {currentPlanPrice !== null && (
-            <span className="text-lg font-bold text-primary whitespace-nowrap">€{currentPlanPrice}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
+            <span className="text-lg font-bold text-primary whitespace-nowrap">€{fmtPrice(currentPlanPrice)}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
           )}
         </div>
 
@@ -156,7 +156,7 @@ const ChangePlanPage = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-primary whitespace-nowrap">€{plan.price}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
+                    <span className="text-lg font-bold text-primary whitespace-nowrap">€{fmtPrice(plan.price)}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
                     <button
                       onClick={() => handleSelectPlan(plan)}
                       className="rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.98]"
@@ -179,7 +179,7 @@ const ChangePlanPage = () => {
                 </div>
                 <div className="flex-1">
                   <span className="text-base font-bold text-foreground">{i.cp_freezeTitle}</span>
-                  <p className="text-xs text-muted-foreground">€{freezePlan.price}{i.cp_perMonth}</p>
+                  <p className="text-xs text-muted-foreground">€{fmtPrice(freezePlan.price)}{i.cp_perMonth}</p>
                 </div>
                 <button
                   onClick={() => handleSelectPlan(freezePlan)}
@@ -251,7 +251,7 @@ const ChangePlanPage = () => {
                   )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{i.cp_monthlyFee}</span>
-                    <span className="font-bold text-primary">€{selectedPlan.price}</span>
+                    <span className="font-bold text-primary">€{fmtPrice(selectedPlan.price)}</span>
                   </div>
                 </div>
                 <div className={cn(
