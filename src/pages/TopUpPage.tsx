@@ -291,7 +291,7 @@ const TopUpPage = () => {
         <>
           <div className="mb-4 rounded-xl bg-secondary/60 px-4 py-3">
             <span className="text-sm text-muted-foreground">{selectedPkg.gb} GB</span>
-            <span className="mt-1 block text-sm font-semibold text-foreground">€{selectedPkg.price}</span>
+            <span className="mt-1 block text-sm font-semibold text-foreground">€{fmtPrice(selectedPkg.price)}</span>
           </div>
           <StripePaymentForm
             amount={selectedPkg.price}
@@ -342,7 +342,7 @@ const TopUpPage = () => {
                 </div>
                 <span className="text-lg font-bold text-foreground">{pkg.gb} GB</span>
               </div>
-              <span className="text-lg font-bold text-primary">€{pkg.price}</span>
+              <span className="text-lg font-bold text-primary">€{fmtPrice(pkg.price)}</span>
             </button>
           ))}
         </div>
@@ -354,7 +354,7 @@ const TopUpPage = () => {
           <div className="mb-6 rounded-xl bg-secondary/60 p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">{selectedPkg.gb} GB</span>
-              <span className="font-mono text-lg font-bold text-foreground">€{selectedPkg.price.toFixed(2)}</span>
+              <span className="font-mono text-lg font-bold text-foreground">€{fmtPrice(selectedPkg.price)}</span>
             </div>
             <div className="mt-2 flex items-center justify-between">
               <span className="text-sm text-muted-foreground">{i.commission}</span>
@@ -362,7 +362,7 @@ const TopUpPage = () => {
             </div>
             <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground">{i.total}</span>
-              <span className="font-mono text-xl font-bold text-foreground">€{selectedPkg.price.toFixed(2)}</span>
+              <span className="font-mono text-xl font-bold text-foreground">€{fmtPrice(selectedPkg.price)}</span>
             </div>
           </div>
         )}
