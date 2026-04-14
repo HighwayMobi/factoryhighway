@@ -292,10 +292,10 @@ const AccountPage = () => {
             <div className="border-t border-border px-6 py-3 flex items-center justify-between">
               <div>
                 <span className="text-sm text-muted-foreground">{i.acc_balance}</span>
-                <span className="ml-2 text-sm font-bold text-primary">€{user.balance}</span>
+                <span className="ml-2 text-sm font-bold text-primary">€{fmtPrice(user.balance)}</span>
                 <br />
                 <span className="text-xs text-muted-foreground">{i.acc_monthlyFee}</span>
-                <span className="ml-1 text-xs font-semibold text-primary">€{user.monthlyFee}</span>
+                <span className="ml-1 text-xs font-semibold text-primary">€{fmtPrice(user.monthlyFee)}</span>
               </div>
               <button
                 onClick={() => navigate("/topup")}
@@ -325,8 +325,8 @@ const AccountPage = () => {
                           ? (() => { const d = new Date(); d.setDate(d.getDate() + 1); return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`; })()
                           : user.feeDate;
                         return lang === "ru"
-                          ? <>С {showDate} тариф сменится на<br />«{user.newPlan}» — €{user.newPlanPrice}/мес</>
-                          : <>From {showDate} plan changes to<br />"{user.newPlan}" — €{user.newPlanPrice}/mo</>;
+                          ? <>С {showDate} тариф сменится на<br />«{user.newPlan}» — €{fmtPrice(user.newPlanPrice)}/мес</>
+                          : <>From {showDate} plan changes to<br />"{user.newPlan}" — €{fmtPrice(user.newPlanPrice)}/mo</>;
                       })()}
                     </span>
                     <button
@@ -339,7 +339,7 @@ const AccountPage = () => {
                   </div>
                 ) : (
                   <>
-                    {i.acc_feeNotice} €{user.monthlyFee} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
+                    {i.acc_feeNotice} €{fmtPrice(user.monthlyFee)} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
                   </>
                 )}
               </div>
