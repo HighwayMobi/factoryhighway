@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Signal, Loader2, Check, Snowflake, AlertTriangle } from "lucide-react";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
-import { cn } from "@/lib/utils";
+import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";

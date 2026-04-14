@@ -6,7 +6,7 @@ import {
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
   ChevronLeft, Download, ShieldOff,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
