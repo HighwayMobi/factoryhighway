@@ -253,7 +253,7 @@ const TopUpPage = () => {
         <div className="mb-6 rounded-xl bg-secondary/60 p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">{i.topUpAmount}</span>
-            <span className="font-mono text-lg font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
+            <span className="font-mono text-lg font-bold text-foreground">€{fmtPrice(displayAmount)}</span>
           </div>
           <div className="mt-2 flex items-center justify-between">
             <span className="text-sm text-muted-foreground">{i.commission}</span>
@@ -261,7 +261,7 @@ const TopUpPage = () => {
           </div>
           <div className="mt-3 border-t border-border pt-3 flex items-center justify-between">
             <span className="text-sm font-semibold text-foreground">{i.total}</span>
-            <span className="font-mono text-xl font-bold text-foreground">€{displayAmount.toFixed(2)}</span>
+            <span className="font-mono text-xl font-bold text-foreground">€{fmtPrice(displayAmount)}</span>
           </div>
         </div>
 
