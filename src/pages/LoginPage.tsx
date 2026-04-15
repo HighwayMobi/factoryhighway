@@ -63,6 +63,7 @@ const LoginPage = () => {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState<{type: "ok" | "err";text: string;} | null>(null);
+  const [forgotCooldown, setForgotCooldown] = useState(0);
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [topUpMode, setTopUpMode] = useState<TopUpMode>("balance");
   const [selectedGbPkg, setSelectedGbPkg] = useState<typeof gbPackages[0] | null>(null);
@@ -189,7 +190,20 @@ const LoginPage = () => {
     }
   };
 
+  // Cooldown timer effect
+  useEffect(() => {
+    if (forgotCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setForgotCooldown(prev => {
+        if (prev <= 1) { clearInterval(timer); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [forgotCooldown]);
+
   const handleForgotPassword = async () => {
+    if (forgotCooldown > 0) return;
     setForgotMsg(null);
     setForgotLoading(true);
     try {
@@ -205,6 +219,7 @@ const LoginPage = () => {
       const data = await res.json();
       if (res.ok && data.success) {
         setForgotMsg({ type: "ok", text: i.passwordSent });
+        setForgotCooldown(120);
       } else {
         setForgotMsg({ type: "err", text: forgotTab === "phone" ? i.forgotPasswordError : i.forgotPasswordEmailError });
       }
@@ -777,17 +792,17 @@ const LoginPage = () => {
             }
 
             <button
-              disabled={!isForgotValid || forgotLoading}
+              disabled={!isForgotValid || forgotLoading || forgotCooldown > 0}
               onClick={handleForgotPassword}
               className={cn(
                 "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                isForgotValid && !forgotLoading ?
+                isForgotValid && !forgotLoading && forgotCooldown === 0 ?
                 "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 active:scale-[0.98]" :
                 "bg-muted text-muted-foreground cursor-not-allowed"
               )}>
 
               {forgotLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {forgotLoading ? i.sending : i.sendPassword}
+              {forgotLoading ? i.sending : forgotCooldown > 0 ? `${i.sendPassword} (${Math.floor(forgotCooldown / 60)}:${String(forgotCooldown % 60).padStart(2, '0')})` : i.sendPassword}
             </button>
           </div>
         </DialogContent>
