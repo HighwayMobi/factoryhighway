@@ -58,12 +58,21 @@ const InternalHeader = ({ lang, onLangChange, showBack, brandTitle }: InternalHe
   return (
     <header className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-        <img
-          src={highwayLogo}
-          alt="Highway Mobile"
-          className="h-9 cursor-pointer"
-          onClick={() => navigate("/account")}
-        />
+        {brandTitle ? (
+          <button
+            onClick={() => navigate("/account")}
+            className="text-lg font-bold tracking-wide text-foreground hover:text-primary transition-colors"
+          >
+            {brandTitle}
+          </button>
+        ) : (
+          <img
+            src={highwayLogo}
+            alt="Highway Mobile"
+            className="h-9 cursor-pointer"
+            onClick={() => navigate("/account")}
+          />
+        )}
         <div className="flex items-center gap-3">
           {/* Notifications */}
           <div className="relative" ref={notifRef}>
