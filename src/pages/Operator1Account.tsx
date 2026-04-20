@@ -18,7 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const AccountPage = () => {
+const Operator1Account = () => {
   const { lang, setLang } = useLang();
   const { toast } = useToast();
   const [financesOpen, setFinancesOpen] = useState(false);
