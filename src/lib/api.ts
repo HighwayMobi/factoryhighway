@@ -70,6 +70,8 @@ export interface Remains {
 export interface Subscriber {
   id: number;
   number: string;
+  operator: string;
+  operator_id: number;
   active: boolean;
   status: string;
   balance: number;
