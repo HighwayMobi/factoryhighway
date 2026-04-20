@@ -18,7 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const Operator1Account = () => {
+const Operator2Account = () => {
   const { lang, setLang } = useLang();
   const { toast } = useToast();
   const [financesOpen, setFinancesOpen] = useState(false);
@@ -208,7 +208,7 @@ const Operator1Account = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <InternalHeader lang={lang} onLangChange={setLang} />
+        <InternalHeader lang={lang} onLangChange={setLang} brandTitle="ОПЕРАТОР2" />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -218,7 +218,7 @@ const Operator1Account = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative">
-      <InternalHeader lang={lang} onLangChange={setLang} />
+      <InternalHeader lang={lang} onLangChange={setLang} brandTitle="ОПЕРАТОР2" />
 
       {user.status.toLowerCase().replace(/[\s_-]+/g, "") === "notactivated" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md">
@@ -611,4 +611,4 @@ const Operator1Account = () => {
   );
 };
 
-export default Operator1Account;
+export default Operator2Account;
