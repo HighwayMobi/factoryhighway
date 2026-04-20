@@ -17,9 +17,10 @@ interface InternalHeaderProps {
   lang: Lang;
   onLangChange: (lang: Lang) => void;
   showBack?: boolean;
+  brandTitle?: string;
 }
 
-const InternalHeader = ({ lang, onLangChange, showBack }: InternalHeaderProps) => {
+const InternalHeader = ({ lang, onLangChange, showBack, brandTitle }: InternalHeaderProps) => {
   const [langOpen, setLangOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
