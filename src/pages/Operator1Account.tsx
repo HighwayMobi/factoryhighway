@@ -611,4 +611,4 @@ const Operator1Account = () => {
   );
 };
 
-export default AccountPage;
+export default Operator1Account;
