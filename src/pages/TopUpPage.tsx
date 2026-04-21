@@ -99,6 +99,7 @@ const TopUpPage = () => {
   const isGbValid = !!selectedPkg && isPhoneValid && isEmailValid;
   const showPhoneError = !isAuthed && phone.length > 0 && !isPhoneValid;
   const showEmailError = email.length > 0 && !isEmailValid;
+  const showEmailRequired = !isAuthed && email.trim() === "" && isPhoneValid && (displayAmount >= 3 || !!selectedPkg);
 
   const handleTabChange = (tab: "balance" | "gb") => {
     setActiveTab(tab);
