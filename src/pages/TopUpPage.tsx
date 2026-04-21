@@ -99,6 +99,7 @@ const TopUpPage = () => {
   const isGbValid = !!selectedPkg && isPhoneValid && isEmailValid;
   const showPhoneError = !isAuthed && phone.length > 0 && !isPhoneValid;
   const showEmailError = email.length > 0 && !isEmailValid;
+  const showEmailRequired = !isAuthed && email.trim() === "" && isPhoneValid && (displayAmount >= 3 || !!selectedPkg);
 
   const handleTabChange = (tab: "balance" | "gb") => {
     setActiveTab(tab);
@@ -165,13 +166,16 @@ const TopUpPage = () => {
             placeholder="email@example.com"
             className={cn(
               "mt-2 w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 transition-all",
-              showEmailError
+              showEmailError || showEmailRequired
                 ? "border-destructive focus:border-destructive focus:ring-destructive/20"
                 : "border-border focus:border-primary focus:ring-primary/20"
             )}
           />
           {showEmailError && (
             <p className="mt-1 text-xs text-destructive">{i.emailInvalid}</p>
+          )}
+          {!showEmailError && showEmailRequired && (
+            <p className="mt-1 text-xs text-destructive">{i.emailReceipt}</p>
           )}
         </>
       ) : (
