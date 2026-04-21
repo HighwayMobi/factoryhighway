@@ -378,15 +378,6 @@ const LoginPage = () => {
                     </div>
                   }
 
-                  {apiResponse &&
-                  <div className="mb-4 rounded-xl bg-secondary border border-border px-4 py-3 text-xs text-foreground overflow-auto max-h-48">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold text-sm">API Response:</span>
-                        <button onClick={() => setApiResponse(null)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
-                      </div>
-                      <pre className="whitespace-pre-wrap break-all">{apiResponse}</pre>
-                    </div>
-                  }
 
                   <button
                     disabled={!isLoginValid || isLoggingIn}
