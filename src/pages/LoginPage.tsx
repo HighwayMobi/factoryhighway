@@ -166,25 +166,20 @@ const LoginPage = () => {
         body: JSON.stringify(body)
       });
 
-      const data = await res.json();
-      setApiResponse(JSON.stringify(data, null, 2));
+      const data = await res.json().catch(() => ({}));
 
-      if (!res.ok) {
+      const token = data?.data?.token || data?.token;
+      if (!res.ok || data?.success === false || !token) {
         setLoginError(i.loginError);
         return;
       }
 
-      // Store token
-      const token = data.data?.token || data.token;
-      if (token) {
-        const { setAuthToken } = await import("@/lib/api");
-        setAuthToken(token);
-      }
+      const { setAuthToken } = await import("@/lib/api");
+      setAuthToken(token);
 
       navigate("/account");
     } catch (err) {
-      setApiResponse(String(err));
-      setLoginError(i.networkError);
+      setLoginError(i.loginError);
     } finally {
       setIsLoggingIn(false);
     }
