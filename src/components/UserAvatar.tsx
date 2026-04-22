@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Camera, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getAuthToken } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 
 interface UserAvatarProps {
   userId: number | null;
   className?: string;
 }
+
+const AVATAR_API_URL = "https://avatars.highway.mobi/api/upload/avatar";
+const AVATAR_API_KEY = "8415ead183d47c07c463e07625c257d4cb67668ae064b1c56199ba185e6755c8";
 
 const UserAvatar = ({ userId, className }: UserAvatarProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -24,10 +26,8 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
       .maybeSingle()
       .then(({ data }) => {
         if (data?.avatar_path) {
-          const { data: urlData } = supabase.storage
-            .from("avatars")
-            .getPublicUrl(data.avatar_path);
-          setAvatarUrl(urlData.publicUrl + "?t=" + Date.now());
+          // avatar_path now stores full external URL
+          setAvatarUrl(data.avatar_path);
         }
       });
   }, [userId]);
@@ -39,24 +39,38 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
     setUploading(true);
     try {
       const form = new FormData();
-      form.append("avatar", file);
+      form.append("file", file);
 
-      const { data, error } = await supabase.functions.invoke("upload-avatar", {
+      const res = await fetch(AVATAR_API_URL, {
+        method: "POST",
+        headers: { "X-Api-Key": AVATAR_API_KEY },
         body: form,
-        headers: {
-          "x-highway-token": getAuthToken() || "",
-          "x-highway-user-id": String(userId),
-        },
       });
 
-      if (error) {
-        console.error("Avatar upload error:", error);
+      if (!res.ok) {
+        console.error("Avatar upload failed:", res.status, await res.text());
         return;
       }
 
-      if (data?.url) {
-        setAvatarUrl(data.url + "?t=" + Date.now());
+      const json = await res.json();
+      const url: string | undefined = json?.url;
+      if (!url) {
+        console.error("Avatar API: no url in response", json);
+        return;
       }
+
+      // Persist URL via edge function (service role bypasses RLS)
+      const { error: saveError } = await supabase.functions.invoke("save-avatar-url", {
+        body: { highway_user_id: userId, url },
+      });
+
+      if (saveError) {
+        console.error("Failed to save avatar url:", saveError);
+      }
+
+      setAvatarUrl(url + "?t=" + Date.now());
+      // Reset input so same file can be re-uploaded
+      if (inputRef.current) inputRef.current.value = "";
     } catch (err) {
       console.error("Avatar upload failed:", err);
     } finally {
