@@ -264,7 +264,7 @@ const Operator1Account = () => {
             <UserAvatar userId={user.clientId} />
             <div>
               <h1 className="text-xl font-bold text-foreground">{user.name}</h1>
-              <p className="text-sm font-medium text-primary">{user.phone}</p>
+              <SubscriberSelect subscribers={subscribersList} selectedId={user.subscriberId} />
             </div>
             <button
               onClick={handleRefresh}
