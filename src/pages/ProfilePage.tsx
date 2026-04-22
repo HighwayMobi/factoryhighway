@@ -12,6 +12,7 @@ const ProfilePage = () => {
   const navigate = useLangNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [operatorId, setOperatorId] = useState<number>(1);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [docId, setDocId] = useState("");
