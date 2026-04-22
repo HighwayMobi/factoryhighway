@@ -218,7 +218,7 @@ const Operator2Account = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative">
-      <InternalHeader lang={lang} onLangChange={setLang} brandTitle="ОПЕРАТОР2" />
+      <InternalHeader lang={lang} onLangChange={setLang} />
 
       {user.status.toLowerCase().replace(/[\s_-]+/g, "") === "notactivated" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md">
