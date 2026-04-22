@@ -694,7 +694,7 @@ const LoginPage = () => {
             <div className="flex gap-4 text-xs text-muted-foreground">
               <a href={`https://highway.mobi/privacy?lang=${lang}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">{i.privacy}</a>
               <a href={`https://highway.mobi/terms?lang=${lang}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">{i.terms}</a>
-              <a href={`https://highway.mobi/contacts?lang=${lang}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">{i.contacts}</a>
+              <a href={`https://highway.mobi/?lang=${lang}#distributor`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">{i.contacts}</a>
             </div>
             <p className="text-xs text-muted-foreground">© 2026 highway.mobi</p>
           </div>
