@@ -206,6 +206,7 @@ const Operator2Account = () => {
       // ignore — clear token regardless
     }
     clearAuthToken();
+    sessionStorage.removeItem("selected_subscriber_id");
     navigate("/");
   };
 
