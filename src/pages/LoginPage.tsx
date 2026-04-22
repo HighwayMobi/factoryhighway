@@ -101,31 +101,7 @@ const LoginPage = () => {
     setAmount(String(value));
   };
 
-  const handlePublicPay = async (payAmount: number, payPhone: string, payEmail: string) => {
-    if (paying) return;
-    setPaying(true);
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-topup-checkout`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-          body: JSON.stringify({ amount: payAmount, email: payEmail, phone: `34${phoneDigits(payPhone)}` })
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Payment error");
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No checkout URL");
-      }
-    } catch {
-      toast({ title: i.topup_error, variant: "destructive" });
-    } finally {
-      setPaying(false);
-    }
-  };
+  // Guest payments use the unified <StripePaymentForm /> below, which calls the BO API directly.
 
   // Format phone: max 9 digits starting with 6 or 7, formatted as XXX XXX XXX
   const formatSpanishPhone = (raw: string): string => {
