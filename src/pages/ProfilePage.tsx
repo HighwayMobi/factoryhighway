@@ -116,6 +116,8 @@ const ProfilePage = () => {
 
         <h1 className="mb-6 text-2xl font-bold text-foreground">{i.prof_title}</h1>
 
+        {operatorId !== 2 && (
+          <>
         {/* ── Personal Info (read-only) ── */}
         <div className="rounded-2xl border border-border bg-card shadow-sm p-6 mb-4">
           <div className={sectionTitle}>
@@ -171,8 +173,8 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
-
-        {/* ── Email (read-only) ── */}
+          </>
+        )}
         <div className="rounded-2xl border border-border bg-card shadow-sm p-6 mb-4">
           <div className={sectionTitle}>
             <Mail className="h-5 w-5 text-primary" />
