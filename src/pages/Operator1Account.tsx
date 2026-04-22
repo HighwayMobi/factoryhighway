@@ -36,6 +36,7 @@ const Operator1Account = () => {
   const [financeLoading, setFinanceLoading] = useState(false);
   const navigate = useLangNavigate();
   const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; prepaidPlanChange: number; topUp: number } | null>(null);
+  const [subscribersList, setSubscribersList] = useState<Subscriber[]>([]);
   const [user, setUser] = useState({
     name: "",
     phone: "",
@@ -62,7 +63,8 @@ const Operator1Account = () => {
     try {
       const { data } = await fetchUser();
       const c = data.client;
-      const sub = Array.isArray(c.subscribers) ? c.subscribers[0] : c.subscribers;
+      setSubscribersList(getSubscribersList(c));
+      const sub = pickSubscriber(c);
       const plan = sub?.paid_plan;
 
       let remains = sub?.remains;
