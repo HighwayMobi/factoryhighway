@@ -395,7 +395,7 @@ const LoginPage = () => {
 
                   <p className="mt-4 text-center text-xs text-muted-foreground">
                     {i.loginDisclaimer}{" "}
-                    <a href="#" className="text-primary hover:underline">{i.termsLink}</a>
+                    <a href={`https://highway.mobi/terms?lang=${lang}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{i.termsLink}</a>
                   </p>
 
                   <div className="my-5 border-t border-border" />
@@ -692,9 +692,9 @@ const LoginPage = () => {
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="flex gap-4 text-xs text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">{i.privacy}</a>
-              <a href="#" className="hover:text-foreground transition-colors">{i.terms}</a>
-              <a href="#" className="hover:text-foreground transition-colors">{i.contacts}</a>
+              <a href={`https://highway.mobi/privacy?lang=${lang}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">{i.privacy}</a>
+              <a href={`https://highway.mobi/terms?lang=${lang}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">{i.terms}</a>
+              <a href={`https://highway.mobi/contacts?lang=${lang}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">{i.contacts}</a>
             </div>
             <p className="text-xs text-muted-foreground">© 2026 highway.mobi</p>
           </div>
