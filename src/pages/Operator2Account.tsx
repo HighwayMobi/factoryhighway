@@ -351,38 +351,11 @@ const Operator2Account = () => {
             <div className="px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wifi className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">{i.acc_dataAvailable}</span>
+                <span className="text-sm font-medium text-foreground">{lang === "ru" ? "Ваш тариф" : "Your Plan"}</span>
               </div>
-              <span className="text-sm font-bold text-primary">{user.dataRemaining} Gb {i.acc_of} {user.dataTotal} Gb</span>
+              <span className="text-sm font-bold text-primary">{user.dataTotal} Gb</span>
             </div>
-            <div className="border-t border-border px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <PhoneIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">{i.acc_minutesAvailable}</span>
-              </div>
-              <span className="text-sm font-bold text-primary">{user.minutesLimit ?? i.acc_unlimited}</span>
-            </div>
-            {user.dataRemaining < 1 && (
-              <div className="bg-destructive/10 px-6 py-2.5 text-center text-xs font-medium text-destructive">
-                {i.acc_noData}{" "}
-                <button onClick={() => navigate("/buy-gb")} className="underline font-semibold hover:text-destructive/80">{i.acc_buyHere}</button>
-              </div>
-            )}
           </div>
-
-          {/* Buy GB */}
-          <button
-            onClick={() => navigate("/buy-gb")}
-            className="w-full rounded-2xl border border-border bg-card shadow-sm px-6 py-4 flex items-center justify-between transition-colors hover:bg-secondary/50"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                <Plus className="h-4 w-4 text-primary" />
-              </div>
-              <span className="text-base font-semibold text-foreground">{i.acc_buyGb}</span>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </button>
 
           {/* Finances Accordion */}
           <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
