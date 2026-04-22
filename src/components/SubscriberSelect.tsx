@@ -45,9 +45,7 @@ const SubscriberSelect = ({ subscribers, selectedId }: Props) => {
           >
             <div className="flex flex-col">
               <span>{fmtPhone(s.number)}</span>
-              <span className="text-xs text-muted-foreground">
-                {s.operator} · {s.paid_plan?.name}
-              </span>
+              <span className="text-xs text-muted-foreground">{s.paid_plan?.name}</span>
             </div>
           </DropdownMenuItem>
         ))}
