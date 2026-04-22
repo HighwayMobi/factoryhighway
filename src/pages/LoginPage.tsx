@@ -67,7 +67,7 @@ const LoginPage = () => {
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const [topUpMode, setTopUpMode] = useState<TopUpMode>("balance");
   const [selectedGbPkg, setSelectedGbPkg] = useState<typeof gbPackages[0] | null>(null);
-  const [paying, setPaying] = useState(false);
+  
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
