@@ -90,8 +90,13 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
     >
       {uploading ? (
         <Loader2 className="h-5 w-5 animate-spin text-primary" />
-      ) : avatarUrl ? (
-        <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+      ) : avatarUrl && avatarUrl.trim() !== "" ? (
+        <img
+          src={avatarUrl}
+          alt="Avatar"
+          className="h-full w-full object-cover"
+          onError={() => setAvatarUrl(null)}
+        />
       ) : (
         <User className="h-6 w-6 text-primary" />
       )}
