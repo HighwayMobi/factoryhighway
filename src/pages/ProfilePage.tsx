@@ -36,6 +36,8 @@ const ProfilePage = () => {
     fetchUser()
       .then(({ data }) => {
         const c = data.client;
+        const sub = Array.isArray(c.subscribers) ? c.subscribers[0] : c.subscribers;
+        setOperatorId((sub as any)?.operator_id ?? 1);
         setFirstName(c.first_name || "");
         setLastName(c.second_name || "");
         setDocId(c.passport_number || "");
