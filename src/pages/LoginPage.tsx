@@ -609,7 +609,7 @@ const LoginPage = () => {
                     }
 
                       {/* Pay Button or Embedded Form */}
-                      {showPaymentForm && topUpMode === "buyGb" ?
+                      {showPaymentForm && topUpMode === "buyGb" && selectedGbPkg ?
                     paymentSuccess ?
                     <div className="flex flex-col items-center gap-3 py-6">
                             <CheckCircle className="h-12 w-12 text-primary" />
@@ -617,12 +617,12 @@ const LoginPage = () => {
                           </div> :
 
                     <StripePaymentForm
-                      amount={selectedGbPkg!.price}
+                      amount={selectedGbPkg.price}
                       email={topUpEmail}
                       phone={`34${phoneDigits(topUpPhone)}`}
                       type="gb"
-                      size={selectedGbPkg!.gb}
-                      packageId={selectedGbPkg!.id}
+                      size={selectedGbPkg.gb}
+                      packageId={selectedGbPkg.id}
                       onCancel={() => setShowPaymentForm(false)}
                       secureLabel={i.securePayment}
                       cancelLabel={i.topup_back} /> :
