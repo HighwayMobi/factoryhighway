@@ -11,8 +11,10 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient } from "@/lib/api";
+import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient, type Subscriber } from "@/lib/api";
+import { pickSubscriber, getSubscribersList } from "@/lib/selectedSubscriber";
 import UserAvatar from "@/components/UserAvatar";
+import SubscriberSelect from "@/components/SubscriberSelect";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
