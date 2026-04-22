@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Camera, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
 
 interface UserAvatarProps {
   userId: number | null;
   className?: string;
 }
 
-const AVATAR_API_URL = "https://avatars.highway.mobi/api/upload/avatar";
+const AVATAR_API_BASE = "https://avatars.highway.mobi/api";
 const AVATAR_API_KEY = "8415ead183d47c07c463e07625c257d4cb67668ae064b1c56199ba185e6755c8";
 
 const UserAvatar = ({ userId, className }: UserAvatarProps) => {
@@ -16,21 +15,30 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load avatar URL from DB on mount
+  // Load current avatar URL from external API
   useEffect(() => {
     if (!userId) return;
-    supabase
-      .from("user_avatars")
-      .select("avatar_path")
-      .eq("highway_user_id", userId)
-      .maybeSingle()
-      .then(({ data }) => {
-        const path = data?.avatar_path;
-        // Only accept full external URLs; ignore legacy storage paths like "2/avatar.png"
-        if (path && /^https?:\/\//i.test(path)) {
-          setAvatarUrl(path);
+    let cancelled = false;
+    fetch(`${AVATAR_API_BASE}/avatar/${userId}`, {
+      headers: { "X-Api-Key": AVATAR_API_KEY },
+    })
+      .then(async (res) => {
+        if (!res.ok) return null;
+        const json = await res.json();
+        return json?.url as string | undefined;
+      })
+      .then((url) => {
+        if (cancelled) return;
+        if (url && /^https?:\/\//i.test(url)) {
+          setAvatarUrl(url);
         }
+      })
+      .catch(() => {
+        /* no avatar yet */
       });
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,9 +48,10 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
     setUploading(true);
     try {
       const form = new FormData();
+      form.append("client_id", String(userId));
       form.append("file", file);
 
-      const res = await fetch(AVATAR_API_URL, {
+      const res = await fetch(`${AVATAR_API_BASE}/upload/avatar`, {
         method: "POST",
         headers: { "X-Api-Key": AVATAR_API_KEY },
         body: form,
@@ -60,17 +69,8 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
         return;
       }
 
-      // Persist URL via edge function (service role bypasses RLS)
-      const { error: saveError } = await supabase.functions.invoke("save-avatar-url", {
-        body: { highway_user_id: userId, url },
-      });
-
-      if (saveError) {
-        console.error("Failed to save avatar url:", saveError);
-      }
-
+      // Cache-bust to force refresh
       setAvatarUrl(url + "?t=" + Date.now());
-      // Reset input so same file can be re-uploaded
       if (inputRef.current) inputRef.current.value = "";
     } catch (err) {
       console.error("Avatar upload failed:", err);
