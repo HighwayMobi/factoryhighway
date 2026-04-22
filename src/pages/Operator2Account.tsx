@@ -208,7 +208,7 @@ const Operator2Account = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <InternalHeader lang={lang} onLangChange={setLang} brandTitle="ОПЕРАТОР2" />
+        <InternalHeader lang={lang} onLangChange={setLang} />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
