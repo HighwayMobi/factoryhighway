@@ -11,8 +11,10 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient } from "@/lib/api";
+import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient, type Subscriber } from "@/lib/api";
+import { pickSubscriber, getSubscribersList } from "@/lib/selectedSubscriber";
 import UserAvatar from "@/components/UserAvatar";
+import SubscriberSelect from "@/components/SubscriberSelect";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -34,6 +36,7 @@ const Operator2Account = () => {
   const [financeLoading, setFinanceLoading] = useState(false);
   const navigate = useLangNavigate();
   const [finance, setFinance] = useState<{ planFee: number; additionalServices: number; prepaidPlanChange: number; topUp: number } | null>(null);
+  const [subscribersList, setSubscribersList] = useState<Subscriber[]>([]);
   const [user, setUser] = useState({
     name: "",
     phone: "",
@@ -60,7 +63,8 @@ const Operator2Account = () => {
     try {
       const { data } = await fetchUser();
       const c = data.client;
-      const sub = Array.isArray(c.subscribers) ? c.subscribers[0] : c.subscribers;
+      setSubscribersList(getSubscribersList(c));
+      const sub = pickSubscriber(c);
       const plan = sub?.paid_plan;
 
       let remains = sub?.remains;
@@ -202,6 +206,7 @@ const Operator2Account = () => {
       // ignore — clear token regardless
     }
     clearAuthToken();
+    sessionStorage.removeItem("selected_subscriber_id");
     navigate("/");
   };
 
@@ -260,7 +265,7 @@ const Operator2Account = () => {
             <UserAvatar userId={user.clientId} />
             <div>
               <h1 className="text-xl font-bold text-foreground">{user.name}</h1>
-              <p className="text-sm font-medium text-primary">{user.phone}</p>
+              <SubscriberSelect subscribers={subscribersList} selectedId={user.subscriberId} />
             </div>
             <button
               onClick={handleRefresh}

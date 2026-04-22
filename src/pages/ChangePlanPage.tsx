@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { apiFetch, fetchUser, type PaidPlan } from "@/lib/api";
+import { pickSubscriber } from "@/lib/selectedSubscriber";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +38,7 @@ const ChangePlanPage = () => {
       apiFetch("api/paidPlans/1"),
     ])
       .then(([userRes, plansRes]) => {
-        const sub = Array.isArray(userRes.data.client.subscribers) ? userRes.data.client.subscribers[0] : userRes.data.client.subscribers;
+        const sub = pickSubscriber(userRes.data.client)!;
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
         setCurrentPlanPrice(sub.paid_plan?.price ?? null);

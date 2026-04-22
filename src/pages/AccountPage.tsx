@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { fetchUser } from "@/lib/api";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
+import { pickSubscriber } from "@/lib/selectedSubscriber";
 import Operator1Account from "./Operator1Account";
 import Operator2Account from "./Operator2Account";
 
@@ -13,8 +14,7 @@ const AccountPage = () => {
   useEffect(() => {
     fetchUser()
       .then(({ data }) => {
-        const c = data.client;
-        const sub = Array.isArray(c.subscribers) ? c.subscribers[0] : c.subscribers;
+        const sub = pickSubscriber(data.client);
         setOperatorId(sub?.operator_id ?? 1);
       })
       .catch((err) => {

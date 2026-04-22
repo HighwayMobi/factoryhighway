@@ -7,6 +7,7 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, type GbPackage } from "@/lib/api";
+import { pickSubscriber } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import StripePaymentForm from "@/components/StripePaymentForm";
 
@@ -58,7 +59,7 @@ const TopUpPage = () => {
         setIsAuthed(true);
 
         // Load user-specific GB packages
-        const sub = Array.isArray(c.subscribers) ? c.subscribers[0] : c.subscribers;
+        const sub = pickSubscriber(c);
         const gbPkgs: GbPackage[] = (sub as any)?.paid_plan?.gbPackages || [];
         if (gbPkgs.length > 0) {
           const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
