@@ -46,6 +46,7 @@ const Operator2Account = () => {
     feeDate: "",
     dataRemaining: 0,
     dataTotal: 0,
+    planGb: 0,
     minutesLimit: null as number | null,
     paymentType: "",
     iccid: "",
@@ -103,6 +104,7 @@ const Operator2Account = () => {
         monthlyFee: plan?.price ?? 0,
         feeDate,
         dataTotal: Math.max(remains?.gb_initial ?? plan?.gb ?? 0, remains?.gb ?? 0),
+        planGb: plan?.gb ?? 0,
         dataRemaining: remains?.gb ?? 0,
         minutesLimit: plan?.minutes === 0 ? null : (plan?.minutes ?? null),
         paymentType: sub?.payment_type ?? "",
@@ -358,7 +360,7 @@ const Operator2Account = () => {
                 <Wifi className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-foreground">{lang === "ru" ? "Ваш тариф" : "Your Plan"}</span>
               </div>
-              <span className="text-sm font-bold text-primary">{user.dataTotal} Gb</span>
+              <span className="text-sm font-bold text-primary">{user.planGb} Gb</span>
             </div>
           </div>
 
