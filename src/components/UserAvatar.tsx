@@ -25,9 +25,10 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
       .eq("highway_user_id", userId)
       .maybeSingle()
       .then(({ data }) => {
-        if (data?.avatar_path) {
-          // avatar_path now stores full external URL
-          setAvatarUrl(data.avatar_path);
+        const path = data?.avatar_path;
+        // Only accept full external URLs; ignore legacy storage paths like "2/avatar.png"
+        if (path && /^https?:\/\//i.test(path)) {
+          setAvatarUrl(path);
         }
       });
   }, [userId]);
