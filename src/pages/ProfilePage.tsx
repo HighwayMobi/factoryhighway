@@ -5,6 +5,7 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, apiFetch } from "@/lib/api";
+import { pickSubscriber } from "@/lib/selectedSubscriber";
 
 const ProfilePage = () => {
   const { lang, setLang } = useLang();
@@ -36,7 +37,7 @@ const ProfilePage = () => {
     fetchUser()
       .then(({ data }) => {
         const c = data.client;
-        const sub = Array.isArray(c.subscribers) ? c.subscribers[0] : c.subscribers;
+        const sub = pickSubscriber(c);
         setOperatorId((sub as any)?.operator_id ?? 1);
         setFirstName(c.first_name || "");
         setLastName(c.second_name || "");
