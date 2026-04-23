@@ -49,6 +49,9 @@ const TopUpPage = () => {
   // GB packages state
   const [packages, setPackages] = useState<DisplayPackage[]>(DEFAULT_PACKAGES);
   const [selectedPkg, setSelectedPkg] = useState<DisplayPackage | null>(null);
+  const [subscriberId, setSubscriberId] = useState<number | null>(null);
+  const [subscriberBalance, setSubscriberBalance] = useState<number>(0);
+  const [payingFromBalance, setPayingFromBalance] = useState(false);
 
   useEffect(() => {
     fetchUser()
@@ -60,6 +63,10 @@ const TopUpPage = () => {
 
         // Load user-specific GB packages
         const sub = pickSubscriber(c);
+        if (sub) {
+          setSubscriberId(sub.id);
+          setSubscriberBalance(Number(sub.balance) || 0);
+        }
         const gbPkgs: GbPackage[] = (sub as any)?.paid_plan?.gbPackages || [];
         if (gbPkgs.length > 0) {
           const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
