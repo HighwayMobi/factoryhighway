@@ -158,7 +158,7 @@ const translations = {
     topup_payFromBalance: "Оплатить с баланса",
     topup_orPayCard: "или",
     topup_notEnoughFunds: "Недостаточно средств на балансе",
-    topup_error: "Ошибка, проверьте данные",
+    topup_notEnoughFundsMsg: "Недостаточно средств на балансе",
   },
   en: {
     loginTitle: "Sign in to your account",
@@ -317,7 +317,7 @@ const translations = {
     topup_payFromBalance: "Pay from balance",
     topup_orPayCard: "or",
     topup_notEnoughFunds: "Not enough funds on balance",
-    topup_error: "Error, please check details",
+    topup_notEnoughFundsMsg: "Not enough funds on balance",
   },
 } as const;
 
