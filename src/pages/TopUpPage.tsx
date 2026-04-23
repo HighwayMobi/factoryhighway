@@ -6,7 +6,7 @@ import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, type GbPackage } from "@/lib/api";
+import { fetchUser, addGbFromBalance, type GbPackage } from "@/lib/api";
 import { pickSubscriber } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import StripePaymentForm from "@/components/StripePaymentForm";
@@ -49,6 +49,9 @@ const TopUpPage = () => {
   // GB packages state
   const [packages, setPackages] = useState<DisplayPackage[]>(DEFAULT_PACKAGES);
   const [selectedPkg, setSelectedPkg] = useState<DisplayPackage | null>(null);
+  const [subscriberId, setSubscriberId] = useState<number | null>(null);
+  const [subscriberBalance, setSubscriberBalance] = useState<number>(0);
+  const [payingFromBalance, setPayingFromBalance] = useState(false);
 
   useEffect(() => {
     fetchUser()
@@ -60,6 +63,10 @@ const TopUpPage = () => {
 
         // Load user-specific GB packages
         const sub = pickSubscriber(c);
+        if (sub) {
+          setSubscriberId(sub.id);
+          setSubscriberBalance(Number(sub.balance) || 0);
+        }
         const gbPkgs: GbPackage[] = (sub as any)?.paid_plan?.gbPackages || [];
         if (gbPkgs.length > 0) {
           const mapped: DisplayPackage[] = gbPkgs.map((p, idx) => ({
@@ -111,6 +118,26 @@ const TopUpPage = () => {
   const handlePhoneChange = (val: string) => {
     const digits = val.replace(/\D/g, "");
     setPhone(digits.slice(0, 9));
+  };
+
+  const canPayFromBalance = isAuthed && !!selectedPkg && subscriberId != null && subscriberBalance >= (selectedPkg?.price ?? Infinity);
+
+  const handleBalancePay = async () => {
+    if (!selectedPkg || subscriberId == null) return;
+    setPayingFromBalance(true);
+    try {
+      await addGbFromBalance(subscriberId, selectedPkg.gb);
+      toast({ title: i.topup_paymentSuccess });
+      navigate("/account?refresh=1");
+    } catch (e: any) {
+      const msg = String(e?.message || "");
+      toast({
+        title: msg.includes("401") ? i.topup_notEnoughFunds || "Недостаточно средств" : i.topup_error || "Ошибка, проверьте данные",
+        variant: "destructive",
+      });
+    } finally {
+      setPayingFromBalance(false);
+    }
   };
 
   const renderPhoneField = () => (
@@ -375,19 +402,46 @@ const TopUpPage = () => {
         )}
 
         {/* Pay Button */}
-        <button
-          disabled={!isGbValid}
-          onClick={() => setShowPaymentForm(true)}
-          className={cn(
-            "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-            isGbValid
-              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
-              : "bg-muted text-muted-foreground cursor-not-allowed"
-          )}
-        >
-          <CreditCard className="h-4 w-4" />
-          {i.payByCard}
-        </button>
+        {canPayFromBalance ? (
+          <>
+            <button
+              disabled={!isGbValid || payingFromBalance}
+              onClick={handleBalancePay}
+              className={cn(
+                "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+                isGbValid && !payingFromBalance
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
+              )}
+            >
+              {payingFromBalance ? "..." : `${i.topup_payFromBalance || "Оплатить с баланса"} (€${fmtPrice(subscriberBalance)})`}
+            </button>
+            <p className="mt-2 text-center text-xs text-muted-foreground">
+              {i.topup_orPayCard || "или"}{" "}
+              <button
+                type="button"
+                onClick={() => setShowPaymentForm(true)}
+                className="font-medium text-primary hover:underline"
+              >
+                {i.payByCard}
+              </button>
+            </p>
+          </>
+        ) : (
+          <button
+            disabled={!isGbValid}
+            onClick={() => setShowPaymentForm(true)}
+            className={cn(
+              "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
+              isGbValid
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:brightness-110 active:scale-[0.98]"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
+            )}
+          >
+            <CreditCard className="h-4 w-4" />
+            {i.payByCard}
+          </button>
+        )}
 
         {renderTrustBadges()}
       </>

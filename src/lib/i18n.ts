@@ -155,6 +155,10 @@ const translations = {
     topup_success: "Баланс успешно пополнен!",
     topup_back: "← Назад",
     topup_paymentSuccess: "Оплата прошла успешно!",
+    topup_payFromBalance: "Оплатить с баланса",
+    topup_orPayCard: "или",
+    topup_notEnoughFunds: "Недостаточно средств на балансе",
+    topup_notEnoughFundsMsg: "Недостаточно средств на балансе",
   },
   en: {
     loginTitle: "Sign in to your account",
@@ -310,6 +314,10 @@ const translations = {
     topup_success: "Balance topped up successfully!",
     topup_back: "← Back",
     topup_paymentSuccess: "Payment successful!",
+    topup_payFromBalance: "Pay from balance",
+    topup_orPayCard: "or",
+    topup_notEnoughFunds: "Not enough funds on balance",
+    topup_notEnoughFundsMsg: "Not enough funds on balance",
   },
 } as const;
 

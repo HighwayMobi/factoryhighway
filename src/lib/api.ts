@@ -117,3 +117,9 @@ export interface UserResponse {
 }
 
 export const fetchUser = (): Promise<UserResponse> => apiFetch("api/user");
+
+export const addGbFromBalance = (subscriberId: number, size: number) =>
+  apiFetch("api/addGB", {
+    method: "PUT",
+    body: JSON.stringify({ subscriber_id: subscriberId, size }),
+  });
