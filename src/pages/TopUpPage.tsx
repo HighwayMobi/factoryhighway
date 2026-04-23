@@ -473,35 +473,37 @@ const TopUpPage = () => {
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-          {/* Tabs */}
-          <div className="mb-6 flex rounded-xl border border-border bg-secondary/40 p-1">
-            <button
-              onClick={() => handleTabChange("balance")}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
-                activeTab === "balance"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <CreditCard className="h-4 w-4" />
-              {i.topup_tabBalance}
-            </button>
-            <button
-              onClick={() => handleTabChange("gb")}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
-                activeTab === "gb"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Wifi className="h-4 w-4" />
-              {i.topup_tabBuyGb}
-            </button>
-          </div>
+          {/* Tabs — hide GB tab for operator 2 */}
+          {gbAllowed && (
+            <div className="mb-6 flex rounded-xl border border-border bg-secondary/40 p-1">
+              <button
+                onClick={() => handleTabChange("balance")}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                  activeTab === "balance"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <CreditCard className="h-4 w-4" />
+                {i.topup_tabBalance}
+              </button>
+              <button
+                onClick={() => handleTabChange("gb")}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all",
+                  activeTab === "gb"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Wifi className="h-4 w-4" />
+                {i.topup_tabBuyGb}
+              </button>
+            </div>
+          )}
 
-          {activeTab === "balance" ? renderBalanceTab() : renderGbTab()}
+          {activeTab === "balance" || !gbAllowed ? renderBalanceTab() : renderGbTab()}
         </div>
       </main>
 
