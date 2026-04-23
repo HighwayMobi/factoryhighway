@@ -52,6 +52,8 @@ const TopUpPage = () => {
   const [subscriberId, setSubscriberId] = useState<number | null>(null);
   const [subscriberBalance, setSubscriberBalance] = useState<number>(0);
   const [payingFromBalance, setPayingFromBalance] = useState(false);
+  const [operatorId, setOperatorId] = useState<number | null>(null);
+  const gbAllowed = operatorId !== 2;
 
   useEffect(() => {
     fetchUser()
