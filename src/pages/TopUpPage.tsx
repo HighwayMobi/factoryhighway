@@ -6,7 +6,7 @@ import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, type GbPackage } from "@/lib/api";
+import { fetchUser, addGbFromBalance, type GbPackage } from "@/lib/api";
 import { pickSubscriber } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import StripePaymentForm from "@/components/StripePaymentForm";
