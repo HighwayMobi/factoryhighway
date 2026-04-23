@@ -68,6 +68,10 @@ const TopUpPage = () => {
         if (sub) {
           setSubscriberId(sub.id);
           setSubscriberBalance(Number(sub.balance) || 0);
+          setOperatorId(sub.operator_id ?? null);
+          if (sub.operator_id === 2 && activeTab === "gb") {
+            setActiveTab("balance");
+          }
         }
         const gbPkgs: GbPackage[] = (sub as any)?.paid_plan?.gbPackages || [];
         if (gbPkgs.length > 0) {
