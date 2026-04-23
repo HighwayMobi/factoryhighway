@@ -420,7 +420,7 @@ const TopUpPage = () => {
                   : "bg-muted text-muted-foreground cursor-not-allowed"
               )}
             >
-              {payingFromBalance ? "..." : `${i.topup_payFromBalance || "Оплатить с баланса"} (€${fmtPrice(subscriberBalance)})`}
+              {payingFromBalance ? "..." : i.topup_payFromBalance.replace("{amount}", fmtPrice(subscriberBalance))}
             </button>
             <p className="mt-2 text-center text-xs text-muted-foreground">
               {i.topup_orPayCard || "или"}{" "}
