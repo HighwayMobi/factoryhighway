@@ -60,18 +60,22 @@ const TopUpPage = () => {
       .then(({ data }) => {
         const c = data.client;
         setEmail(c.email || "");
-        setPhone(c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "");
         setIsAuthed(true);
 
         // Load user-specific GB packages
         const sub = pickSubscriber(c);
         if (sub) {
+          // Use the SELECTED subscriber's number (not the client's main phone)
+          const subNum = sub.number || "";
+          setPhone(subNum ? (subNum.startsWith("+") ? subNum : `+34 ${subNum}`) : "");
           setSubscriberId(sub.id);
           setSubscriberBalance(Number(sub.balance) || 0);
           setOperatorId(sub.operator_id ?? null);
           if (sub.operator_id === 2 && activeTab === "gb") {
             setActiveTab("balance");
           }
+        } else {
+          setPhone(c.phone ? (c.phone.startsWith("+") ? c.phone : `+${c.phone}`) : "");
         }
         const gbPkgs: GbPackage[] = (sub as any)?.paid_plan?.gbPackages || [];
         if (gbPkgs.length > 0) {
