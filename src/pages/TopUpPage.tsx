@@ -340,7 +340,7 @@ const TopUpPage = () => {
           <StripePaymentForm
             amount={selectedPkg.price}
             email={email}
-            phone={isAuthed ? phone : `34${phone}`}
+            phone={isAuthed ? `34${phone.replace(/\D/g, "").replace(/^34/, "")}` : `34${phone}`}
             type="gb"
             size={selectedPkg.gb}
             packageId={selectedPkg.id}
