@@ -241,7 +241,7 @@ const TopUpPage = () => {
         <StripePaymentForm
           amount={displayAmount}
           email={email}
-          phone={isAuthed ? phone : `34${phone}`}
+          phone={isAuthed ? `34${phone.replace(/\D/g, "").replace(/^34/, "")}` : `34${phone}`}
           type="mobile"
           onCancel={() => setShowPaymentForm(false)}
           secureLabel={i.securePayment}
