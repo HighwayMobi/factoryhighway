@@ -378,7 +378,7 @@ const LoginPage = () => {
 
                   <p className="text-center text-sm text-muted-foreground">
                     {i.notSubscriber}{" "}
-                    <a className="font-semibold text-primary hover:underline" href="https://signup.highway.mobi/?lang=en">{i.registration}</a>.
+                    <a className="font-semibold text-primary hover:underline" href={`https://signup.highway.mobi/?lang=${lang}`}>{i.registration}</a>.
                   </p>
                 </div>
               </div>
