@@ -139,7 +139,7 @@ const translations = {
     cp_perMonth: "/мес",
     cp_confirmTitle: "Подтверждение смены тарифа",
     cp_newPlan: "Новый тариф",
-    cp_data: "Трафик",
+    cp_data: "Пакет ГБ",
     cp_monthlyFee: "Абонентская плата",
     cp_upgradeNote: "Новый тариф будет применён {date}. Абонентская плата €{price} будет списана сразу.",
     cp_downgradeNote: "Новый тариф будет применён после окончания оплаченного периода текущего тарифа — {date}.",
