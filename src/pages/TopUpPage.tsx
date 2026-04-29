@@ -42,7 +42,8 @@ const TopUpPage = () => {
   const [editingEmail, setEditingEmail] = useState(false);
   const [phone, setPhone] = useState("");
   const [isAuthed, setIsAuthed] = useState(false);
-  const [showPaymentForm, setShowPaymentForm] = useState(autoOpenCardPayment && initialTab === "balance" && Number.isFinite(initialNum) && initialNum >= 3);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [autoOpenConsumed, setAutoOpenConsumed] = useState(false);
   const { lang, setLang } = useLang();
   const navigate = useLangNavigate();
   const i = t(lang);
