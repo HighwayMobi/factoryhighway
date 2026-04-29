@@ -229,3 +229,50 @@ export const addGbFromBalance = (subscriberId: number, size: number) =>
     method: "PUT",
     body: JSON.stringify({ subscriber_id: subscriberId, size }),
   });
+
+export interface CheckFundsResult {
+  enough: boolean;
+  deficit: number; // amount missing in EUR (0 if enough)
+  raw?: any;
+}
+
+/**
+ * Calls api/checkFunds to verify the client has enough balance for an operation.
+ * Service examples: "addGB", "paidPlan".
+ * Returns { enough, deficit }. If API call itself errors out (network/etc),
+ * caller should handle the thrown error.
+ */
+export const checkFunds = async (
+  service: string,
+  price: number,
+  subscriberId: number,
+  returnUrl = "/success"
+): Promise<CheckFundsResult> => {
+  try {
+    const res = await apiFetch("api/checkFunds", {
+      method: "POST",
+      body: JSON.stringify({
+        data: {
+          service,
+          price,
+          subscriber_id: subscriberId,
+          return_url: returnUrl,
+        },
+      }),
+    });
+    // Successful response — funds are sufficient
+    return { enough: true, deficit: 0, raw: res };
+  } catch (err: any) {
+    const payload = err?.payload || {};
+    const data = payload?.data || {};
+    // API may return success:false with deficit info, or simply a "Not enough funds" message.
+    const apiDeficit = Number(
+      data.deficit ?? data.amount ?? data.missing ?? data.need ?? 0
+    );
+    const msg = String(err?.message || "").toLowerCase();
+    if (apiDeficit > 0 || msg.includes("not enough") || msg.includes("funds") || err?.status === 401) {
+      return { enough: false, deficit: apiDeficit, raw: payload };
+    }
+    throw err;
+  }
+};

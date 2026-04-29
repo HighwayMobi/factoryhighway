@@ -164,6 +164,8 @@ const translations = {
     topup_orPayCard: "или",
     topup_notEnoughFunds: "Недостаточно средств на балансе",
     topup_notEnoughFundsMsg: "Недостаточно средств на балансе",
+    cp_insufficientTitle: "Недостаточно средств",
+    cp_insufficientDesc: "Перенаправляем на пополнение баланса (не хватает €{amount}).",
   },
   en: {
     loginTitle: "Sign in to your account",
