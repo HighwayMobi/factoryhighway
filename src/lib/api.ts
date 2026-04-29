@@ -112,11 +112,31 @@ const doFetch = async (path: string, options: RequestInit, serviceTok: string) =
 export const apiFetch = async (path: string, options: RequestInit = {}) => {
   let token = await getServiceToken();
   let res = await doFetch(path, options, token);
+
   if (res.status === 401) {
-    // Service token might be stale — force refresh and retry once.
-    token = await getServiceToken(true);
-    res = await doFetch(path, options, token);
+    // Distinguish a stale service token (auth issue) from a business 401
+    // like "Not enough funds". Only retry on the former, otherwise the
+    // duplicate request can cause side effects on the backend (e.g. queueing
+    // a plan change twice).
+    let bodyText = "";
+    try { bodyText = await res.clone().text(); } catch {}
+    let parsed: any = null;
+    try { parsed = bodyText ? JSON.parse(bodyText) : null; } catch {}
+    const msg = String(parsed?.message || parsed?.error || "").toLowerCase();
+    const isBusiness401 =
+      msg.includes("not enough") ||
+      msg.includes("funds") ||
+      msg.includes("balance") ||
+      msg.includes("forbidden") ||
+      msg.includes("not allowed") ||
+      parsed?.success === false;
+
+    if (!isBusiness401) {
+      token = await getServiceToken(true);
+      res = await doFetch(path, options, token);
+    }
   }
+
   if (!res.ok) {
     let message = `API error ${res.status}`;
     try {
