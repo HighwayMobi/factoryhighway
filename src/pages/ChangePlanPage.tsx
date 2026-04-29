@@ -7,6 +7,7 @@ import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { apiFetch, fetchUser, type PaidPlan } from "@/lib/api";
 import { pickSubscriber } from "@/lib/selectedSubscriber";
+import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
