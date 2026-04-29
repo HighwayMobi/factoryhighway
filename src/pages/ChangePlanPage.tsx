@@ -45,9 +45,10 @@ const ChangePlanPage = () => {
 
         const operatorId = sub.operator_id ?? 1;
         const plansRes = await apiFetch(`api/paidPlans/${operatorId}`);
-        const allPlans: PaidPlan[] = Array.isArray(plansRes.data)
+        const rawPlans: PaidPlan[] = Array.isArray(plansRes.data)
           ? plansRes.data
           : Object.values(plansRes.data || {});
+        const allPlans = rawPlans.filter((p: any) => (p.operator_id ?? operatorId) === operatorId);
         const freeze = allPlans.find((p) => p.gb === 0);
         setFreezePlan(freeze && freeze.id !== sub.paid_plan_id ? freeze : null);
         setPlans(allPlans.filter((p) => p.id !== sub.paid_plan_id && p.gb > 0));
