@@ -83,17 +83,24 @@ const ChangePlanPage = () => {
     if (!selectedPlan || !subscriberId) return;
     setSubmitting(true);
     try {
-      await apiFetch("api/paidPlan", {
+      const res = await apiFetch("api/paidPlan", {
         method: "PUT",
         body: JSON.stringify({
           subscriber_id: subscriberId,
           plan_id: selectedPlan.id,
         }),
       });
+      console.log("Plan change response:", res);
+      toast({ title: i.cp_successTitle, description: i.cp_successDesc });
       setConfirmOpen(false);
       navigate("/account?refresh=1");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to change plan:", err);
+      toast({
+        title: i.cp_errorTitle,
+        description: err?.message || i.cp_errorDesc,
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
     }
