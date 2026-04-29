@@ -302,6 +302,7 @@ const translations = {
     cp_data: "Data",
     cp_monthlyFee: "Monthly fee",
     cp_upgradeNote: "The new plan will take effect on {date}. Monthly fee €{price} will be charged immediately.",
+    cp_op2Note: "The new plan will take effect 3 days after confirmation and payment. Monthly fee €{price} will be charged immediately.",
     cp_downgradeNote: "The new plan will take effect after the current paid period ends — {date}.",
     cp_freezeNote: "Your SIM will be frozen after the current paid period ends — {date}. Freeze fee €{price}/mo.",
     cp_cancel: "Cancel",
