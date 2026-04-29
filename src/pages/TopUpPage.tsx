@@ -95,6 +95,20 @@ const TopUpPage = () => {
       });
   }, []);
 
+  // Auto-open Stripe form for ?pay=card only after user data is loaded
+  useEffect(() => {
+    if (autoOpenConsumed) return;
+    if (!autoOpenCardPayment) return;
+    if (initialTab !== "balance") return;
+    if (!Number.isFinite(initialNum) || initialNum < 3) return;
+    if (!isAuthed) return;
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 9) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return;
+    setShowPaymentForm(true);
+    setAutoOpenConsumed(true);
+  }, [isAuthed, phone, email, autoOpenCardPayment, initialTab, initialNum, autoOpenConsumed]);
+
   const handlePresetClick = (value: number) => {
     setSelectedPreset(value);
     setAmount(String(value));
