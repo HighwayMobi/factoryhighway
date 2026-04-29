@@ -258,7 +258,7 @@ export interface CheckFundsResult {
 
 /**
  * Calls api/checkFunds to verify the client has enough balance for an operation.
- * Service examples: "addGB", "paidPlan".
+ * Service examples: "addGB", "ChangePaidPlan".
  * Returns { enough, deficit }. If API call itself errors out (network/etc),
  * caller should handle the thrown error.
  */
@@ -292,6 +292,14 @@ export const checkFunds = async (
     const msg = String(err?.message || "").toLowerCase();
     if (apiDeficit > 0 || msg.includes("not enough") || msg.includes("funds") || err?.status === 401) {
       return { enough: false, deficit: apiDeficit, raw: payload };
+    }
+    if (err?.status === 400) {
+      console.warn("checkFunds rejected by API, using local balance fallback", { service, subscriberId, payload, message: err?.message });
+      const userRes = await fetchUser();
+      const subscriber = userRes.data.client.subscribers?.find((sub) => sub.id === subscriberId);
+      const balance = Number(subscriber?.balance ?? 0);
+      const deficit = Math.max(0, Number(price) - balance);
+      return { enough: deficit <= 0, deficit, raw: payload };
     }
     throw err;
   }

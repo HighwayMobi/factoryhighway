@@ -85,7 +85,7 @@ const ChangePlanPage = () => {
     try {
       // 1. Check funds via API before attempting plan change
       const funds = await checkFunds(
-        "paidPlan",
+        "ChangePaidPlan",
         Number(selectedPlan.price) || 0,
         subscriberId,
         "/change-plan"
@@ -111,7 +111,12 @@ const ChangePlanPage = () => {
           description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
         });
         setConfirmOpen(false);
-        navigate(`/topup?amount=${topUpAmount}&returnTo=/change-plan`);
+        const params = new URLSearchParams({
+          amount: String(topUpAmount),
+          returnTo: "/change-plan",
+          pay: "card",
+        });
+        navigate(`/topup?${params.toString()}`);
         return;
       }
 
