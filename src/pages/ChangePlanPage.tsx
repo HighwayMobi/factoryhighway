@@ -33,11 +33,8 @@ const ChangePlanPage = () => {
   const [nextPaymentDate, setNextPaymentDate] = useState<string>("");
 
   useEffect(() => {
-    Promise.all([
-      fetchUser(),
-      apiFetch("api/paidPlans/1"),
-    ])
-      .then(([userRes, plansRes]) => {
+    fetchUser()
+      .then(async (userRes) => {
         const sub = pickSubscriber(userRes.data.client)!;
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
@@ -46,6 +43,8 @@ const ChangePlanPage = () => {
         setSubscriberId(sub.id);
         setNextPaymentDate(sub.nextPaymentDate || "");
 
+        const operatorId = sub.operator_id ?? 1;
+        const plansRes = await apiFetch(`api/paidPlans/${operatorId}`);
         const allPlans: PaidPlan[] = Array.isArray(plansRes.data)
           ? plansRes.data
           : Object.values(plansRes.data || {});
