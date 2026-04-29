@@ -5,7 +5,7 @@ import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { apiFetch, fetchUser, type PaidPlan } from "@/lib/api";
+import { apiFetch, fetchUser, checkFunds, type PaidPlan } from "@/lib/api";
 import { pickSubscriber } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -83,6 +83,39 @@ const ChangePlanPage = () => {
     if (!selectedPlan || !subscriberId) return;
     setSubmitting(true);
     try {
+      // 1. Check funds via API before attempting plan change
+      const funds = await checkFunds(
+        "paidPlan",
+        Number(selectedPlan.price) || 0,
+        subscriberId,
+        "/change-plan"
+      );
+
+      if (!funds.enough) {
+        // Calculate deficit: prefer API-provided value, otherwise (price - subscriber balance)
+        let deficit = funds.deficit;
+        if (!deficit || deficit <= 0) {
+          try {
+            const userRes = await fetchUser();
+            const sub = pickSubscriber(userRes.data.client);
+            const bal = Number(sub?.balance) || 0;
+            deficit = Math.max(0, Number(selectedPlan.price) - bal);
+          } catch {
+            deficit = Number(selectedPlan.price);
+          }
+        }
+        // Stripe minimum top-up is 3€
+        const topUpAmount = Math.max(3, Math.ceil(deficit));
+        toast({
+          title: i.cp_insufficientTitle,
+          description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
+        });
+        setConfirmOpen(false);
+        navigate(`/topup?amount=${topUpAmount}&returnTo=/change-plan`);
+        return;
+      }
+
+      // 2. Funds OK — perform the actual plan change
       const res = await apiFetch("api/paidPlan", {
         method: "PUT",
         body: JSON.stringify({
