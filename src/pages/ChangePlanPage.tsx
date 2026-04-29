@@ -45,6 +45,7 @@ const ChangePlanPage = () => {
         setNextPaymentDate(sub.nextPaymentDate || "");
 
         const operatorId = sub.operator_id ?? 1;
+        setOperatorId(operatorId);
         // Note: api/paidPlans/1 returns ALL plans across operators; api/paidPlans/2 returns []
         // So we always fetch from /1 and filter client-side by the subscriber's operator_id.
         const plansRes = await apiFetch(`api/paidPlans/1`);
