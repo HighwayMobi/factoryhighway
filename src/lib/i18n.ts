@@ -330,6 +330,8 @@ const translations = {
     topup_orPayCard: "or",
     topup_notEnoughFunds: "Not enough funds on balance",
     topup_notEnoughFundsMsg: "Not enough funds on balance",
+    cp_insufficientTitle: "Insufficient funds",
+    cp_insufficientDesc: "Redirecting to top-up (€{amount} missing).",
   },
 } as const;
 
