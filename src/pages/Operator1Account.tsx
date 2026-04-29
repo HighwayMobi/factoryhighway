@@ -379,7 +379,29 @@ const Operator1Account = () => {
                 <button onClick={() => navigate("/buy-gb")} className="underline font-semibold hover:text-destructive/80">{i.acc_buyHere}</button>
               </div>
             )}
+            <div className="border-t border-border px-6 py-3">
+              <button
+                type="button"
+                onClick={() => setShowCoverage(true)}
+                className="text-sm font-medium text-primary hover:underline focus:outline-none"
+              >
+                {lang === "ru" ? "Страны покрытия" : "Coverage countries"}
+              </button>
+            </div>
           </div>
+
+          <Dialog open={showCoverage} onOpenChange={setShowCoverage}>
+            <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{lang === "ru" ? "Страны покрытия" : "Coverage countries"}</DialogTitle>
+              </DialogHeader>
+              <ul className="grid grid-cols-1 gap-1.5 text-sm text-foreground">
+                {COVERAGE_COUNTRIES.map((c) => (
+                  <li key={c} className="py-1 border-b border-border/40 last:border-0">{c}</li>
+                ))}
+              </ul>
+            </DialogContent>
+          </Dialog>
 
           {/* Buy GB */}
           <button
