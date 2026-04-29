@@ -31,6 +31,7 @@ const ChangePlanPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [freezePlan, setFreezePlan] = useState<PaidPlan | null>(null);
   const [nextPaymentDate, setNextPaymentDate] = useState<string>("");
+  const [operatorId, setOperatorId] = useState<number>(1);
 
   useEffect(() => {
     fetchUser()
@@ -44,6 +45,7 @@ const ChangePlanPage = () => {
         setNextPaymentDate(sub.nextPaymentDate || "");
 
         const operatorId = sub.operator_id ?? 1;
+        setOperatorId(operatorId);
         // Note: api/paidPlans/1 returns ALL plans across operators; api/paidPlans/2 returns []
         // So we always fetch from /1 and filter client-side by the subscriber's operator_id.
         const plansRes = await apiFetch(`api/paidPlans/1`);
@@ -232,6 +234,8 @@ const ChangePlanPage = () => {
             let noteText = "";
             if (isFreeze) {
               noteText = i.cp_freezeNote.replace("{date}", feeDate).replace("{price}", String(selectedPlan.price));
+            } else if (operatorId === 2) {
+              noteText = i.cp_op2Note.replace("{price}", String(selectedPlan.price));
             } else if (isUpgrade) {
               noteText = i.cp_upgradeNote.replace("{date}", tomorrow).replace("{price}", String(selectedPlan.price));
             } else {
