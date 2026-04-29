@@ -1,33 +1,108 @@
 const API_BASE = "https://sim.highway.mobi/web";
 
-export const getAuthToken = (): string | null => {
-  // Try cookie first, then localStorage fallback
-  const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
-  if (match && match[1]) return match[1];
-  return localStorage.getItem("auth_token");
+// Service token obtained via edge function `highway-auth` (login+password kept server-side).
+// Refreshed every ~55 minutes, or on 401, or when missing.
+const TOKEN_TTL_MS = 55 * 60 * 1000;
+const SERVICE_TOKEN_KEY = "highway_service_token";
+const SERVICE_TOKEN_EXP_KEY = "highway_service_token_exp";
+
+let serviceToken: string | null = null;
+let serviceTokenExpiresAt = 0;
+let inflightAuth: Promise<string> | null = null;
+
+const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+
+const loadCachedServiceToken = () => {
+  if (serviceToken) return;
+  try {
+    const t = localStorage.getItem(SERVICE_TOKEN_KEY);
+    const exp = Number(localStorage.getItem(SERVICE_TOKEN_EXP_KEY) || 0);
+    if (t && exp && Date.now() < exp) {
+      serviceToken = t;
+      serviceTokenExpiresAt = exp;
+    }
+  } catch {}
+};
+loadCachedServiceToken();
+
+const persistServiceToken = (token: string, ttlMs: number) => {
+  serviceToken = token;
+  serviceTokenExpiresAt = Date.now() + ttlMs;
+  try {
+    localStorage.setItem(SERVICE_TOKEN_KEY, token);
+    localStorage.setItem(SERVICE_TOKEN_EXP_KEY, String(serviceTokenExpiresAt));
+  } catch {}
 };
 
-export const setAuthToken = (token: string) => {
-  document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 10}`;
-  localStorage.setItem("auth_token", token);
+const requestNewServiceToken = async (): Promise<string> => {
+  if (!SUPABASE_URL) throw new Error("Supabase URL missing");
+  const url = `${SUPABASE_URL}/functions/v1/highway-auth`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(SUPABASE_ANON_KEY ? { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } : {}),
+    },
+  });
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    console.error("highway-auth proxy failed", res.status, txt);
+    throw new Error(`Auth proxy error ${res.status}`);
+  }
+  const json = await res.json();
+  const token: string = json.token;
+  const expiresIn: number = Number(json.expires_in) || 3600;
+  // Refresh a bit before real expiry; cap to TOKEN_TTL_MS.
+  const ttlMs = Math.min(TOKEN_TTL_MS, Math.max(60_000, expiresIn * 1000 - 60_000));
+  persistServiceToken(token, ttlMs);
+  return token;
 };
 
+const getServiceToken = async (force = false): Promise<string> => {
+  if (!force && serviceToken && Date.now() < serviceTokenExpiresAt) {
+    return serviceToken;
+  }
+  if (inflightAuth) return inflightAuth;
+  inflightAuth = requestNewServiceToken().finally(() => {
+    inflightAuth = null;
+  });
+  return inflightAuth;
+};
+
+// Legacy helpers kept for backwards compatibility (some components may still call them).
+export const getAuthToken = (): string | null => serviceToken;
+export const setAuthToken = (_token: string) => { /* no-op: managed automatically */ };
 export const clearAuthToken = () => {
-  document.cookie = "auth_token=; path=/; max-age=0";
-  localStorage.removeItem("auth_token");
+  serviceToken = null;
+  serviceTokenExpiresAt = 0;
+  try {
+    localStorage.removeItem(SERVICE_TOKEN_KEY);
+    localStorage.removeItem(SERVICE_TOKEN_EXP_KEY);
+    // Clean up legacy keys/cookies as well.
+    localStorage.removeItem("auth_token");
+    document.cookie = "auth_token=; path=/; max-age=0";
+  } catch {}
 };
 
-export const apiFetch = async (path: string, options: RequestInit = {}) => {
-  const token = getAuthToken();
+const doFetch = async (path: string, options: RequestInit, token: string) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
     ...(options.headers as Record<string, string> || {}),
+    Authorization: `Bearer ${token}`,
   };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+  return fetch(`${API_BASE}/${path}`, { ...options, headers });
+};
+
+export const apiFetch = async (path: string, options: RequestInit = {}) => {
+  let token = await getServiceToken();
+  let res = await doFetch(path, options, token);
+  if (res.status === 401) {
+    // Token might be stale — force refresh and retry once.
+    token = await getServiceToken(true);
+    res = await doFetch(path, options, token);
   }
-  const res = await fetch(`${API_BASE}/${path}`, { ...options, headers });
   if (!res.ok) {
     try { await res.text(); } catch {}
     throw new Error(`API error ${res.status}`);
