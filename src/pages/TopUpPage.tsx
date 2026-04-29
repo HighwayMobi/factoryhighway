@@ -32,6 +32,7 @@ const TopUpPage = () => {
   const returnTo = searchParams.get("returnTo") || undefined;
   const initialTab = searchParams.get("tab") === "gb" ? "gb" : "balance";
   const initialNum = parseFloat(initialAmount);
+  const autoOpenCardPayment = searchParams.get("pay") === "card";
   const [activeTab, setActiveTab] = useState<"balance" | "gb">(initialTab);
   const [amount, setAmount] = useState(initialAmount);
   const [selectedPreset, setSelectedPreset] = useState<number | null>(
@@ -41,7 +42,7 @@ const TopUpPage = () => {
   const [editingEmail, setEditingEmail] = useState(false);
   const [phone, setPhone] = useState("");
   const [isAuthed, setIsAuthed] = useState(false);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(autoOpenCardPayment && initialTab === "balance" && Number.isFinite(initialNum) && initialNum >= 3);
   const { lang, setLang } = useLang();
   const navigate = useLangNavigate();
   const i = t(lang);
