@@ -234,6 +234,8 @@ const ChangePlanPage = () => {
             let noteText = "";
             if (isFreeze) {
               noteText = i.cp_freezeNote.replace("{date}", feeDate).replace("{price}", String(selectedPlan.price));
+            } else if (operatorId === 2) {
+              noteText = i.cp_op2Note.replace("{price}", String(selectedPlan.price));
             } else if (isUpgrade) {
               noteText = i.cp_upgradeNote.replace("{date}", tomorrow).replace("{price}", String(selectedPlan.price));
             } else {
