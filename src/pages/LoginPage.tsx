@@ -185,13 +185,18 @@ const LoginPage = () => {
       { phone: phoneDigits(forgotPhone) } :
       { email: forgotEmail };
 
-      const res = await fetch("https://sim.highway.mobi/web/api/forgotPassword", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const { apiFetch } = await import("@/lib/api");
+      let data: any = null;
+      try {
+        data = await apiFetch("api/forgotPassword", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      } catch {
+        setForgotMsg({ type: "err", text: forgotTab === "phone" ? i.forgotPasswordError : i.forgotPasswordEmailError });
+        return;
+      }
+      if (data?.success) {
         setForgotMsg({ type: "ok", text: i.passwordSent });
         setForgotCooldown(120);
       } else {
