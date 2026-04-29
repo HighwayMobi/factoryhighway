@@ -34,6 +34,7 @@ const Operator2Account = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [cancellingPlan, setCancellingPlan] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showCoverage, setShowCoverage] = useState(false);
   const [financeMonth, setFinanceMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() }; // 0-indexed
