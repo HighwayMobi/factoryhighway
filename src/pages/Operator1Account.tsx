@@ -96,7 +96,14 @@ const Operator1Account = () => {
         feeDate = `${String(payDay).padStart(2, "0")}.${String(m).padStart(2, "0")}.${year}`;
       }
 
-      const isUpgrade = sub?.new_paid_plan && plan
+      // A planned plan change exists ONLY when the API returns new_paid_plan
+      // AND its id differs from the current paid_plan_id. Otherwise the API
+      // sometimes echoes the current plan as new_paid_plan, which previously
+      // caused a phantom "scheduled change" banner.
+      const hasPlannedChange = !!sub?.new_paid_plan
+        && sub.new_paid_plan.id != null
+        && sub.new_paid_plan.id !== sub.paid_plan_id;
+      const isUpgrade = hasPlannedChange && plan
         ? (plan.gb === 0 || (sub.new_paid_plan.price > (plan.price ?? 0)))
         : false;
 
@@ -115,8 +122,8 @@ const Operator1Account = () => {
         iccid: sub?.iccid ?? "",
         activationDate: sub?.activation_date ?? "",
         contractNumber: sub?.contract_number ?? "",
-        newPlan: sub?.new_paid_plan?.local_name?.[lang] || sub?.new_paid_plan?.name || "",
-        newPlanPrice: sub?.new_paid_plan?.price ?? null,
+        newPlan: hasPlannedChange ? (sub?.new_paid_plan?.local_name?.[lang] || sub?.new_paid_plan?.name || "") : "",
+        newPlanPrice: hasPlannedChange ? (sub?.new_paid_plan?.price ?? null) : null,
         subscriberId: sub?.id ?? null,
         clientId: c.id ?? null,
         status: sub?.status ?? c.status ?? "",
