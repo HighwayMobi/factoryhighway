@@ -96,13 +96,17 @@ const Operator1Account = () => {
         feeDate = `${String(payDay).padStart(2, "0")}.${String(m).padStart(2, "0")}.${year}`;
       }
 
-      // A planned plan change exists ONLY when the API returns new_paid_plan
-      // AND its id differs from the current paid_plan_id. Otherwise the API
-      // sometimes echoes the current plan as new_paid_plan, which previously
-      // caused a phantom "scheduled change" banner.
-      const hasPlannedChange = !!sub?.new_paid_plan
-        && sub.new_paid_plan.id != null
-        && sub.new_paid_plan.id !== sub.paid_plan_id;
+      // A planned plan change exists ONLY when the API returns a pending
+      // new_paid_plan_id that matches new_paid_plan.id and differs from the
+      // current paid_plan_id. The API can return new_paid_plan without an
+      // actual scheduled service request, which must not show the banner.
+      const pendingPlanId = Number(sub?.new_paid_plan_id || 0);
+      const newPlanId = Number(sub?.new_paid_plan?.id || 0);
+      const currentPlanId = Number(sub?.paid_plan_id || 0);
+      const hasPlannedChange = pendingPlanId > 0
+        && newPlanId > 0
+        && pendingPlanId === newPlanId
+        && pendingPlanId !== currentPlanId;
       const isUpgrade = hasPlannedChange && plan
         ? (plan.gb === 0 || (sub.new_paid_plan.price > (plan.price ?? 0)))
         : false;
@@ -205,8 +209,12 @@ const Operator1Account = () => {
         body: JSON.stringify({ service: "ChangePaidPlan", subscriber_id: user.subscriberId }),
       });
       await loadData();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to cancel plan change:", err);
+      if (err?.status === 404) {
+        setUser((prev) => ({ ...prev, newPlan: "", newPlanPrice: null, isUpgrade: false }));
+        setShowCancelConfirm(false);
+      }
     } finally {
       setCancellingPlan(false);
     }
