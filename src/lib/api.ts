@@ -118,10 +118,27 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
     res = await doFetch(path, options, token);
   }
   if (!res.ok) {
-    try { await res.text(); } catch {}
-    throw new Error(`API error ${res.status}`);
+    let message = `API error ${res.status}`;
+    try {
+      const txt = await res.text();
+      try {
+        const j = JSON.parse(txt);
+        if (j && (j.message || j.error)) message = j.message || j.error;
+      } catch {}
+    } catch {}
+    const err: any = new Error(message);
+    err.status = res.status;
+    throw err;
   }
-  return res.json();
+  const json = await res.json();
+  // Some endpoints return 200 with {success:false, message:"..."} — surface as error.
+  if (json && json.success === false) {
+    const err: any = new Error(json.message || json.error || "Request failed");
+    err.status = res.status;
+    err.payload = json;
+    throw err;
+  }
+  return json;
 };
 
 export interface GbPackage {
