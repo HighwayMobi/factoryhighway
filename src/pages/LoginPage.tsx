@@ -126,32 +126,37 @@ const LoginPage = () => {
     setLoginError("");
     setIsLoggingIn(true);
     try {
-      const body: Record<string, string> = {
-        password,
-        key: "6xARHinsvuC"
-      };
+      const body: Record<string, string> = { password };
       if (activeTab === "email") {
         body.username = email;
       } else {
         body.phone = phoneDigits(phone);
       }
 
-      const res = await fetch("https://sim.highway.mobi/web/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(body)
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      const token = data?.data?.token || data?.token;
-      if (!res.ok || data?.success === false || !token) {
+      const { apiFetch } = await import("@/lib/api");
+      let data: any = null;
+      try {
+        data = await apiFetch("api/login", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      } catch (e) {
+        console.error("Login request failed", e);
         setLoginError(i.loginError);
         return;
       }
 
-      const { setAuthToken } = await import("@/lib/api");
-      setAuthToken(token);
+      const token = data?.data?.token || data?.token;
+      if (data?.success === false || !token) {
+        setLoginError(i.loginError);
+        return;
+      }
+
+      // User token is no longer used for API auth (service token handles that),
+      // but we still persist it in case any flow needs it (e.g. inapp marker).
+      try {
+        localStorage.setItem("user_token", token);
+      } catch {}
 
       navigate("/account");
     } catch (err) {
