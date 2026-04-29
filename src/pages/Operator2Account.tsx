@@ -19,6 +19,11 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+
+const COVERAGE_COUNTRIES = "🇩🇪 Germany / Alemania, 🇦🇹 Austria, 🇧🇪 Belgium / Bélgica, 🇧🇬 Bulgaria, 🇨🇾 Cyprus / Chipre, 🇭🇷 Croatia / Croacia, 🇻🇦 Vatican City, 🇩🇰 Denmark / Dinamarca, 🇸🇰 Slovakia / Eslovaquia, 🇸🇮 Slovenia / Eslovenia, 🇪🇪 Estonia, 🇫🇮 Finland / Finlandia, 🇫🇷 France / Francia, 🇬🇮 Gibraltar, 🇬🇷 Greece / Grecia, 🇬🇵 Guadeloupe, 🇬🇫 French Guiana, 🇭🇺 Hungary / Hungría, 🇮🇪 Ireland / Irlanda, 🇮🇸 Iceland / Islandia, 🇮🇹 Italy / Italia, 🇱🇻 Latvia / Letonia, 🇱🇮 Liechtenstein, 🇱🇹 Lithuania / Lituania, 🇱🇺 Luxembourg / Luxemburgo, 🇲🇹 Malta, 🇲🇶 Martinique / Martinica, 🇾🇹 Mayotte, 🇳🇴 Norway / Noruega, 🇳🇱 Netherlands / Países Bajos, 🇵🇱 Poland / Polonia, 🇵🇹 Portugal, 🇨🇿 Czech Republic / República Checa, 🇷🇪 Réunion, 🇷🇴 Romania / Rumanía, 🇲🇫 Saint Martin / San Martín".split(", ");
 
 const Operator2Account = () => {
   const { lang, setLang } = useLang();
