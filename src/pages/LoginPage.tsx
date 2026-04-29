@@ -126,14 +126,17 @@ const LoginPage = () => {
     setLoginError("");
     setIsLoggingIn(true);
     try {
-      const body: Record<string, string> = { password };
+      const body: Record<string, string> = {
+        password,
+        key: "architecto",
+      };
       if (activeTab === "email") {
         body.username = email;
       } else {
         body.phone = phoneDigits(phone);
       }
 
-      const { apiFetch } = await import("@/lib/api");
+      const { apiFetch, setAuthToken } = await import("@/lib/api");
       let data: any = null;
       try {
         data = await apiFetch("api/login", {
@@ -152,12 +155,7 @@ const LoginPage = () => {
         return;
       }
 
-      // User token is no longer used for API auth (service token handles that),
-      // but we still persist it in case any flow needs it (e.g. inapp marker).
-      try {
-        localStorage.setItem("user_token", token);
-      } catch {}
-
+      setAuthToken(token);
       navigate("/account");
     } catch (err) {
       setLoginError(i.loginError);
@@ -187,13 +185,18 @@ const LoginPage = () => {
       { phone: phoneDigits(forgotPhone) } :
       { email: forgotEmail };
 
-      const res = await fetch("https://sim.highway.mobi/web/api/forgotPassword", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const { apiFetch } = await import("@/lib/api");
+      let data: any = null;
+      try {
+        data = await apiFetch("api/forgotPassword", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      } catch {
+        setForgotMsg({ type: "err", text: forgotTab === "phone" ? i.forgotPasswordError : i.forgotPasswordEmailError });
+        return;
+      }
+      if (data?.success) {
         setForgotMsg({ type: "ok", text: i.passwordSent });
         setForgotCooldown(120);
       } else {
