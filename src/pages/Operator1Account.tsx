@@ -103,10 +103,15 @@ const Operator1Account = () => {
       const pendingPlanId = Number(sub?.new_paid_plan_id || 0);
       const newPlanId = Number(sub?.new_paid_plan?.id || 0);
       const currentPlanId = Number(sub?.paid_plan_id || 0);
+      // Also require balance to cover the new plan price — otherwise the
+      // change is not actually confirmed (payment still pending).
+      const newPlanPrice = Number(sub?.new_paid_plan?.price || 0);
+      const subBalance = Number(sub?.balance || 0);
       const hasPlannedChange = pendingPlanId > 0
         && newPlanId > 0
         && pendingPlanId === newPlanId
-        && pendingPlanId !== currentPlanId;
+        && pendingPlanId !== currentPlanId
+        && subBalance >= newPlanPrice;
       const isUpgrade = hasPlannedChange && plan
         ? (plan.gb === 0 || (sub.new_paid_plan.price > (plan.price ?? 0)))
         : false;
