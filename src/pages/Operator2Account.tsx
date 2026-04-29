@@ -13,6 +13,7 @@ import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient, type Subscriber } from "@/lib/api";
 import { pickSubscriber, getSubscribersList } from "@/lib/selectedSubscriber";
+import { getConfirmedPlanChange, clearPlanChangeConfirmed } from "@/lib/confirmedPlanChange";
 import UserAvatar from "@/components/UserAvatar";
 import SubscriberSelect from "@/components/SubscriberSelect";
 import {
