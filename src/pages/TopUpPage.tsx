@@ -6,7 +6,7 @@ import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, addGbFromBalance, type GbPackage } from "@/lib/api";
+import { fetchUser, addGbFromBalance, checkFunds, type GbPackage } from "@/lib/api";
 import { pickSubscriber } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import StripePaymentForm from "@/components/StripePaymentForm";
@@ -136,6 +136,18 @@ const TopUpPage = () => {
     if (!selectedPkg || subscriberId == null) return;
     setPayingFromBalance(true);
     try {
+      // Verify funds via API first to avoid 401 on addGB
+      const funds = await checkFunds("addGB", Number(selectedPkg.price) || 0, subscriberId, "/topup?tab=gb");
+      if (!funds.enough) {
+        const deficit = funds.deficit > 0 ? funds.deficit : Math.max(0, Number(selectedPkg.price) - subscriberBalance);
+        const topUpAmount = Math.max(3, Math.ceil(deficit));
+        toast({
+          title: i.topup_notEnoughFunds || "Недостаточно средств",
+          description: `${topUpAmount}€`,
+        });
+        navigate(`/topup?tab=balance&amount=${topUpAmount}&returnTo=/topup?tab=gb`);
+        return;
+      }
       await addGbFromBalance(subscriberId, selectedPkg.gb);
       toast({ title: i.topup_paymentSuccess });
       navigate("/account?refresh=1");
