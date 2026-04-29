@@ -129,6 +129,9 @@ const ChangePlanPage = () => {
         }),
       });
       console.log("Plan change response:", res);
+      // Mark this change as confirmed locally — only now the banner is allowed
+      const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
+      markPlanChangeConfirmed(subscriberId, selectedPlan.id);
       toast({ title: i.cp_successTitle, description: i.cp_successDesc });
       setConfirmOpen(false);
       navigate("/account?refresh=1");
