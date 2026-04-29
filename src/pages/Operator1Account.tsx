@@ -216,10 +216,12 @@ const Operator1Account = () => {
         method: "POST",
         body: JSON.stringify({ service: "ChangePaidPlan", subscriber_id: user.subscriberId }),
       });
+      clearPlanChangeConfirmed(user.subscriberId);
       await loadData();
     } catch (err: any) {
       console.error("Failed to cancel plan change:", err);
       if (err?.status === 404) {
+        clearPlanChangeConfirmed(user.subscriberId);
         setUser((prev) => ({ ...prev, newPlan: "", newPlanPrice: null, isUpgrade: false }));
         setShowCancelConfirm(false);
       }
