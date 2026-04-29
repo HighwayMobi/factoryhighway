@@ -70,28 +70,42 @@ const getServiceToken = async (force = false): Promise<string> => {
   return inflightAuth;
 };
 
-// Legacy helpers kept for backwards compatibility (some components may still call them).
-export const getAuthToken = (): string | null => serviceToken;
-export const setAuthToken = (_token: string) => { /* no-op: managed automatically */ };
+// User token from `api/login` (per-user). Sent as Authorization: Bearer for protected endpoints.
+const USER_TOKEN_KEY = "user_token";
+let userToken: string | null = null;
+try {
+  userToken = localStorage.getItem(USER_TOKEN_KEY);
+} catch {}
+
+export const getAuthToken = (): string | null => userToken;
+export const setAuthToken = (token: string) => {
+  userToken = token;
+  try { localStorage.setItem(USER_TOKEN_KEY, token); } catch {}
+};
 export const clearAuthToken = () => {
   serviceToken = null;
   serviceTokenExpiresAt = 0;
+  userToken = null;
   try {
     localStorage.removeItem(SERVICE_TOKEN_KEY);
     localStorage.removeItem(SERVICE_TOKEN_EXP_KEY);
-    // Clean up legacy keys/cookies as well.
+    localStorage.removeItem(USER_TOKEN_KEY);
     localStorage.removeItem("auth_token");
     document.cookie = "auth_token=; path=/; max-age=0";
   } catch {}
 };
 
-const doFetch = async (path: string, options: RequestInit, token: string) => {
+const doFetch = async (path: string, options: RequestInit, serviceTok: string) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
     ...(options.headers as Record<string, string> || {}),
-    Authorization: `Bearer ${token}`,
+    "X-API-KEY": serviceTok,
   };
+  // Attach user token for protected endpoints, unless caller explicitly disables it.
+  if (userToken && !headers.Authorization) {
+    headers.Authorization = `Bearer ${userToken}`;
+  }
   return fetch(`${API_BASE}/${path}`, { ...options, headers });
 };
 
@@ -99,7 +113,7 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
   let token = await getServiceToken();
   let res = await doFetch(path, options, token);
   if (res.status === 401) {
-    // Token might be stale — force refresh and retry once.
+    // Service token might be stale — force refresh and retry once.
     token = await getServiceToken(true);
     res = await doFetch(path, options, token);
   }
