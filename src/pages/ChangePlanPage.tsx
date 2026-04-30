@@ -33,6 +33,7 @@ const ChangePlanPage = () => {
   const [freezePlan, setFreezePlan] = useState<PaidPlan | null>(null);
   const [nextPaymentDate, setNextPaymentDate] = useState<string>("");
   const [operatorId, setOperatorId] = useState<number>(1);
+  const [subPhone, setSubPhone] = useState<string>("");
 
   useEffect(() => {
     fetchUser()
@@ -44,6 +45,9 @@ const ChangePlanPage = () => {
         setPaymentDay(sub.paymentDay);
         setSubscriberId(sub.id);
         setNextPaymentDate(sub.nextPaymentDate || "");
+        const rawPhone = String((sub as any).phone || (sub as any).msisdn || "").replace(/\D/g, "");
+        const localPhone = rawPhone.startsWith("34") ? rawPhone.slice(2) : rawPhone;
+        setSubPhone(localPhone ? `+34 ${localPhone}` : "");
 
         const operatorId = sub.operator_id ?? 1;
         setOperatorId(operatorId);
@@ -178,6 +182,11 @@ const ChangePlanPage = () => {
           <p className="mt-2 text-sm text-muted-foreground">
             {i.cp_subtitle}
           </p>
+          {subPhone && (
+            <p className="mt-1 text-sm font-semibold text-primary">
+              {i.cp_forLine} {subPhone}
+            </p>
+          )}
         </div>
 
         {/* Current plan badge */}
@@ -293,6 +302,12 @@ const ChangePlanPage = () => {
             return (
               <div className="space-y-4 py-2">
                 <div className="rounded-xl border border-border bg-secondary/30 p-4 space-y-2">
+                  {subPhone && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{i.cp_forLine}</span>
+                      <span className="font-semibold text-primary">{subPhone}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{i.cp_newPlan}</span>
                     <span className="font-semibold text-foreground">
