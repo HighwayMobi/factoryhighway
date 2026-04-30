@@ -33,6 +33,7 @@ const ChangePlanPage = () => {
   const [freezePlan, setFreezePlan] = useState<PaidPlan | null>(null);
   const [nextPaymentDate, setNextPaymentDate] = useState<string>("");
   const [operatorId, setOperatorId] = useState<number>(1);
+  const [subPhone, setSubPhone] = useState<string>("");
 
   useEffect(() => {
     fetchUser()
