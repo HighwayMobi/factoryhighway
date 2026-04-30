@@ -110,6 +110,14 @@ const doFetch = async (path: string, options: RequestInit, serviceTok: string) =
 };
 
 export const apiFetch = async (path: string, options: RequestInit = {}) => {
+  const reqId = Math.random().toString(36).slice(2, 8);
+  const method = (options.method || "GET").toUpperCase();
+  let reqBody: any = undefined;
+  if (options.body && typeof options.body === "string") {
+    try { reqBody = JSON.parse(options.body); } catch { reqBody = options.body; }
+  }
+  console.log(`[HW→ ${reqId}] ${method} ${path}`, reqBody ?? "");
+
   let token = await getServiceToken();
   let res = await doFetch(path, options, token);
 
