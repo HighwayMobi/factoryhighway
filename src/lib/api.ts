@@ -147,18 +147,23 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
 
   if (!res.ok) {
     let message = `API error ${res.status}`;
+    let parsedBody: any = null;
+    let rawTxt = "";
     try {
-      const txt = await res.text();
+      rawTxt = await res.text();
       try {
-        const j = JSON.parse(txt);
-        if (j && (j.message || j.error)) message = j.message || j.error;
+        parsedBody = rawTxt ? JSON.parse(rawTxt) : null;
+        if (parsedBody && (parsedBody.message || parsedBody.error)) message = parsedBody.message || parsedBody.error;
       } catch {}
     } catch {}
+    console.warn(`[HW← ${reqId}] ${res.status} ${method} ${path}`, parsedBody ?? rawTxt);
     const err: any = new Error(message);
     err.status = res.status;
+    err.payload = parsedBody;
     throw err;
   }
   const json = await res.json();
+  console.log(`[HW← ${reqId}] ${res.status} ${method} ${path}`, json);
   // Some endpoints return 200 with {success:false, message:"..."} — surface as error.
   if (json && json.success === false) {
     const err: any = new Error(json.message || json.error || "Request failed");
