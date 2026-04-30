@@ -155,19 +155,8 @@ const ChangePlanPage = () => {
       navigate("/account?refresh=1");
     } catch (err: any) {
       console.error("Failed to change plan:", err);
-      // 409 "Already changed" — на бэке смена уже зафиксирована (например, после доплаты).
-      // Считаем операцию успешной: подтверждаем локально и ведём пользователя в кабинет.
-      const msg = String(err?.message || "").toLowerCase();
-      if (err?.status === 409 || msg.includes("already changed")) {
-        try {
-          const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
-          markPlanChangeConfirmed(subscriberId!, selectedPlan!.id);
-        } catch {/* ignore */}
-        toast({ title: i.cp_successTitle, description: i.cp_successDesc });
-        setConfirmOpen(false);
-        navigate("/account?refresh=1");
-        return;
-      }
+      // 409 "Already changed" means backend kept the existing scheduled plan,
+      // so do NOT mark the selected plan locally as confirmed.
       toast({
         title: i.cp_errorTitle,
         description: err?.message || i.cp_errorDesc,
