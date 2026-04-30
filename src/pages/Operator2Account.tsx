@@ -319,7 +319,7 @@ const Operator2Account = () => {
                 <span className="text-base font-semibold text-foreground">{user.plan}</span>
               </div>
               <button
-                onClick={() => navigate("/change-plan")}
+                onClick={() => navigate(user.subscriberId ? `/change-plan?subscriber_id=${user.subscriberId}` : "/change-plan")}
                 disabled={!!user.newPlan}
                 className="w-[130px] rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground text-center disabled:opacity-40 disabled:pointer-events-none"
               >

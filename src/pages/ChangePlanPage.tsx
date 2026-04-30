@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ArrowLeft, Signal, Loader2, Check, Snowflake, AlertTriangle } from "lucide-react";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { cn, fmtPrice } from "@/lib/utils";
@@ -6,7 +7,7 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
 import { apiFetch, fetchUser, checkFunds, type PaidPlan } from "@/lib/api";
-import { pickSubscriber } from "@/lib/selectedSubscriber";
+import { getSubscribersList, pickSubscriber, setSelectedSubscriberId } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -19,6 +20,8 @@ import {
 const ChangePlanPage = () => {
   const { lang, setLang } = useLang();
   const navigate = useLangNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedSubscriberId = Number(searchParams.get("subscriber_id") || 0) || null;
   const i = t(lang);
   const [plans, setPlans] = useState<PaidPlan[]>([]);
   const [currentPlanId, setCurrentPlanId] = useState<number | null>(null);
@@ -38,7 +41,11 @@ const ChangePlanPage = () => {
   useEffect(() => {
     fetchUser()
       .then(async (userRes) => {
-        const sub = pickSubscriber(userRes.data.client)!;
+        const subscribers = getSubscribersList(userRes.data.client);
+        const sub = (requestedSubscriberId ? subscribers.find((s) => s.id === requestedSubscriberId) : undefined)
+          ?? pickSubscriber(userRes.data.client);
+        if (!sub) throw new Error("Subscriber not found");
+        if (requestedSubscriberId && sub.id === requestedSubscriberId) setSelectedSubscriberId(sub.id);
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
         setCurrentPlanPrice(sub.paid_plan?.price ?? null);
@@ -67,7 +74,7 @@ const ChangePlanPage = () => {
         if (err.message?.includes("401")) navigate("/");
       })
       .finally(() => setLoading(false));
-  }, [lang]);
+  }, [lang, requestedSubscriberId]);
 
   const getNextFeeDate = () => {
     if (!paymentDay) return "";
