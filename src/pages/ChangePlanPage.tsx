@@ -182,6 +182,11 @@ const ChangePlanPage = () => {
           <p className="mt-2 text-sm text-muted-foreground">
             {i.cp_subtitle}
           </p>
+          {subPhone && (
+            <p className="mt-1 text-sm font-semibold text-primary">
+              {i.cp_forLine} {subPhone}
+            </p>
+          )}
         </div>
 
         {/* Current plan badge */}
