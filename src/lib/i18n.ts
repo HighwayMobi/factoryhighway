@@ -134,6 +134,7 @@ const translations = {
     // Change Plan page
     cp_title: "Сменить тариф",
     cp_subtitle: "Выберите новый тарифный план",
+    cp_forLine: "для линии",
     cp_currentPlan: "Текущий тариф",
     cp_select: "Выбрать",
     cp_perMonth: "/мес",
