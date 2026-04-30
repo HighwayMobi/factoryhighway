@@ -105,12 +105,13 @@ const Operator1Account = () => {
       const newPlanId = Number(sub?.new_paid_plan?.id || 0);
       const currentPlanId = Number(sub?.paid_plan_id || 0);
       const confirmedId = sub?.id ? getConfirmedPlanChange(sub.id) : null;
-      const hasPlannedChange = !!confirmedId
-        && pendingPlanId > 0
+      // Показываем баннер запланированной смены, если API сам сообщает о ней
+      // (new_paid_plan_id отличается от текущего и есть объект new_paid_plan).
+      // Локальный confirmedId больше не обязателен — он лишь дополнительный сигнал.
+      const hasPlannedChange = pendingPlanId > 0
         && newPlanId > 0
         && pendingPlanId === newPlanId
-        && pendingPlanId !== currentPlanId
-        && pendingPlanId === confirmedId;
+        && pendingPlanId !== currentPlanId;
       // If API no longer reflects this pending change, clear our local flag
       if (sub?.id && confirmedId && (pendingPlanId !== confirmedId || pendingPlanId === currentPlanId)) {
         clearPlanChangeConfirmed(sub.id);
