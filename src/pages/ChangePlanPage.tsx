@@ -45,7 +45,7 @@ const ChangePlanPage = () => {
         setPaymentDay(sub.paymentDay);
         setSubscriberId(sub.id);
         setNextPaymentDate(sub.nextPaymentDate || "");
-        const rawPhone = String((sub as any).phone || (sub as any).msisdn || "").replace(/\D/g, "");
+        const rawPhone = String((sub as any).number || (sub as any).phone || (sub as any).msisdn || "").replace(/\D/g, "");
         const localPhone = rawPhone.startsWith("34") ? rawPhone.slice(2) : rawPhone;
         setSubPhone(localPhone ? `+34 ${localPhone}` : "");
 
