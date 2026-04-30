@@ -65,7 +65,14 @@ const ChangePlanPage = () => {
           ? plansRes.data
           : Object.values(plansRes.data || {});
         const allPlans = rawPlans.filter((p: any) => (p.operator_id ?? operatorId) === operatorId);
-        const freeze = allPlans.find((p) => p.gb === 0);
+        // FREEZE существует только у оператора 1 в API. Для оператора 2 синтезируем
+        // его на основе FREEZE оператора 1 (id, цена, gb=0), чтобы пользователь
+        // мог заказать заморозку и получить такой же баннер на дашборде.
+        let freeze = allPlans.find((p) => p.gb === 0);
+        if (!freeze && operatorId === 2) {
+          const op1Freeze = rawPlans.find((p: any) => p.gb === 0 && (p.operator_id ?? 1) === 1);
+          if (op1Freeze) freeze = { ...op1Freeze, operator_id: 2 } as PaidPlan;
+        }
         setFreezePlan(freeze && freeze.id !== sub.paid_plan_id ? freeze : null);
         setPlans(allPlans.filter((p) => p.id !== sub.paid_plan_id && p.gb > 0));
       })
