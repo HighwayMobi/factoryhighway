@@ -302,6 +302,12 @@ const ChangePlanPage = () => {
             return (
               <div className="space-y-4 py-2">
                 <div className="rounded-xl border border-border bg-secondary/30 p-4 space-y-2">
+                  {subPhone && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{i.cp_forLine}</span>
+                      <span className="font-semibold text-primary">{subPhone}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{i.cp_newPlan}</span>
                     <span className="font-semibold text-foreground">
