@@ -107,8 +107,60 @@ const ChangePlanPage = () => {
   };
 
   const handleSelectPlan = (plan: PaidPlan) => {
+    if (pendingPlanId) return;
     setSelectedPlan(plan);
     setConfirmOpen(true);
+  };
+
+  const reloadPlans = async () => {
+    setLoading(true);
+    try {
+      const userRes = await fetchUser();
+      const subs = getSubscribersList(userRes.data.client);
+      const sub = (requestedSubscriberId ? subs.find((s) => s.id === requestedSubscriberId) : undefined)
+        ?? pickSubscriber(userRes.data.client);
+      if (!sub) return;
+      const pendingId = Number((sub as any).new_paid_plan_id || 0);
+      if (pendingId && pendingId !== sub.paid_plan_id) {
+        const plansRes = await apiFetch(`api/paidPlans/1`);
+        const rawPlans: PaidPlan[] = Array.isArray(plansRes.data) ? plansRes.data : Object.values(plansRes.data || {});
+        const pp = rawPlans.find((p: any) => p.id === pendingId);
+        setPendingPlanId(pendingId);
+        setPendingPlanName(pp?.local_name?.[lang] || pp?.name || `#${pendingId}`);
+      } else {
+        setPendingPlanId(null);
+        setPendingPlanName("");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelPending = async () => {
+    if (!subscriberId) return;
+    setCancellingPending(true);
+    try {
+      await apiFetch("api/cancelService", {
+        method: "POST",
+        body: JSON.stringify({ service: "ChangePaidPlan", subscriber_id: subscriberId }),
+      });
+      const { clearPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
+      clearPlanChangeConfirmed(subscriberId);
+      toast({ title: i.cp_successTitle });
+      await reloadPlans();
+    } catch (err: any) {
+      console.error("Failed to cancel scheduled plan change:", err);
+      if (err?.status === 404) {
+        const { clearPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
+        clearPlanChangeConfirmed(subscriberId);
+        setPendingPlanId(null);
+        setPendingPlanName("");
+      } else {
+        toast({ title: i.cp_errorTitle, description: err?.message || i.cp_errorDesc, variant: "destructive" });
+      }
+    } finally {
+      setCancellingPending(false);
+    }
   };
 
   const handleConfirm = async () => {
