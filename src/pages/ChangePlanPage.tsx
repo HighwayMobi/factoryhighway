@@ -37,6 +37,9 @@ const ChangePlanPage = () => {
   const [nextPaymentDate, setNextPaymentDate] = useState<string>("");
   const [operatorId, setOperatorId] = useState<number>(1);
   const [subPhone, setSubPhone] = useState<string>("");
+  const [pendingPlanId, setPendingPlanId] = useState<number | null>(null);
+  const [pendingPlanName, setPendingPlanName] = useState<string>("");
+  const [cancellingPending, setCancellingPending] = useState(false);
 
   useEffect(() => {
     fetchUser()
@@ -75,6 +78,17 @@ const ChangePlanPage = () => {
         }
         setFreezePlan(freeze && freeze.id !== sub.paid_plan_id ? freeze : null);
         setPlans(allPlans.filter((p) => p.id !== sub.paid_plan_id && p.gb > 0));
+
+        // Detect already-scheduled plan change
+        const pendingId = Number((sub as any).new_paid_plan_id || 0);
+        if (pendingId && pendingId !== sub.paid_plan_id) {
+          setPendingPlanId(pendingId);
+          const pp = rawPlans.find((p: any) => p.id === pendingId);
+          setPendingPlanName(pp?.local_name?.[lang] || pp?.name || `#${pendingId}`);
+        } else {
+          setPendingPlanId(null);
+          setPendingPlanName("");
+        }
       })
       .catch((err) => {
         console.error("Failed to load plans:", err);
@@ -93,8 +107,60 @@ const ChangePlanPage = () => {
   };
 
   const handleSelectPlan = (plan: PaidPlan) => {
+    if (pendingPlanId) return;
     setSelectedPlan(plan);
     setConfirmOpen(true);
+  };
+
+  const reloadPlans = async () => {
+    setLoading(true);
+    try {
+      const userRes = await fetchUser();
+      const subs = getSubscribersList(userRes.data.client);
+      const sub = (requestedSubscriberId ? subs.find((s) => s.id === requestedSubscriberId) : undefined)
+        ?? pickSubscriber(userRes.data.client);
+      if (!sub) return;
+      const pendingId = Number((sub as any).new_paid_plan_id || 0);
+      if (pendingId && pendingId !== sub.paid_plan_id) {
+        const plansRes = await apiFetch(`api/paidPlans/1`);
+        const rawPlans: PaidPlan[] = Array.isArray(plansRes.data) ? plansRes.data : Object.values(plansRes.data || {});
+        const pp = rawPlans.find((p: any) => p.id === pendingId);
+        setPendingPlanId(pendingId);
+        setPendingPlanName(pp?.local_name?.[lang] || pp?.name || `#${pendingId}`);
+      } else {
+        setPendingPlanId(null);
+        setPendingPlanName("");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelPending = async () => {
+    if (!subscriberId) return;
+    setCancellingPending(true);
+    try {
+      await apiFetch("api/cancelService", {
+        method: "POST",
+        body: JSON.stringify({ service: "ChangePaidPlan", subscriber_id: subscriberId }),
+      });
+      const { clearPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
+      clearPlanChangeConfirmed(subscriberId);
+      toast({ title: i.cp_successTitle });
+      await reloadPlans();
+    } catch (err: any) {
+      console.error("Failed to cancel scheduled plan change:", err);
+      if (err?.status === 404) {
+        const { clearPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
+        clearPlanChangeConfirmed(subscriberId);
+        setPendingPlanId(null);
+        setPendingPlanName("");
+      } else {
+        toast({ title: i.cp_errorTitle, description: err?.message || i.cp_errorDesc, variant: "destructive" });
+      }
+    } finally {
+      setCancellingPending(false);
+    }
   };
 
   const handleConfirm = async () => {
@@ -217,6 +283,29 @@ const ChangePlanPage = () => {
           )}
         </div>
 
+        {/* Pending plan change banner */}
+        {pendingPlanId && (
+          <div className="mb-6 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 space-y-3">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-bold text-foreground">{i.cp_pendingTitle}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {i.cp_pendingDesc.replace("{name}", pendingPlanName)}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleCancelPending}
+              disabled={cancellingPending}
+              className="w-full rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {cancellingPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {cancellingPending ? i.cp_pendingCancelling : i.cp_pendingCancel}
+            </button>
+          </div>
+        )}
+
         <div className="space-y-3">
           {plans.map((plan) => {
             const name = plan.local_name?.[lang] || plan.name;
@@ -238,7 +327,8 @@ const ChangePlanPage = () => {
                     <span className="text-lg font-bold text-primary whitespace-nowrap">€{fmtPrice(plan.price)}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
                     <button
                       onClick={() => handleSelectPlan(plan)}
-                      className="rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.98]"
+                      disabled={!!pendingPlanId}
+                      className="rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary"
                     >
                       {i.cp_select}
                     </button>
@@ -262,7 +352,8 @@ const ChangePlanPage = () => {
                 </div>
                 <button
                   onClick={() => handleSelectPlan(freezePlan)}
-                  className="rounded-xl border border-orange-400 px-5 py-2.5 text-sm font-semibold text-orange-600 dark:text-orange-400 transition-all hover:bg-orange-500 hover:text-white active:scale-[0.98]"
+                  disabled={!!pendingPlanId}
+                  className="rounded-xl border border-orange-400 px-5 py-2.5 text-sm font-semibold text-orange-600 dark:text-orange-400 transition-all hover:bg-orange-500 hover:text-white active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-orange-600 dark:disabled:hover:text-orange-400"
                 >
                   {i.cp_select}
                 </button>
