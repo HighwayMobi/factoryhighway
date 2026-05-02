@@ -338,6 +338,10 @@ const translations = {
     topup_notEnoughFundsMsg: "Not enough funds on balance",
     cp_insufficientTitle: "Insufficient funds",
     cp_insufficientDesc: "Redirecting to top-up (€{amount} missing).",
+    cp_pendingTitle: "Plan change already scheduled",
+    cp_pendingDesc: "A change to «{name}» is already scheduled. To pick a different plan, cancel the scheduled change first.",
+    cp_pendingCancel: "Cancel scheduled change",
+    cp_pendingCancelling: "Cancelling...",
   },
 } as const;
 
