@@ -78,6 +78,17 @@ const ChangePlanPage = () => {
         }
         setFreezePlan(freeze && freeze.id !== sub.paid_plan_id ? freeze : null);
         setPlans(allPlans.filter((p) => p.id !== sub.paid_plan_id && p.gb > 0));
+
+        // Detect already-scheduled plan change
+        const pendingId = Number((sub as any).new_paid_plan_id || 0);
+        if (pendingId && pendingId !== sub.paid_plan_id) {
+          setPendingPlanId(pendingId);
+          const pp = rawPlans.find((p: any) => p.id === pendingId);
+          setPendingPlanName(pp?.local_name?.[lang] || pp?.name || `#${pendingId}`);
+        } else {
+          setPendingPlanId(null);
+          setPendingPlanName("");
+        }
       })
       .catch((err) => {
         console.error("Failed to load plans:", err);
