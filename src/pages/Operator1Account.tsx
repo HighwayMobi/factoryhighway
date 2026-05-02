@@ -97,24 +97,14 @@ const Operator1Account = () => {
         feeDate = `${String(payDay).padStart(2, "0")}.${String(m).padStart(2, "0")}.${year}`;
       }
 
-      // A planned plan change is shown ONLY when WE confirmed it locally
-      // via a successful PUT api/paidPlan in this session AND the API still
-      // reports the same pending plan id. This prevents stale BO data from
-      // showing a phantom banner before the user actually requested + paid.
+      // Show planned plan change banner whenever API reports new_paid_plan_id
+      // different from current paid_plan_id. We trust the API as the source of truth.
       const pendingPlanId = Number(sub?.new_paid_plan_id || 0);
-      const newPlanId = Number(sub?.new_paid_plan?.id || 0);
       const currentPlanId = Number(sub?.paid_plan_id || 0);
+      const hasPlannedChange = pendingPlanId > 0 && pendingPlanId !== currentPlanId;
+      // Clear stale local flag if API no longer reflects a pending change
       const confirmedId = sub?.id ? getConfirmedPlanChange(sub.id) : null;
-      // Show only the plan that this client actually confirmed successfully.
-      // API may still return an older scheduled plan, but that must not appear
-      // after the user attempts a different change.
-      const hasPlannedChange = pendingPlanId > 0
-        && newPlanId > 0
-        && pendingPlanId === newPlanId
-        && pendingPlanId !== currentPlanId
-        && confirmedId === pendingPlanId;
-      // If API no longer reflects this pending change, clear our local flag
-      if (sub?.id && confirmedId && (pendingPlanId !== confirmedId || pendingPlanId === currentPlanId)) {
+      if (sub?.id && confirmedId && !hasPlannedChange) {
         clearPlanChangeConfirmed(sub.id);
       }
       const isUpgrade = hasPlannedChange && plan
