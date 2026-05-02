@@ -327,7 +327,8 @@ const ChangePlanPage = () => {
                     <span className="text-lg font-bold text-primary whitespace-nowrap">€{fmtPrice(plan.price)}<span className="text-xs font-normal text-muted-foreground">{i.cp_perMonth}</span></span>
                     <button
                       onClick={() => handleSelectPlan(plan)}
-                      className="rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.98]"
+                      disabled={!!pendingPlanId}
+                      className="rounded-xl border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary"
                     >
                       {i.cp_select}
                     </button>
