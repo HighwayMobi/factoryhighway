@@ -37,6 +37,9 @@ const ChangePlanPage = () => {
   const [nextPaymentDate, setNextPaymentDate] = useState<string>("");
   const [operatorId, setOperatorId] = useState<number>(1);
   const [subPhone, setSubPhone] = useState<string>("");
+  const [pendingPlanId, setPendingPlanId] = useState<number | null>(null);
+  const [pendingPlanName, setPendingPlanName] = useState<string>("");
+  const [cancellingPending, setCancellingPending] = useState(false);
 
   useEffect(() => {
     fetchUser()
