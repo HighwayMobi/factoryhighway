@@ -128,7 +128,7 @@ const LoginPage = () => {
     try {
       const body: Record<string, string> = {
         password,
-        key: "architecto",
+        key: "6xARHinsvuC",
       };
       if (activeTab === "email") {
         body.username = email;

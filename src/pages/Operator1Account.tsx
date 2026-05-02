@@ -11,7 +11,7 @@ import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, apiFetch, clearAuthToken, getAuthToken, type UserClient, type Subscriber } from "@/lib/api";
+import { fetchUser, apiFetch, clearAuthToken, getAuthToken, apiUrl, type UserClient, type Subscriber } from "@/lib/api";
 import { pickSubscriber, getSubscribersList } from "@/lib/selectedSubscriber";
 import { getConfirmedPlanChange, clearPlanChangeConfirmed } from "@/lib/confirmedPlanChange";
 import UserAvatar from "@/components/UserAvatar";
@@ -524,7 +524,7 @@ const Operator1Account = () => {
                             const dateParam = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
                             const token = getAuthToken();
                             try {
-                              const res = await fetch(`https://sim.highway.mobi/web/api/invoice?subscriber_id=${user.subscriberId}&date=${dateParam}`, {
+                              const res = await fetch(apiUrl(`/api/invoice?subscriber_id=${user.subscriberId}&date=${dateParam}`), {
                                 headers: {
                                   "Authorization": `Bearer ${token}`,
                                   "Accept": "application/json",
