@@ -167,6 +167,10 @@ const translations = {
     topup_notEnoughFundsMsg: "Недостаточно средств на балансе",
     cp_insufficientTitle: "Недостаточно средств",
     cp_insufficientDesc: "Перенаправляем на пополнение баланса (не хватает €{amount}).",
+    cp_pendingTitle: "Уже запланирована смена тарифа",
+    cp_pendingDesc: "Запланирована смена на тариф «{name}». Чтобы выбрать другой тариф, сначала отмените текущую запланированную смену.",
+    cp_pendingCancel: "Отменить запланированную смену",
+    cp_pendingCancelling: "Отмена...",
   },
   en: {
     loginTitle: "Sign in to your account",
