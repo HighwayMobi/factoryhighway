@@ -352,7 +352,8 @@ const ChangePlanPage = () => {
                 </div>
                 <button
                   onClick={() => handleSelectPlan(freezePlan)}
-                  className="rounded-xl border border-orange-400 px-5 py-2.5 text-sm font-semibold text-orange-600 dark:text-orange-400 transition-all hover:bg-orange-500 hover:text-white active:scale-[0.98]"
+                  disabled={!!pendingPlanId}
+                  className="rounded-xl border border-orange-400 px-5 py-2.5 text-sm font-semibold text-orange-600 dark:text-orange-400 transition-all hover:bg-orange-500 hover:text-white active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-orange-600 dark:disabled:hover:text-orange-400"
                 >
                   {i.cp_select}
                 </button>
