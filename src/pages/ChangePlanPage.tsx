@@ -283,28 +283,7 @@ const ChangePlanPage = () => {
           )}
         </div>
 
-        {/* Pending plan change banner */}
-        {pendingPlanId && (
-          <div className="mb-6 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 space-y-3">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm font-bold text-foreground">{i.cp_pendingTitle}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {i.cp_pendingDesc.replace("{name}", pendingPlanName)}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleCancelPending}
-              disabled={cancellingPending}
-              className="w-full rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {cancellingPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {cancellingPending ? i.cp_pendingCancelling : i.cp_pendingCancel}
-            </button>
-          </div>
-        )}
+        {/* Pending plan change banner is shown only on the main account page */}
 
         <div className="space-y-3">
           {plans.map((plan) => {
