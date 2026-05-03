@@ -1,14 +1,4 @@
-const resolveApiBase = () => {
-  if (import.meta.env.VITE_API_BASE) {
-    return import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-  }
-  if (typeof window !== 'undefined') {
-    return `${window.location.origin}/web`;
-  }
-  return '/web';
-};
-
-export const API_BASE = resolveApiBase();
+export const API_BASE = "https://sim.highway.mobi/web";
 export const apiUrl = (path: string) => {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `${API_BASE}${normalized}`;
