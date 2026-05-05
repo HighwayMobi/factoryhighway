@@ -110,6 +110,10 @@ const ChangePlanPage = () => {
   const handleSelectPlan = (plan: PaidPlan) => {
     if (pendingPlanId) return;
     setSelectedPlan(plan);
+    // Default: upgrade -> "now", downgrade/freeze -> "later"
+    const isFreeze = plan.gb === 0;
+    const isUpgrade = !isFreeze && currentPlanPrice !== null && plan.price > currentPlanPrice;
+    setWhenChange(isUpgrade ? "now" : "later");
     setConfirmOpen(true);
   };
 
