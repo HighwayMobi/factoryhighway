@@ -208,7 +208,7 @@ const Operator2Account = () => {
     try {
       await apiFetch("api/cancelService", {
         method: "POST",
-        body: JSON.stringify({ service: "ChangePaidPlan", subscriber_id: user.subscriberId }),
+        body: JSON.stringify({ service: '"ChangePaidPlan"', subscriber_id: user.subscriberId }),
       });
       clearPlanChangeConfirmed(user.subscriberId);
       await loadData();
