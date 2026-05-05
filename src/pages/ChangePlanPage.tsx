@@ -40,6 +40,7 @@ const ChangePlanPage = () => {
   const [pendingPlanId, setPendingPlanId] = useState<number | null>(null);
   const [pendingPlanName, setPendingPlanName] = useState<string>("");
   const [cancellingPending, setCancellingPending] = useState(false);
+  const [whenChange, setWhenChange] = useState<"now" | "later">("now");
 
   useEffect(() => {
     fetchUser()
