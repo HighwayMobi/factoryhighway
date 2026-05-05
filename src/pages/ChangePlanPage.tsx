@@ -170,55 +170,58 @@ const ChangePlanPage = () => {
 
   const handleConfirm = async () => {
     if (!selectedPlan || !subscriberId) return;
+    const isFreeze = selectedPlan.gb === 0;
+    const isUpgrade = !isFreeze && currentPlanPrice !== null && selectedPlan.price > currentPlanPrice;
+    // Downgrade & freeze always at end of period; upgrade depends on user choice
+    const nowFlag = isUpgrade && whenChange === "now" ? 1 : 0;
     setSubmitting(true);
     try {
-      // 1. Check funds via API before attempting plan change
-      const funds = await checkFunds(
-        "ChangePaidPlan",
-        Number(selectedPlan.price) || 0,
-        subscriberId,
-        "/change-plan"
-      );
+      // Funds check only when charging immediately
+      if (nowFlag === 1) {
+        const funds = await checkFunds(
+          "ChangePaidPlan",
+          Number(selectedPlan.price) || 0,
+          subscriberId,
+          "/change-plan"
+        );
 
-      if (!funds.enough) {
-        // Calculate deficit: prefer API-provided value, otherwise (price - subscriber balance)
-        let deficit = funds.deficit;
-        if (!deficit || deficit <= 0) {
-          try {
-            const userRes = await fetchUser();
-            const sub = pickSubscriber(userRes.data.client);
-            const bal = Number(sub?.balance) || 0;
-            deficit = Math.max(0, Number(selectedPlan.price) - bal);
-          } catch {
-            deficit = Number(selectedPlan.price);
+        if (!funds.enough) {
+          let deficit = funds.deficit;
+          if (!deficit || deficit <= 0) {
+            try {
+              const userRes = await fetchUser();
+              const sub = pickSubscriber(userRes.data.client);
+              const bal = Number(sub?.balance) || 0;
+              deficit = Math.max(0, Number(selectedPlan.price) - bal);
+            } catch {
+              deficit = Number(selectedPlan.price);
+            }
           }
+          const topUpAmount = Math.max(3, Math.ceil(deficit));
+          toast({
+            title: i.cp_insufficientTitle,
+            description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
+          });
+          setConfirmOpen(false);
+          const params = new URLSearchParams({
+            amount: String(topUpAmount),
+            returnTo: "/change-plan",
+            pay: "card",
+          });
+          navigate(`/topup?${params.toString()}`);
+          return;
         }
-        // Stripe minimum top-up is 3€
-        const topUpAmount = Math.max(3, Math.ceil(deficit));
-        toast({
-          title: i.cp_insufficientTitle,
-          description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
-        });
-        setConfirmOpen(false);
-        const params = new URLSearchParams({
-          amount: String(topUpAmount),
-          returnTo: "/change-plan",
-          pay: "card",
-        });
-        navigate(`/topup?${params.toString()}`);
-        return;
       }
 
-      // 2. Funds OK — perform the actual plan change
       const res = await apiFetch("api/paidPlan", {
         method: "PUT",
         body: JSON.stringify({
           subscriber_id: subscriberId,
           plan_id: selectedPlan.id,
+          now: nowFlag,
         }),
       });
       console.log("Plan change response:", res);
-      // Mark this change as confirmed locally — only now the banner is allowed
       const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
       markPlanChangeConfirmed(subscriberId, selectedPlan.id);
       toast({ title: i.cp_successTitle, description: i.cp_successDesc });
@@ -226,8 +229,6 @@ const ChangePlanPage = () => {
       navigate("/account?refresh=1");
     } catch (err: any) {
       console.error("Failed to change plan:", err);
-      // 409 "Already changed" means backend kept the existing scheduled plan,
-      // so do NOT mark the selected plan locally as confirmed.
       toast({
         title: i.cp_errorTitle,
         description: err?.message || i.cp_errorDesc,
