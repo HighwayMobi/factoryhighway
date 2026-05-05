@@ -176,8 +176,8 @@ const ChangePlanPage = () => {
     const nowFlag = isUpgrade && whenChange === "now" ? 1 : 0;
     setSubmitting(true);
     try {
-      // Funds check only when charging immediately
-      if (nowFlag === 1) {
+      // Always check funds for the new plan price; backend handles actual charging
+      {
         const funds = await checkFunds(
           "ChangePaidPlan",
           Number(selectedPlan.price) || 0,
