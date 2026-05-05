@@ -40,6 +40,7 @@ const ChangePlanPage = () => {
   const [pendingPlanId, setPendingPlanId] = useState<number | null>(null);
   const [pendingPlanName, setPendingPlanName] = useState<string>("");
   const [cancellingPending, setCancellingPending] = useState(false);
+  const [whenChange, setWhenChange] = useState<"now" | "later">("now");
 
   useEffect(() => {
     fetchUser()
@@ -109,6 +110,10 @@ const ChangePlanPage = () => {
   const handleSelectPlan = (plan: PaidPlan) => {
     if (pendingPlanId) return;
     setSelectedPlan(plan);
+    // Default: upgrade -> "now", downgrade/freeze -> "later"
+    const isFreeze = plan.gb === 0;
+    const isUpgrade = !isFreeze && currentPlanPrice !== null && plan.price > currentPlanPrice;
+    setWhenChange(isUpgrade ? "now" : "later");
     setConfirmOpen(true);
   };
 
@@ -165,55 +170,58 @@ const ChangePlanPage = () => {
 
   const handleConfirm = async () => {
     if (!selectedPlan || !subscriberId) return;
+    const isFreeze = selectedPlan.gb === 0;
+    const isUpgrade = !isFreeze && currentPlanPrice !== null && selectedPlan.price > currentPlanPrice;
+    // Downgrade & freeze always at end of period; upgrade depends on user choice
+    const nowFlag = isUpgrade && whenChange === "now" ? 1 : 0;
     setSubmitting(true);
     try {
-      // 1. Check funds via API before attempting plan change
-      const funds = await checkFunds(
-        "ChangePaidPlan",
-        Number(selectedPlan.price) || 0,
-        subscriberId,
-        "/change-plan"
-      );
+      // Funds check only when charging immediately
+      if (nowFlag === 1) {
+        const funds = await checkFunds(
+          "ChangePaidPlan",
+          Number(selectedPlan.price) || 0,
+          subscriberId,
+          "/change-plan"
+        );
 
-      if (!funds.enough) {
-        // Calculate deficit: prefer API-provided value, otherwise (price - subscriber balance)
-        let deficit = funds.deficit;
-        if (!deficit || deficit <= 0) {
-          try {
-            const userRes = await fetchUser();
-            const sub = pickSubscriber(userRes.data.client);
-            const bal = Number(sub?.balance) || 0;
-            deficit = Math.max(0, Number(selectedPlan.price) - bal);
-          } catch {
-            deficit = Number(selectedPlan.price);
+        if (!funds.enough) {
+          let deficit = funds.deficit;
+          if (!deficit || deficit <= 0) {
+            try {
+              const userRes = await fetchUser();
+              const sub = pickSubscriber(userRes.data.client);
+              const bal = Number(sub?.balance) || 0;
+              deficit = Math.max(0, Number(selectedPlan.price) - bal);
+            } catch {
+              deficit = Number(selectedPlan.price);
+            }
           }
+          const topUpAmount = Math.max(3, Math.ceil(deficit));
+          toast({
+            title: i.cp_insufficientTitle,
+            description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
+          });
+          setConfirmOpen(false);
+          const params = new URLSearchParams({
+            amount: String(topUpAmount),
+            returnTo: "/change-plan",
+            pay: "card",
+          });
+          navigate(`/topup?${params.toString()}`);
+          return;
         }
-        // Stripe minimum top-up is 3€
-        const topUpAmount = Math.max(3, Math.ceil(deficit));
-        toast({
-          title: i.cp_insufficientTitle,
-          description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
-        });
-        setConfirmOpen(false);
-        const params = new URLSearchParams({
-          amount: String(topUpAmount),
-          returnTo: "/change-plan",
-          pay: "card",
-        });
-        navigate(`/topup?${params.toString()}`);
-        return;
       }
 
-      // 2. Funds OK — perform the actual plan change
       const res = await apiFetch("api/paidPlan", {
         method: "PUT",
         body: JSON.stringify({
           subscriber_id: subscriberId,
           plan_id: selectedPlan.id,
+          now: nowFlag,
         }),
       });
       console.log("Plan change response:", res);
-      // Mark this change as confirmed locally — only now the banner is allowed
       const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
       markPlanChangeConfirmed(subscriberId, selectedPlan.id);
       toast({ title: i.cp_successTitle, description: i.cp_successDesc });
@@ -221,8 +229,6 @@ const ChangePlanPage = () => {
       navigate("/account?refresh=1");
     } catch (err: any) {
       console.error("Failed to change plan:", err);
-      // 409 "Already changed" means backend kept the existing scheduled plan,
-      // so do NOT mark the selected plan locally as confirmed.
       toast({
         title: i.cp_errorTitle,
         description: err?.message || i.cp_errorDesc,
@@ -374,14 +380,21 @@ const ChangePlanPage = () => {
             const isFreeze = selectedPlan.gb === 0;
             const isUpgrade = !isFreeze && currentPlanPrice !== null && selectedPlan.price > currentPlanPrice;
             const feeDate = nextPaymentDate ? nextPaymentDate.split("-").reverse().join(".") : getNextFeeDate();
-            const tomorrow = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`; })();
+            const soonDays = operatorId === 2 ? 3 : 1;
+            const soonDate = (() => {
+              const d = new Date(); d.setDate(d.getDate() + soonDays);
+              return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`;
+            })();
             let noteText = "";
             if (isFreeze) {
               noteText = i.cp_freezeNote.replace("{date}", feeDate).replace("{price}", String(selectedPlan.price));
-            } else if (operatorId === 2) {
-              noteText = i.cp_op2Note.replace("{price}", String(selectedPlan.price));
             } else if (isUpgrade) {
-              noteText = i.cp_upgradeNote.replace("{date}", tomorrow).replace("{price}", String(selectedPlan.price));
+              if (whenChange === "now") {
+                const tpl = operatorId === 2 ? i.cp_op2Note : i.cp_upgradeNote;
+                noteText = tpl.replace("{date}", soonDate).replace("{price}", String(selectedPlan.price));
+              } else {
+                noteText = i.cp_downgradeNote.replace("{date}", feeDate);
+              }
             } else {
               noteText = i.cp_downgradeNote.replace("{date}", feeDate);
             }
@@ -411,10 +424,43 @@ const ChangePlanPage = () => {
                     <span className="font-bold text-primary">€{fmtPrice(selectedPlan.price)}</span>
                   </div>
                 </div>
+
+                {isUpgrade && (
+                  <div className="rounded-xl border border-border bg-card p-4 space-y-2">
+                    <p className="text-sm font-semibold text-foreground">{i.cp_whenChangeTitle}</p>
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="whenChange"
+                        value="now"
+                        checked={whenChange === "now"}
+                        onChange={() => setWhenChange("now")}
+                        className="mt-1 accent-primary"
+                      />
+                      <span className="text-sm text-foreground">
+                        {i.cp_whenChangeNow.replace("{date}", soonDate)}
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="whenChange"
+                        value="later"
+                        checked={whenChange === "later"}
+                        onChange={() => setWhenChange("later")}
+                        className="mt-1 accent-primary"
+                      />
+                      <span className="text-sm text-foreground">
+                        {i.cp_whenChangeLater.replace("{date}", feeDate)}
+                      </span>
+                    </label>
+                  </div>
+                )}
+
                 <div className={cn(
                   "rounded-xl border p-4 text-sm text-foreground",
                   isFreeze ? "bg-orange-50/50 border-orange-300/50 dark:bg-orange-950/20 dark:border-orange-500/30" :
-                  isUpgrade ? "bg-green-50/50 border-green-300/50 dark:bg-green-950/20 dark:border-green-500/30" :
+                  isUpgrade && whenChange === "now" ? "bg-green-50/50 border-green-300/50 dark:bg-green-950/20 dark:border-green-500/30" :
                   "bg-primary/5 border-primary/20"
                 )}>
                   <p>{noteText}</p>
