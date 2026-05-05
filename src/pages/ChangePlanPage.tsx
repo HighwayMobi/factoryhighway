@@ -147,7 +147,7 @@ const ChangePlanPage = () => {
     try {
       await apiFetch("api/cancelService", {
         method: "POST",
-        body: JSON.stringify({ service: "ChangePaidPlan", subscriber_id: subscriberId }),
+        body: JSON.stringify({ service: '"ChangePaidPlan"', subscriber_id: subscriberId }),
       });
       const { clearPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
       clearPlanChangeConfirmed(subscriberId);
