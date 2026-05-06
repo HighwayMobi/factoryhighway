@@ -136,9 +136,7 @@ const Operator1Account = () => {
 
       // Finance is loaded separately via loadFinance
 
-      if (c.lang === "en" || c.lang === "ru") {
-        setLang(c.lang);
-      }
+      // Do not override user-selected language with server value here.
     } catch (err: any) {
       console.error("Failed to fetch user:", err);
       if (err.message?.includes("401")) {
