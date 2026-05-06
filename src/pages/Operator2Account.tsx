@@ -178,7 +178,7 @@ const Operator2Account = () => {
 
   useEffect(() => {
     loadData().finally(() => setLoading(false));
-  }, []);
+  }, [lang]);
 
   // Auto-refresh after payment redirect
   useEffect(() => {
