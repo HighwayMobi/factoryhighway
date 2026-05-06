@@ -128,11 +128,7 @@ const Operator2Account = () => {
         iccid: sub?.iccid ?? "",
         activationDate: sub?.activation_date ?? "",
         contractNumber: sub?.contract_number ?? "",
-        newPlan: hasPlannedChange
-          ? (sub?.new_paid_plan?.gb === 0
-              ? t(lang).cp_freezeTitle
-              : (sub?.new_paid_plan?.local_name?.[lang] || sub?.new_paid_plan?.name || ""))
-          : "",
+        newPlan: hasPlannedChange ? (sub?.new_paid_plan?.local_name?.[lang] || sub?.new_paid_plan?.name || "") : "",
         newPlanPrice: hasPlannedChange ? (sub?.new_paid_plan?.price ?? null) : null,
         subscriberId: sub?.id ?? null,
         clientId: c.id ?? null,
@@ -182,7 +178,7 @@ const Operator2Account = () => {
 
   useEffect(() => {
     loadData().finally(() => setLoading(false));
-  }, []);
+  }, [lang]);
 
   // Auto-refresh after payment redirect
   useEffect(() => {
