@@ -77,3 +77,8 @@
     font-family: var(--font-mono);
   }
 }
+
+.in-mobile-app footer {
+  display: none !important;
+}
+
