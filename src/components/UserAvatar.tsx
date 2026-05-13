@@ -18,9 +18,7 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    fetch(`${AVATAR_API_BASE}/avatar/${userId}`, {
-      headers: { "X-Api-Key": AVATAR_API_KEY },
-    })
+    fetch(`${AVATAR_API_BASE}/${userId}`)
       .then(async (res) => {
         if (!res.ok) return null;
         const json = await res.json();
