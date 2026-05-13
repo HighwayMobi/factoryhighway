@@ -48,9 +48,8 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
       form.append("client_id", String(userId));
       form.append("file", file);
 
-      const res = await fetch(`${AVATAR_API_BASE}/upload/avatar`, {
+      const res = await fetch(`${AVATAR_API_BASE}/upload`, {
         method: "POST",
-        headers: { "X-Api-Key": AVATAR_API_KEY },
         body: form,
       });
 
