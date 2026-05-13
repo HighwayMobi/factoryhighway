@@ -7,8 +7,7 @@ interface UserAvatarProps {
   className?: string;
 }
 
-const AVATAR_API_BASE = "https://avatars.highway.mobi/api";
-const AVATAR_API_KEY = "8415ead183d47c07c463e07625c257d4cb67668ae064b1c56199ba185e6755c8";
+const AVATAR_API_BASE = "/api/avatar";
 
 const UserAvatar = ({ userId, className }: UserAvatarProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
