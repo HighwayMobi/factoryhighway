@@ -7,8 +7,7 @@ interface UserAvatarProps {
   className?: string;
 }
 
-const AVATAR_API_BASE = "https://avatars.highway.mobi/api";
-const AVATAR_API_KEY = "8415ead183d47c07c463e07625c257d4cb67668ae064b1c56199ba185e6755c8";
+const AVATAR_API_BASE = "/api/avatar";
 
 const UserAvatar = ({ userId, className }: UserAvatarProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -19,9 +18,7 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    fetch(`${AVATAR_API_BASE}/avatar/${userId}`, {
-      headers: { "X-Api-Key": AVATAR_API_KEY },
-    })
+    fetch(`${AVATAR_API_BASE}/${userId}`)
       .then(async (res) => {
         if (!res.ok) return null;
         const json = await res.json();
@@ -51,9 +48,8 @@ const UserAvatar = ({ userId, className }: UserAvatarProps) => {
       form.append("client_id", String(userId));
       form.append("file", file);
 
-      const res = await fetch(`${AVATAR_API_BASE}/upload/avatar`, {
+      const res = await fetch(`${AVATAR_API_BASE}/upload`, {
         method: "POST",
-        headers: { "X-Api-Key": AVATAR_API_KEY },
         body: form,
       });
 
