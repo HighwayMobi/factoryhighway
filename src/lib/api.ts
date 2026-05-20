@@ -282,7 +282,8 @@ export const checkFunds = async (
   service: string,
   price: number,
   subscriberId: number,
-  returnUrl = "/success"
+  returnUrl = "/success",
+  name?: string
 ): Promise<CheckFundsResult> => {
   try {
     const res = await apiFetch("api/checkFunds", {
@@ -293,6 +294,7 @@ export const checkFunds = async (
           price,
           subscriber_id: subscriberId,
           return_url: returnUrl,
+          ...(name ? { name } : {}),
         },
       }),
     });
