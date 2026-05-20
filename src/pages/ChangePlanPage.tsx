@@ -182,7 +182,8 @@ const ChangePlanPage = () => {
           "ChangePaidPlan",
           Number(selectedPlan.price) || 0,
           subscriberId,
-          "/change-plan"
+          "/change-plan",
+          selectedPlan.local_name?.[lang] || selectedPlan.name || "Change plan"
         );
 
         if (!funds.enough) {
