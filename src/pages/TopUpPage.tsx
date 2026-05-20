@@ -153,7 +153,7 @@ const TopUpPage = () => {
     setPayingFromBalance(true);
     try {
       // Verify funds via API first to avoid 401 on addGB
-      const funds = await checkFunds("addGB", Number(selectedPkg.price) || 0, subscriberId, "/topup?tab=gb");
+      const funds = await checkFunds("addGB", Number(selectedPkg.price) || 0, subscriberId, "/topup?tab=gb", `+${selectedPkg.gb} GB`);
       if (!funds.enough) {
         const deficit = funds.deficit > 0 ? funds.deficit : Math.max(0, Number(selectedPkg.price) - subscriberBalance);
         const topUpAmount = Math.max(3, Math.ceil(deficit));
