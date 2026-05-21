@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import StripePaymentForm from "@/components/StripePaymentForm";
 
 const ChangePlanPage = () => {
   const { lang, setLang } = useLang();
@@ -41,6 +42,9 @@ const ChangePlanPage = () => {
   const [pendingPlanName, setPendingPlanName] = useState<string>("");
   const [cancellingPending, setCancellingPending] = useState(false);
   const [whenChange, setWhenChange] = useState<"now" | "later">("now");
+  const [paymentPreset, setPaymentPreset] = useState<any | null>(null);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [payerEmail, setPayerEmail] = useState<string>("");
 
   useEffect(() => {
     fetchUser()
@@ -50,6 +54,7 @@ const ChangePlanPage = () => {
           ?? pickSubscriber(userRes.data.client);
         if (!sub) throw new Error("Subscriber not found");
         if (requestedSubscriberId && sub.id === requestedSubscriberId) setSelectedSubscriberId(sub.id);
+        setPayerEmail(userRes.data.client.email || "");
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
         setCurrentPlanPrice(sub.paid_plan?.price ?? null);
@@ -187,29 +192,32 @@ const ChangePlanPage = () => {
         );
 
         if (!funds.enough) {
-          let deficit = funds.deficit;
-          if (!deficit || deficit <= 0) {
-            try {
-              const userRes = await fetchUser();
-              const sub = pickSubscriber(userRes.data.client);
-              const bal = Number(sub?.balance) || 0;
-              deficit = Math.max(0, Number(selectedPlan.price) - bal);
-            } catch {
-              deficit = Number(selectedPlan.price);
-            }
+          // checkFunds returned ready-made Stripe payment data — open Stripe
+          // checkout directly with that preset so backend completes the plan
+          // change after successful payment (do NOT redirect to /topup which
+          // would only add money to balance).
+          const raw = (funds.raw as any)?.data;
+          if (raw && raw.amount) {
+            setPaymentPreset({
+              email: raw.email || payerEmail,
+              name: raw.name || (selectedPlan.local_name?.[lang] || selectedPlan.name),
+              amount: Number(raw.amount),
+              product: raw.product,
+              metadata: raw.metadata,
+              return_url: raw.return_url,
+              title: "CHANGE PLAN",
+            });
+            setConfirmOpen(false);
+            setPaymentOpen(true);
+            return;
           }
-          const topUpAmount = Math.max(3, Math.ceil(deficit));
+          // Fallback: no payment data returned — show error.
           toast({
             title: i.cp_insufficientTitle,
-            description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
+            description: i.cp_errorDesc,
+            variant: "destructive",
           });
           setConfirmOpen(false);
-          const params = new URLSearchParams({
-            amount: String(topUpAmount),
-            returnTo: "/change-plan",
-            pay: "card",
-          });
-          navigate(`/topup?${params.toString()}`);
           return;
         }
       }
@@ -492,6 +500,28 @@ const ChangePlanPage = () => {
               {submitting ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : i.cp_confirm}
             </button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Stripe payment dialog (deficit for plan change) */}
+      <Dialog open={paymentOpen} onOpenChange={(open) => { setPaymentOpen(open); if (!open) setPaymentPreset(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{i.cp_confirmTitle}</DialogTitle>
+          </DialogHeader>
+          {paymentPreset && (
+            <StripePaymentForm
+              amount={paymentPreset.amount}
+              email={paymentPreset.email}
+              phone={subPhone}
+              type="mobile"
+              preset={paymentPreset}
+              returnTo="/change-plan"
+              secureLabel={lang === "ru" ? "Защищённая оплата" : "Secure payment"}
+              cancelLabel={lang === "ru" ? "← Отмена" : "← Cancel"}
+              onCancel={() => { setPaymentOpen(false); setPaymentPreset(null); }}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
