@@ -192,29 +192,32 @@ const ChangePlanPage = () => {
         );
 
         if (!funds.enough) {
-          let deficit = funds.deficit;
-          if (!deficit || deficit <= 0) {
-            try {
-              const userRes = await fetchUser();
-              const sub = pickSubscriber(userRes.data.client);
-              const bal = Number(sub?.balance) || 0;
-              deficit = Math.max(0, Number(selectedPlan.price) - bal);
-            } catch {
-              deficit = Number(selectedPlan.price);
-            }
+          // checkFunds returned ready-made Stripe payment data — open Stripe
+          // checkout directly with that preset so backend completes the plan
+          // change after successful payment (do NOT redirect to /topup which
+          // would only add money to balance).
+          const raw = (funds.raw as any)?.data;
+          if (raw && raw.amount) {
+            setPaymentPreset({
+              email: raw.email || payerEmail,
+              name: raw.name || (selectedPlan.local_name?.[lang] || selectedPlan.name),
+              amount: Number(raw.amount),
+              product: raw.product,
+              metadata: raw.metadata,
+              return_url: raw.return_url,
+              title: "CHANGE PLAN",
+            });
+            setConfirmOpen(false);
+            setPaymentOpen(true);
+            return;
           }
-          const topUpAmount = Math.max(3, Math.ceil(deficit));
+          // Fallback: no payment data returned — show error.
           toast({
             title: i.cp_insufficientTitle,
-            description: i.cp_insufficientDesc.replace("{amount}", String(topUpAmount)),
+            description: i.cp_errorDesc,
+            variant: "destructive",
           });
           setConfirmOpen(false);
-          const params = new URLSearchParams({
-            amount: String(topUpAmount),
-            returnTo: "/change-plan",
-            pay: "card",
-          });
-          navigate(`/topup?${params.toString()}`);
           return;
         }
       }
