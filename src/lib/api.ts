@@ -298,7 +298,17 @@ export const checkFunds = async (
         },
       }),
     });
-    // Successful response — funds are sufficient
+    // The API returns success:true even when funds are insufficient — in that
+    // case the response contains payment metadata (amount to top up, product
+    // name, message "Payment"). Detect that and treat as deficit.
+    const data = (res as any)?.data || {};
+    const msg = String((res as any)?.message || "").toLowerCase();
+    const apiDeficit = Number(data.amount ?? data.deficit ?? data.missing ?? data.need ?? 0);
+    const looksLikePayment =
+      msg === "payment" || data.product != null || data.metadata != null || apiDeficit > 0;
+    if (looksLikePayment && apiDeficit > 0) {
+      return { enough: false, deficit: apiDeficit, raw: res };
+    }
     return { enough: true, deficit: 0, raw: res };
   } catch (err: any) {
     const payload = err?.payload || {};
