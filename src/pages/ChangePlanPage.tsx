@@ -103,6 +103,48 @@ const ChangePlanPage = () => {
       .finally(() => setLoading(false));
   }, [lang, requestedSubscriberId]);
 
+  // After Stripe top-up for ChangePaidPlan: replay PUT api/paidPlan with saved params.
+  useEffect(() => {
+    if (loading || !subscriberId) return;
+    let saved: any = null;
+    try {
+      const raw = sessionStorage.getItem("pending_plan_change");
+      if (raw) saved = JSON.parse(raw);
+    } catch {}
+    if (!saved || saved.subscriberId !== subscriberId) return;
+    // expire after 30 min
+    if (Date.now() - Number(saved.ts || 0) > 30 * 60 * 1000) {
+      sessionStorage.removeItem("pending_plan_change");
+      return;
+    }
+    sessionStorage.removeItem("pending_plan_change");
+    (async () => {
+      setSubmitting(true);
+      try {
+        const reqBody = {
+          subscriber_id: saved.subscriberId,
+          plan_id: saved.plan_id,
+          now: saved.now,
+        };
+        console.log("[ChangePlan] Replay PUT api/paidPlan after top-up:", reqBody);
+        await apiFetch("api/paidPlan", { method: "PUT", body: JSON.stringify(reqBody) });
+        const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
+        markPlanChangeConfirmed(saved.subscriberId, saved.plan_id);
+        toast({ title: i.cp_successTitle, description: i.cp_successDesc });
+        navigate("/account?refresh=1");
+      } catch (err: any) {
+        console.error("Failed to replay plan change:", err);
+        toast({
+          title: i.cp_errorTitle,
+          description: err?.message || i.cp_errorDesc,
+          variant: "destructive",
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    })();
+  }, [loading, subscriberId]);
+
   const getNextFeeDate = () => {
     if (!paymentDay) return "";
     const now = new Date();
@@ -193,11 +235,22 @@ const ChangePlanPage = () => {
 
         if (!funds.enough) {
           // checkFunds returned ready-made Stripe payment data — open Stripe
-          // checkout directly with that preset so backend completes the plan
-          // change after successful payment (do NOT redirect to /topup which
-          // would only add money to balance).
+          // checkout directly with that preset. Backend credits the balance,
+          // then on return we replay PUT api/paidPlan with saved params.
           const raw = (funds.raw as any)?.data;
           if (raw && raw.amount) {
+            try {
+              sessionStorage.setItem(
+                "pending_plan_change",
+                JSON.stringify({
+                  subscriberId,
+                  plan_id: selectedPlan.id,
+                  now: nowFlag,
+                  name: selectedPlan.local_name?.[lang] || selectedPlan.name,
+                  ts: Date.now(),
+                })
+              );
+            } catch {}
             setPaymentPreset({
               email: raw.email || payerEmail,
               name: raw.name || (selectedPlan.local_name?.[lang] || selectedPlan.name),
