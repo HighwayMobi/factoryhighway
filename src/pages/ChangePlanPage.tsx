@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import StripePaymentForm from "@/components/StripePaymentForm";
 
 const ChangePlanPage = () => {
   const { lang, setLang } = useLang();
