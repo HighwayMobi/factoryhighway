@@ -324,7 +324,9 @@ export const checkFunds = async (
     if (err?.status === 400) {
       console.warn("checkFunds rejected by API, using local balance fallback", { service, subscriberId, payload, message: err?.message });
       const userRes = await fetchUser();
-      const subscriber = userRes.data.client.subscribers?.find((sub) => sub.id === subscriberId);
+      const raw = userRes.data.client.subscribers as any;
+      const list: any[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
+      const subscriber = list.find((sub) => sub.id === subscriberId);
       const balance = Number(subscriber?.balance ?? 0);
       const deficit = Math.max(0, Number(price) - balance);
       return { enough: deficit <= 0, deficit, raw: payload };
