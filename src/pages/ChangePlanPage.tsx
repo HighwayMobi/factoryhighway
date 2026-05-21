@@ -42,6 +42,9 @@ const ChangePlanPage = () => {
   const [pendingPlanName, setPendingPlanName] = useState<string>("");
   const [cancellingPending, setCancellingPending] = useState(false);
   const [whenChange, setWhenChange] = useState<"now" | "later">("now");
+  const [paymentPreset, setPaymentPreset] = useState<any | null>(null);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [payerEmail, setPayerEmail] = useState<string>("");
 
   useEffect(() => {
     fetchUser()
