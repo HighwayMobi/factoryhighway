@@ -504,6 +504,29 @@ const ChangePlanPage = () => {
       </Dialog>
     </div>
   );
+      {/* Stripe payment dialog (deficit for plan change) */}
+      <Dialog open={paymentOpen} onOpenChange={(open) => { setPaymentOpen(open); if (!open) setPaymentPreset(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{i.cp_confirmTitle}</DialogTitle>
+          </DialogHeader>
+          {paymentPreset && (
+            <StripePaymentForm
+              amount={paymentPreset.amount}
+              email={paymentPreset.email}
+              phone={subPhone}
+              type="mobile"
+              preset={paymentPreset}
+              returnTo="/change-plan"
+              secureLabel={lang === "ru" ? "Защищённая оплата" : "Secure payment"}
+              cancelLabel={lang === "ru" ? "← Отмена" : "← Cancel"}
+              onCancel={() => { setPaymentOpen(false); setPaymentPreset(null); }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 };
 
 export default ChangePlanPage;
