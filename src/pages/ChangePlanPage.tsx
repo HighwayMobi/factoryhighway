@@ -502,8 +502,7 @@ const ChangePlanPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+
       {/* Stripe payment dialog (deficit for plan change) */}
       <Dialog open={paymentOpen} onOpenChange={(open) => { setPaymentOpen(open); if (!open) setPaymentPreset(null); }}>
         <DialogContent className="sm:max-w-md">
