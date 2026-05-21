@@ -193,11 +193,22 @@ const ChangePlanPage = () => {
 
         if (!funds.enough) {
           // checkFunds returned ready-made Stripe payment data — open Stripe
-          // checkout directly with that preset so backend completes the plan
-          // change after successful payment (do NOT redirect to /topup which
-          // would only add money to balance).
+          // checkout directly with that preset. Backend credits the balance,
+          // then on return we replay PUT api/paidPlan with saved params.
           const raw = (funds.raw as any)?.data;
           if (raw && raw.amount) {
+            try {
+              sessionStorage.setItem(
+                "pending_plan_change",
+                JSON.stringify({
+                  subscriberId,
+                  plan_id: selectedPlan.id,
+                  now: nowFlag,
+                  name: selectedPlan.local_name?.[lang] || selectedPlan.name,
+                  ts: Date.now(),
+                })
+              );
+            } catch {}
             setPaymentPreset({
               email: raw.email || payerEmail,
               name: raw.name || (selectedPlan.local_name?.[lang] || selectedPlan.name),
