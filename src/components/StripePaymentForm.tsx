@@ -79,37 +79,63 @@ const StripePaymentForm = ({
     try {
       const successRedirectUrl = `${window.location.origin}${successPath}`;
 
-      // Step 1: Create top-up request
-      const topUpBody: Record<string, unknown> = { type, phone, email, backURL: successRedirectUrl, replenishment: false, title: type === "gb" ? "ADD GB" : "TOP UP" };
-      topUpBody.amount = amount;
-      if (type === "gb" && size != null) {
-        topUpBody.gb = Math.round(size);
+      let payment: {
+        email: string;
+        name: string;
+        amount: number;
+        product?: unknown;
+        metadata?: unknown;
+        title?: string;
+      };
+
+      if (preset) {
+        // Use ready-made payment data (e.g. from api/checkFunds). No api/topUp.
+        payment = {
+          email: preset.email,
+          name: preset.name,
+          amount: preset.amount,
+          product: preset.product,
+          metadata: preset.metadata,
+          title: preset.title,
+        };
+      } else {
+        // Step 1: Create top-up request (plain balance top-up / addGB)
+        const topUpBody: Record<string, unknown> = {
+          type,
+          phone,
+          email,
+          backURL: successRedirectUrl,
+          replenishment: false,
+          title: type === "gb" ? "ADD GB" : "TOP UP",
+        };
+        topUpBody.amount = amount;
+        if (type === "gb" && size != null) {
+          topUpBody.gb = Math.round(size);
+        }
+        if (type === "gb" && packageId && !packageId.startsWith("default-"))
+          topUpBody.packageId = packageId;
+
+        const topUpResult = await apiFetch("api/topUp", {
+          method: "POST",
+          body: JSON.stringify(topUpBody),
+        });
+        if (!topUpResult.success) {
+          throw new Error(topUpResult.message || "Failed to create top-up");
+        }
+        payment = topUpResult.data;
       }
-      if (type === "gb" && packageId && !packageId.startsWith("default-")) topUpBody.packageId = packageId;
 
-      const topUpResult = await apiFetch("api/topUp", {
-        method: "POST",
-        body: JSON.stringify(topUpBody),
-      });
-      if (!topUpResult.success) {
-        throw new Error(topUpResult.message || "Failed to create top-up");
-      }
-
-      
-
-      // Step 2: Init Stripe checkout — pass data as-is from topUp, no return_url override
-      const { email: resEmail, name, amount: resAmount, product, metadata } = topUpResult.data;
-
+      // Step 2: Init Stripe checkout
       const checkoutBody: Record<string, unknown> = {
-        amount: resAmount,
-        email: resEmail,
-        name,
-        title: type === "gb" ? "ADD GB" : "TOP UP",
-        metadata,
+        amount: payment.amount,
+        email: payment.email,
+        name: payment.name,
+        title: payment.title ?? (type === "gb" ? "ADD GB" : "TOP UP"),
+        metadata: payment.metadata,
         return_url: successRedirectUrl,
         backURL: successRedirectUrl,
       };
-      if (product != null) checkoutBody.product = product;
+      if (payment.product != null) checkoutBody.product = payment.product;
 
       const checkoutResult = await apiFetch("api/checkout", {
         method: "POST",
@@ -130,7 +156,7 @@ const StripePaymentForm = ({
       });
       throw err;
     }
-  }, [amount, email, phone, type, size, packageId, successPath, lang]);
+  }, [amount, email, phone, type, size, packageId, successPath, lang, preset]);
 
 
   if (error) {
