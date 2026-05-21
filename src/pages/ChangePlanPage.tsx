@@ -54,6 +54,7 @@ const ChangePlanPage = () => {
           ?? pickSubscriber(userRes.data.client);
         if (!sub) throw new Error("Subscriber not found");
         if (requestedSubscriberId && sub.id === requestedSubscriberId) setSelectedSubscriberId(sub.id);
+        setPayerEmail(userRes.data.client.email || "");
         setCurrentPlanId(sub.paid_plan_id);
         setCurrentPlanName(sub.paid_plan?.local_name?.[lang] || sub.paid_plan?.name || "");
         setCurrentPlanPrice(sub.paid_plan?.price ?? null);
