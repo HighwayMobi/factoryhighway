@@ -82,9 +82,26 @@ try {
 } catch {}
 
 export const getAuthToken = (): string | null => userToken;
+
+/**
+ * Clear all per-user caches kept in session/localStorage so that the next
+ * user does not see stale profile/lines/avatar/plan data from the previous one.
+ * Service (X-API-KEY) token is preserved — it's not per-user.
+ */
+const invalidatePerUserCaches = () => {
+  try {
+    sessionStorage.removeItem("selected_subscriber_id");
+    sessionStorage.removeItem("highway:confirmedPlanChange");
+    sessionStorage.removeItem("pending_plan_change");
+    sessionStorage.removeItem("inapp");
+  } catch {}
+};
+
 export const setAuthToken = (token: string) => {
+  const changed = userToken !== token;
   userToken = token;
   try { localStorage.setItem(USER_TOKEN_KEY, token); } catch {}
+  if (changed) invalidatePerUserCaches();
 };
 export const clearAuthToken = () => {
   serviceToken = null;
