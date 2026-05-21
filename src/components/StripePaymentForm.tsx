@@ -16,6 +16,16 @@ const stripePromise = loadStripe(
 
 const SUCCESS_REDIRECT_PATH = "/payment-success";
 
+interface PaymentPreset {
+  email: string;
+  name: string;
+  amount: number;
+  product?: string;
+  metadata?: unknown;
+  return_url?: string;
+  title?: string;
+}
+
 interface StripePaymentFormProps {
   amount: number;
   email: string;
@@ -30,6 +40,9 @@ interface StripePaymentFormProps {
   successLabel?: string;
   backLabel?: string;
   returnTo?: string;
+  // When provided, skips api/topUp and uses these payment details directly
+  // (e.g. data returned by api/checkFunds for ChangePaidPlan / addGB services).
+  preset?: PaymentPreset;
 }
 
 const StripePaymentForm = ({
@@ -46,6 +59,7 @@ const StripePaymentForm = ({
   successLabel = "Payment successful!",
   backLabel = "← Back",
   returnTo,
+  preset,
 }: StripePaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useLangNavigate();
