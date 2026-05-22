@@ -5,11 +5,13 @@
  * solely on user.new_paid_plan_id (which can be stale/phantom from BO).
  *
  * Stored in sessionStorage so it survives navigation but resets per session.
- * Key per subscriber_id, value = confirmed new plan id.
+ * Key per subscriber_id, value = { planId, now }.
  */
 const KEY = "highway:confirmedPlanChange";
 
-type Map = Record<string, number>;
+type Entry = { planId: number; now?: boolean };
+// legacy: stored as plain number
+type Map = Record<string, Entry | number>;
 
 function read(): Map {
   try {
@@ -28,9 +30,18 @@ function write(map: Map) {
   }
 }
 
-export function markPlanChangeConfirmed(subscriberId: number, newPlanId: number) {
+function normalizeEntry(value: any): Entry | null {
+  if (!value) return null;
+  if (typeof value === "number") return { planId: value, now: false };
+  if (typeof value === "object" && typeof value.planId === "number") {
+    return { planId: value.planId, now: !!value.now };
+  }
+  return null;
+}
+
+export function markPlanChangeConfirmed(subscriberId: number, newPlanId: number, now = false) {
   const map = read();
-  map[String(subscriberId)] = newPlanId;
+  map[String(subscriberId)] = { planId: newPlanId, now };
   write(map);
 }
 
@@ -40,8 +51,8 @@ export function clearPlanChangeConfirmed(subscriberId: number) {
   write(map);
 }
 
-export function getConfirmedPlanChange(subscriberId: number): number | null {
+export function getConfirmedPlanChange(subscriberId: number): Entry | null {
   const map = read();
   const v = map[String(subscriberId)];
-  return typeof v === "number" && v > 0 ? v : null;
+  return normalizeEntry(v);
 }
