@@ -230,8 +230,10 @@ const ChangePlanPage = () => {
           Number(selectedPlan.price) || 0,
           subscriberId,
           "/change-plan",
-          selectedPlan.local_name?.[lang] || selectedPlan.name || "Change plan"
+          selectedPlan.local_name?.[lang] || selectedPlan.name || "Change plan",
+          { plan_id: selectedPlan.id, now: nowFlag }
         );
+
 
         if (!funds.enough) {
           // checkFunds returned ready-made Stripe payment data — open Stripe
