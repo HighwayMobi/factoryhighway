@@ -357,13 +357,15 @@ const Operator1Account = () => {
                           : <>From {showDate} plan changes to<br />"{user.newPlan}" — €{fmtPrice(user.newPlanPrice)}/mo</>;
                       })()}
                     </span>
-                    <button
-                      onClick={() => setShowCancelConfirm(true)}
-                      disabled={cancellingPlan}
-                      className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
-                    >
-                      {cancellingPlan ? "..." : i.acc_cancelPlanChange}
-                    </button>
+                    {!user.confirmedNow && (
+                      <button
+                        onClick={() => setShowCancelConfirm(true)}
+                        disabled={cancellingPlan}
+                        className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
+                      >
+                        {cancellingPlan ? "..." : i.acc_cancelPlanChange}
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <>
