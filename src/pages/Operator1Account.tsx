@@ -47,7 +47,7 @@ const Operator1Account = () => {
   const [user, setUser] = useState({
     name: "",
     phone: "",
-    balance: 0,
+    balance: 1,
     plan: "",
     monthlyFee: 0,
     feeDate: "",
@@ -64,6 +64,7 @@ const Operator1Account = () => {
     clientId: null as number | null,
     status: "" as string,
     isUpgrade: false,
+    confirmedNow: false,
   });
 
   const loadData = async () => {
