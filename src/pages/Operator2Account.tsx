@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import {
-  LogOut, User, Wifi, Phone as PhoneIcon,
+  LogOut, User, Phone as PhoneIcon,
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
   ChevronLeft, Download, ShieldOff,
 } from "lucide-react";
@@ -378,7 +378,6 @@ const Operator2Account = () => {
           <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
             <div className="px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Wifi className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-foreground">{lang === "ru" ? "Ваш тариф" : "Your Plan"}</span>
               </div>
               <span className="text-sm font-bold text-primary">{user.planGb} Gb</span>
