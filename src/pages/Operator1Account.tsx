@@ -47,7 +47,7 @@ const Operator1Account = () => {
   const [user, setUser] = useState({
     name: "",
     phone: "",
-    balance: 1,
+    balance: 0,
     plan: "",
     monthlyFee: 0,
     feeDate: "",
