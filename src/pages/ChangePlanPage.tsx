@@ -293,7 +293,7 @@ const ChangePlanPage = () => {
         throw e;
       }
       const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
-      markPlanChangeConfirmed(subscriberId, selectedPlan.id);
+      markPlanChangeConfirmed(subscriberId, selectedPlan.id, nowFlag === 1);
       toast({ title: i.cp_successTitle, description: i.cp_successDesc });
       setConfirmOpen(false);
       navigate("/account?refresh=1");
