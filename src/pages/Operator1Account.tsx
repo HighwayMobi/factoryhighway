@@ -133,6 +133,7 @@ const Operator1Account = () => {
         clientId: c.id ?? null,
         status: sub?.status ?? c.status ?? "",
         isUpgrade,
+        confirmedNow: confirmed?.now || false,
       }));
 
       // Finance is loaded separately via loadFinance
