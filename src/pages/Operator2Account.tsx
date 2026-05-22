@@ -65,6 +65,7 @@ const Operator2Account = () => {
     clientId: null as number | null,
     status: "" as string,
     isUpgrade: false,
+    confirmedNow: false,
   });
 
   const loadData = async () => {
