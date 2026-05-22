@@ -300,7 +300,8 @@ export const checkFunds = async (
   price: number,
   subscriberId: number,
   returnUrl = "/success",
-  name?: string
+  name?: string,
+  extra?: Record<string, any>
 ): Promise<CheckFundsResult> => {
   try {
     const res = await apiFetch("api/checkFunds", {
@@ -312,9 +313,11 @@ export const checkFunds = async (
           subscriber_id: subscriberId,
           return_url: returnUrl,
           ...(name ? { name } : {}),
+          ...(extra || {}),
         },
       }),
     });
+
     // The API returns success:true even when funds are insufficient — in that
     // case the response contains payment metadata (amount to top up, product
     // name, message "Payment"). Detect that and treat as deficit.
