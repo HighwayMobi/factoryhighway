@@ -129,7 +129,7 @@ const ChangePlanPage = () => {
         console.log("[ChangePlan] Replay PUT api/paidPlan after top-up:", reqBody);
         await apiFetch("api/paidPlan", { method: "PUT", body: JSON.stringify(reqBody) });
         const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
-        markPlanChangeConfirmed(saved.subscriberId, saved.plan_id);
+        markPlanChangeConfirmed(saved.subscriberId, saved.plan_id, saved.now === 1);
         toast({ title: i.cp_successTitle, description: i.cp_successDesc });
         navigate("/account?refresh=1");
       } catch (err: any) {
@@ -293,7 +293,7 @@ const ChangePlanPage = () => {
         throw e;
       }
       const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
-      markPlanChangeConfirmed(subscriberId, selectedPlan.id);
+      markPlanChangeConfirmed(subscriberId, selectedPlan.id, nowFlag === 1);
       toast({ title: i.cp_successTitle, description: i.cp_successDesc });
       setConfirmOpen(false);
       navigate("/account?refresh=1");

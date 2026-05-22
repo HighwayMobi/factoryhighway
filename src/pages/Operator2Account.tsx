@@ -65,6 +65,7 @@ const Operator2Account = () => {
     clientId: null as number | null,
     status: "" as string,
     isUpgrade: false,
+    confirmedNow: false,
   });
 
   const loadData = async () => {
@@ -104,8 +105,8 @@ const Operator2Account = () => {
       const currentPlanId = Number(sub?.paid_plan_id || 0);
       const hasPlannedChange = pendingPlanId > 0 && pendingPlanId !== currentPlanId;
       // Clear stale local flag if API no longer reflects a pending change
-      const confirmedId = sub?.id ? getConfirmedPlanChange(sub.id) : null;
-      if (sub?.id && confirmedId && !hasPlannedChange) {
+      const confirmed = sub?.id ? getConfirmedPlanChange(sub.id) : null;
+      if (sub?.id && confirmed?.planId && !hasPlannedChange) {
         clearPlanChangeConfirmed(sub.id);
       }
       const isUpgrade = hasPlannedChange && plan
@@ -134,6 +135,7 @@ const Operator2Account = () => {
         clientId: c.id ?? null,
         status: sub?.status ?? c.status ?? "",
         isUpgrade,
+        confirmedNow: confirmed?.now || false,
       }));
 
       // Finance is loaded separately via loadFinance
@@ -357,13 +359,15 @@ const Operator2Account = () => {
                           : <>From {showDate} plan changes to<br />"{user.newPlan}" — €{fmtPrice(user.newPlanPrice)}/mo</>;
                       })()}
                     </span>
-                    <button
-                      onClick={() => setShowCancelConfirm(true)}
-                      disabled={cancellingPlan}
-                      className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
-                    >
-                      {cancellingPlan ? "..." : i.acc_cancelPlanChange}
-                    </button>
+                    {!user.confirmedNow && (
+                      <button
+                        onClick={() => setShowCancelConfirm(true)}
+                        disabled={cancellingPlan}
+                        className="rounded-lg border border-primary-foreground/40 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-foreground/20 active:scale-[0.96] disabled:opacity-50"
+                      >
+                        {cancellingPlan ? "..." : i.acc_cancelPlanChange}
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <>
