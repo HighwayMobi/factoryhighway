@@ -271,23 +271,7 @@ const ChangePlanPage = () => {
         }
       }
 
-      const reqBody = {
-        subscriber_id: subscriberId,
-        plan_id: selectedPlan.id,
-        now: nowFlag,
-      };
-      console.log("[ChangePlan] PUT api/paidPlan request body:", JSON.stringify(reqBody, null, 2));
-      let res: any;
-      try {
-        res = await apiFetch("api/paidPlan", {
-          method: "PUT",
-          body: JSON.stringify(reqBody),
-        });
-        console.log("[ChangePlan] PUT api/paidPlan response:", JSON.stringify(res, null, 2));
-      } catch (e: any) {
-        console.log("[ChangePlan] PUT api/paidPlan error:", e?.status, e?.message, e?.data ? JSON.stringify(e.data, null, 2) : "");
-        throw e;
-      }
+      console.log("[ChangePlan] checkFunds reported sufficient funds; skipping PUT api/paidPlan (backend already scheduled the change).");
       const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
       markPlanChangeConfirmed(subscriberId, selectedPlan.id, nowFlag === 1);
       toast({ title: i.cp_successTitle, description: i.cp_successDesc });
