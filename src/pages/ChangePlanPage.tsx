@@ -121,19 +121,13 @@ const ChangePlanPage = () => {
     (async () => {
       setSubmitting(true);
       try {
-        const reqBody = {
-          subscriber_id: saved.subscriberId,
-          plan_id: saved.plan_id,
-          now: saved.now,
-        };
-        console.log("[ChangePlan] Replay PUT api/paidPlan after top-up:", reqBody);
-        await apiFetch("api/paidPlan", { method: "PUT", body: JSON.stringify(reqBody) });
+        console.log("[ChangePlan] Post top-up confirm (no PUT api/paidPlan; checkFunds already scheduled the change):", saved);
         const { markPlanChangeConfirmed } = await import("@/lib/confirmedPlanChange");
         markPlanChangeConfirmed(saved.subscriberId, saved.plan_id, saved.now === 1);
         toast({ title: i.cp_successTitle, description: i.cp_successDesc });
         navigate("/account?refresh=1");
       } catch (err: any) {
-        console.error("Failed to replay plan change:", err);
+        console.error("Failed to finalize plan change:", err);
         toast({
           title: i.cp_errorTitle,
           description: err?.message || i.cp_errorDesc,
