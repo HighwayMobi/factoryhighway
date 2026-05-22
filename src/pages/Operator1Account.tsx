@@ -349,7 +349,7 @@ const Operator1Account = () => {
                   <div className="flex items-center justify-center gap-2 flex-wrap">
                     <span>
                       {(() => {
-                        const showDate = user.isUpgrade
+                        const showDate = user.confirmedNow
                           ? (() => { const d = new Date(); d.setDate(d.getDate() + 1); return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`; })()
                           : user.feeDate;
                         return lang === "ru"
