@@ -105,8 +105,8 @@ const Operator2Account = () => {
       const currentPlanId = Number(sub?.paid_plan_id || 0);
       const hasPlannedChange = pendingPlanId > 0 && pendingPlanId !== currentPlanId;
       // Clear stale local flag if API no longer reflects a pending change
-      const confirmedId = sub?.id ? getConfirmedPlanChange(sub.id) : null;
-      if (sub?.id && confirmedId && !hasPlannedChange) {
+      const confirmed = sub?.id ? getConfirmedPlanChange(sub.id) : null;
+      if (sub?.id && confirmed?.planId && !hasPlannedChange) {
         clearPlanChangeConfirmed(sub.id);
       }
       const isUpgrade = hasPlannedChange && plan
