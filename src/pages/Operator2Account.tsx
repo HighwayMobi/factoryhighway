@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import {
-  LogOut, User, Wifi, Phone as PhoneIcon,
+  LogOut, User, Phone as PhoneIcon,
   Plus, Clock, Info, Settings, ChevronRight, Signal, FileText, ShieldCheck, ChevronDown, Loader2, RefreshCw,
   ChevronLeft, Download, ShieldOff,
 } from "lucide-react";
