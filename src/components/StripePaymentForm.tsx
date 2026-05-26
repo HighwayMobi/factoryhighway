@@ -11,7 +11,7 @@ import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import { useLang } from "@/contexts/LangContext";
 
 const stripePromise = loadStripe(
-  "pk_test_51S7bGLQM5BJ4b1inXCowPXEgmkzDv5FTUew7zeTUEqzz9OSm4erZg8Pw5HUp8X3cfc2O64EIPEA43osR4Q0BjOvS00xLdjkHCZ"
+  "pk_live_51S7bGAKUpysnrmFauIqwQlGt8jJVCBxX31m9qRTK6160besqyvebJbTMmxyDHcxz80e3Ta5zFhv7jPxkeBD0ivjm00w73pQIef"
 );
 
 const SUCCESS_REDIRECT_PATH = "/payment-success";
