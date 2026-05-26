@@ -1,77 +1,15 @@
-export const API_BASE = "https://sim.highway.mobi/web";
-export const apiUrl = (path: string) => {
-  const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `${API_BASE}${normalized}`;
-};
-
-// Service token obtained via edge function `highway-auth` (login+password kept server-side).
-// Refreshed every ~55 minutes, or on 401, or when missing.
-const TOKEN_TTL_MS = 55 * 60 * 1000;
-const SERVICE_TOKEN_KEY = "highway_service_token";
-const SERVICE_TOKEN_EXP_KEY = "highway_service_token_exp";
-
-let serviceToken: string | null = null;
-let serviceTokenExpiresAt = 0;
-let inflightAuth: Promise<string> | null = null;
+// All highway.mobi requests go through the `highway-proxy` Supabase Edge
+// Function. The partner X-API-KEY lives server-side only — the browser never
+// sees it. We still send the per-user token from `api/login` as
+// `Authorization: Bearer ...`, and the Supabase anon key as `apikey`.
 
 const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_ANON_KEY = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
-const loadCachedServiceToken = () => {
-  if (serviceToken) return;
-  try {
-    const t = localStorage.getItem(SERVICE_TOKEN_KEY);
-    const exp = Number(localStorage.getItem(SERVICE_TOKEN_EXP_KEY) || 0);
-    if (t && exp && Date.now() < exp) {
-      serviceToken = t;
-      serviceTokenExpiresAt = exp;
-    }
-  } catch {}
-};
-loadCachedServiceToken();
-
-const persistServiceToken = (token: string, ttlMs: number) => {
-  serviceToken = token;
-  serviceTokenExpiresAt = Date.now() + ttlMs;
-  try {
-    localStorage.setItem(SERVICE_TOKEN_KEY, token);
-    localStorage.setItem(SERVICE_TOKEN_EXP_KEY, String(serviceTokenExpiresAt));
-  } catch {}
-};
-
-const requestNewServiceToken = async (): Promise<string> => {
-  if (!SUPABASE_URL) throw new Error("Supabase URL missing");
-  const url = `${SUPABASE_URL}/functions/v1/highway-auth`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(SUPABASE_ANON_KEY ? { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } : {}),
-    },
-  });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    console.error("highway-auth proxy failed", res.status, txt);
-    throw new Error(`Auth proxy error ${res.status}`);
-  }
-  const json = await res.json();
-  const token: string = json.token;
-  const expiresIn: number = Number(json.expires_in) || 3600;
-  // Refresh a bit before real expiry; cap to TOKEN_TTL_MS.
-  const ttlMs = Math.min(TOKEN_TTL_MS, Math.max(60_000, expiresIn * 1000 - 60_000));
-  persistServiceToken(token, ttlMs);
-  return token;
-};
-
-const getServiceToken = async (force = false): Promise<string> => {
-  if (!force && serviceToken && Date.now() < serviceTokenExpiresAt) {
-    return serviceToken;
-  }
-  if (inflightAuth) return inflightAuth;
-  inflightAuth = requestNewServiceToken().finally(() => {
-    inflightAuth = null;
-  });
-  return inflightAuth;
+export const API_BASE = `${SUPABASE_URL ?? ""}/functions/v1/highway-proxy`;
+export const apiUrl = (path: string) => {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${API_BASE}${normalized}`;
 };
 
 // User token from `api/login` (per-user). Sent as Authorization: Bearer for protected endpoints.
@@ -86,7 +24,6 @@ export const getAuthToken = (): string | null => userToken;
 /**
  * Clear all per-user caches kept in session/localStorage so that the next
  * user does not see stale profile/lines/avatar/plan data from the previous one.
- * Service (X-API-KEY) token is preserved — it's not per-user.
  */
 const invalidatePerUserCaches = () => {
   try {
@@ -104,30 +41,15 @@ export const setAuthToken = (token: string) => {
   if (changed) invalidatePerUserCaches();
 };
 export const clearAuthToken = () => {
-  serviceToken = null;
-  serviceTokenExpiresAt = 0;
   userToken = null;
   try {
-    localStorage.removeItem(SERVICE_TOKEN_KEY);
-    localStorage.removeItem(SERVICE_TOKEN_EXP_KEY);
     localStorage.removeItem(USER_TOKEN_KEY);
     localStorage.removeItem("auth_token");
+    // Legacy: previous versions stored a partner service token in localStorage.
+    localStorage.removeItem("highway_service_token");
+    localStorage.removeItem("highway_service_token_exp");
     document.cookie = "auth_token=; path=/; max-age=0";
   } catch {}
-};
-
-const doFetch = async (path: string, options: RequestInit, serviceTok: string) => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    ...(options.headers as Record<string, string> || {}),
-    "X-API-KEY": serviceTok,
-  };
-  // Attach user token for protected endpoints, unless caller explicitly disables it.
-  if (userToken && !headers.Authorization) {
-    headers.Authorization = `Bearer ${userToken}`;
-  }
-  return fetch(`${API_BASE}/${path}`, { ...options, headers });
 };
 
 export const apiFetch = async (path: string, options: RequestInit = {}) => {
@@ -139,32 +61,22 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
   }
   console.log(`[HW→ ${reqId}] ${method} ${path}`, reqBody ?? "");
 
-  let token = await getServiceToken();
-  let res = await doFetch(path, options, token);
-
-  if (res.status === 401) {
-    // Distinguish a stale service token (auth issue) from a business 401
-    // like "Not enough funds". Only retry on the former, otherwise the
-    // duplicate request can cause side effects on the backend (e.g. queueing
-    // a plan change twice).
-    let bodyText = "";
-    try { bodyText = await res.clone().text(); } catch {}
-    let parsed: any = null;
-    try { parsed = bodyText ? JSON.parse(bodyText) : null; } catch {}
-    const msg = String(parsed?.message || parsed?.error || "").toLowerCase();
-    const isBusiness401 =
-      msg.includes("not enough") ||
-      msg.includes("funds") ||
-      msg.includes("balance") ||
-      msg.includes("forbidden") ||
-      msg.includes("not allowed") ||
-      parsed?.success === false;
-
-    if (!isBusiness401) {
-      token = await getServiceToken(true);
-      res = await doFetch(path, options, token);
-    }
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    ...(options.headers as Record<string, string> || {}),
+  };
+  if (SUPABASE_ANON_KEY && !headers.apikey) headers.apikey = SUPABASE_ANON_KEY;
+  if (userToken && !headers.Authorization) {
+    headers.Authorization = `Bearer ${userToken}`;
+  } else if (!userToken && !headers.Authorization && SUPABASE_ANON_KEY) {
+    // The edge function requires *some* Authorization for the functions
+    // gateway when verify_jwt is off but the proxy needs the anon key.
+    headers.Authorization = `Bearer ${SUPABASE_ANON_KEY}`;
   }
+
+  const res = await fetch(`${API_BASE}/${path}`, { ...options, headers });
+
   if (!res.ok) {
     let message = `API error ${res.status}`;
     let parsedBody: any = null;
@@ -184,7 +96,6 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
   }
   const json = await res.json();
   console.log(`[HW← ${reqId}] ${res.status} ${method} ${path}`, json);
-  // Some endpoints return 200 with {success:false, message:"..."} — surface as error.
   if (json && json.success === false) {
     const err: any = new Error(json.message || json.error || "Request failed");
     err.status = res.status;
@@ -318,9 +229,6 @@ export const checkFunds = async (
       }),
     });
 
-    // The API returns success:true even when funds are insufficient — in that
-    // case the response contains payment metadata (amount to top up, product
-    // name, message "Payment"). Detect that and treat as deficit.
     const data = (res as any)?.data || {};
     const msg = String((res as any)?.message || "").toLowerCase();
     const apiDeficit = Number(data.amount ?? data.deficit ?? data.missing ?? data.need ?? 0);
@@ -333,7 +241,6 @@ export const checkFunds = async (
   } catch (err: any) {
     const payload = err?.payload || {};
     const data = payload?.data || {};
-    // API may return success:false with deficit info, or simply a "Not enough funds" message.
     const apiDeficit = Number(
       data.deficit ?? data.amount ?? data.missing ?? data.need ?? 0
     );
