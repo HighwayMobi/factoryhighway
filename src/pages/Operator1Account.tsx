@@ -71,7 +71,7 @@ const Operator1Account = () => {
     try {
       const { data } = await fetchUser();
       const c = data.client;
-      setSubscribersList(getSubscribersList(c));
+      setSubscribersList(getVisibleSubscribers(c));
       const sub = pickSubscriber(c);
       const plan = sub?.paid_plan;
 
