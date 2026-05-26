@@ -19,7 +19,7 @@ export const onSelectedSubscriberChange = (cb: (id: number) => void) => {
   return () => window.removeEventListener(EVENT, handler);
 };
 
-const VISIBLE_STATUSES = new Set(["active", "suspend", "suspended"]);
+const VISIBLE_STATUSES = new Set(["active", "activated", "suspend", "suspended"]);
 const normalizeStatus = (s?: string) => (s || "").toLowerCase().replace(/[\s_-]+/g, "");
 
 const rawList = (c: UserClient): Subscriber[] =>
