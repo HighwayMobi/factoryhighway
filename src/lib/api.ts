@@ -59,7 +59,7 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
   if (options.body && typeof options.body === "string") {
     try { reqBody = JSON.parse(options.body); } catch { reqBody = options.body; }
   }
-  console.log(`[HW→ ${reqId}] ${method} ${path}`, reqBody ?? "");
+  // PROD: do not log request bodies — may contain passwords or tokens
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export const apiFetch = async (path: string, options: RequestInit = {}) => {
     throw err;
   }
   const json = await res.json();
-  console.log(`[HW← ${reqId}] ${res.status} ${method} ${path}`, json);
+  // PROD: do not log responses — may contain auth tokens
   if (json && json.success === false) {
     const err: any = new Error(json.message || json.error || "Request failed");
     err.status = res.status;
