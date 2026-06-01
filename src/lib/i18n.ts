@@ -70,6 +70,8 @@ const translations = {
     acc_used: "РАСХОДЫ",
     acc_remaining: "Остаток",
     acc_downloadInvoice: "Скачать фактуру",
+    acc_invoiceDownloadError: "Не удалось скачать фактуру",
+    common_error: "Ошибка",
     acc_months: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"] as readonly string[],
     acc_profile: "Профиль",
     acc_info: "Информация",
