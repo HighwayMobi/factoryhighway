@@ -246,6 +246,8 @@ const translations = {
     acc_used: "COST",
     acc_remaining: "I still have",
     acc_downloadInvoice: "Download invoice",
+    acc_invoiceDownloadError: "Failed to download invoice",
+    common_error: "Error",
     acc_months: ["January","February","March","April","May","June","July","August","September","October","November","December"] as readonly string[],
     acc_profile: "Profile",
     acc_info: "Information",
