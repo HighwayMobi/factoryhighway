@@ -515,7 +515,7 @@ const Operator2Account = () => {
                               a.click();
                               URL.revokeObjectURL(url);
                             } catch {
-                              toast({ title: "Error", description: "Failed to download invoice", variant: "destructive" });
+                              toast({ title: i.common_error, description: i.acc_invoiceDownloadError, variant: "destructive" });
                             }
                           };
                           return (
