@@ -556,6 +556,8 @@ const TopUpPage = () => {
           </button>
         )}
 
+        {renderChargeAutoControl()}
+
         {renderTrustBadges()}
       </>
     );
