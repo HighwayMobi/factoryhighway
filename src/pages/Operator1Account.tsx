@@ -371,9 +371,17 @@ const Operator1Account = () => {
                     )}
                   </div>
                 ) : (
-                  <>
-                    {i.acc_feeNotice} €{fmtPrice(user.monthlyFee)} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
-                  </>
+                  <span className="inline-flex items-center justify-center gap-2 flex-wrap">
+                    <span>
+                      {i.acc_feeNotice} €{fmtPrice(user.monthlyFee)} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
+                    </span>
+                    {user.chargeAuto && (
+                      <CardAutoChargeIcon
+                        ringClassName="ring-primary"
+                        title={i.acc_chargeAutoActive}
+                      />
+                    )}
+                  </span>
                 )}
               </div>
             )}
