@@ -18,6 +18,7 @@ const ALLOWED_ORIGIN_PATTERNS: RegExp[] = [
 const ALLOWED_PATH_SEGMENTS = new Set<string>([
   "addGB",
   "cancelService",
+  "chargeAuto",
   "checkFunds",
   "checkNotifications",
   "checkout",

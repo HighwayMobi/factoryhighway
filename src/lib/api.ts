@@ -157,6 +157,7 @@ export interface Subscriber {
   iccid: string;
   contract_number: string | null;
   notifications: number;
+  charge_auto?: boolean;
 }
 
 export interface UserClient {
@@ -192,6 +193,12 @@ export const addGbFromBalance = (subscriberId: number, size: number) =>
   apiFetch("api/addGB", {
     method: "PUT",
     body: JSON.stringify({ subscriber_id: subscriberId, size }),
+  });
+
+export const setChargeAuto = (subscriberId: number, chargeAuto: boolean) =>
+  apiFetch("api/chargeAuto", {
+    method: "POST",
+    body: JSON.stringify({ subscriber_id: subscriberId, charge_auto: chargeAuto }),
   });
 
 export interface CheckFundsResult {

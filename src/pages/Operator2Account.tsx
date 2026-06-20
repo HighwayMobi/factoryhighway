@@ -12,6 +12,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, apiFetch, clearAuthToken, getAuthToken, apiUrl, type UserClient, type Subscriber } from "@/lib/api";
+import CardAutoChargeIcon from "@/components/CardAutoChargeIcon";
 import { pickSubscriber, getVisibleSubscribers } from "@/lib/selectedSubscriber";
 import { getConfirmedPlanChange, clearPlanChangeConfirmed } from "@/lib/confirmedPlanChange";
 import UserAvatar from "@/components/UserAvatar";
@@ -66,6 +67,7 @@ const Operator2Account = () => {
     status: "" as string,
     isUpgrade: false,
     confirmedNow: false,
+    chargeAuto: false,
   });
 
   const loadData = async () => {
@@ -136,6 +138,7 @@ const Operator2Account = () => {
         status: sub?.status ?? c.status ?? "",
         isUpgrade,
         confirmedNow: confirmed?.now || false,
+        chargeAuto: !!(sub as any)?.charge_auto,
       }));
 
       // Finance is loaded separately via loadFinance
@@ -370,9 +373,17 @@ const Operator2Account = () => {
                     )}
                   </div>
                 ) : (
-                  <>
-                    {i.acc_feeNotice} €{fmtPrice(user.monthlyFee)} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
-                  </>
+                  <span className="inline-flex items-center justify-center gap-2 flex-wrap">
+                    <span>
+                      {i.acc_feeNotice} €{fmtPrice(user.monthlyFee)} {i.acc_feeForCurrentPlan} {i.acc_feeDate} {user.feeDate}
+                    </span>
+                    {user.chargeAuto && (
+                      <CardAutoChargeIcon
+                        ringClassName="ring-primary"
+                        title={i.acc_chargeAutoActive}
+                      />
+                    )}
+                  </span>
                 )}
               </div>
             )}

@@ -6,10 +6,16 @@ import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, addGbFromBalance, checkFunds, type GbPackage } from "@/lib/api";
+import { fetchUser, addGbFromBalance, checkFunds, setChargeAuto, type GbPackage } from "@/lib/api";
 import { pickSubscriber } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import StripePaymentForm from "@/components/StripePaymentForm";
+import CardAutoChargeIcon from "@/components/CardAutoChargeIcon";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const amountPresets = [5, 10, 20, 50];
 
@@ -55,6 +61,10 @@ const TopUpPage = () => {
   const [subscriberBalance, setSubscriberBalance] = useState<number>(0);
   const [payingFromBalance, setPayingFromBalance] = useState(false);
   const [operatorId, setOperatorId] = useState<number | null>(null);
+  const [chargeAuto, setChargeAutoState] = useState<boolean>(false);
+  const [rememberCard, setRememberCard] = useState<boolean>(false);
+  const [showUnbindConfirm, setShowUnbindConfirm] = useState<boolean>(false);
+  const [unbinding, setUnbinding] = useState<boolean>(false);
   const gbAllowed = operatorId !== 2;
 
   useEffect(() => {
@@ -73,6 +83,7 @@ const TopUpPage = () => {
           setSubscriberId(sub.id);
           setSubscriberBalance(Number(sub.balance) || 0);
           setOperatorId(sub.operator_id ?? null);
+          setChargeAutoState(!!(sub as any).charge_auto);
           if (sub.operator_id === 2 && activeTab === "gb") {
             setActiveTab("balance");
           }
@@ -178,6 +189,66 @@ const TopUpPage = () => {
     }
   };
 
+  // Called after a successful Stripe payment. If the user opted in to remember
+  // the card, persist the flag server-side. Failures are non-fatal — the
+  // payment itself already succeeded.
+  const handlePaymentSuccess = async () => {
+    if (!rememberCard || subscriberId == null || chargeAuto) return;
+    try {
+      await setChargeAuto(subscriberId, true);
+      setChargeAutoState(true);
+      toast({ title: i.topup_cardSaved });
+    } catch (e) {
+      console.error("setChargeAuto failed", e);
+    }
+  };
+
+  const handleUnbindCard = async () => {
+    if (subscriberId == null) return;
+    setUnbinding(true);
+    try {
+      await setChargeAuto(subscriberId, false);
+      setChargeAutoState(false);
+      setRememberCard(false);
+      toast({ title: i.topup_cardUnbound });
+    } catch (e: any) {
+      toast({
+        title: i.common_error,
+        description: e?.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUnbinding(false);
+      setShowUnbindConfirm(false);
+    }
+  };
+
+  const renderChargeAutoControl = () => {
+    if (!isAuthed || subscriberId == null) return null;
+    if (chargeAuto) {
+      return (
+        <button
+          type="button"
+          onClick={() => setShowUnbindConfirm(true)}
+          className="mt-3 flex w-full items-center justify-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <CardAutoChargeIcon ringClassName="ring-card" className="text-foreground" />
+          <span className="underline-offset-2 hover:underline">{i.topup_unbindCard}</span>
+        </button>
+      );
+    }
+    return (
+      <label className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground">
+        <Checkbox
+          checked={rememberCard}
+          onCheckedChange={(v) => setRememberCard(v === true)}
+        />
+        <span>{i.topup_rememberCard}</span>
+      </label>
+    );
+  };
+
+
   const renderPhoneField = () => (
     <div className="mb-6 rounded-xl bg-secondary/60 px-4 py-3">
       <span className="text-sm text-muted-foreground">{i.phoneLabel}</span>
@@ -272,6 +343,7 @@ const TopUpPage = () => {
           phone={isAuthed ? `34${phone.replace(/\D/g, "").replace(/^34/, "")}` : `34${phone}`}
           type="mobile"
           onCancel={() => setShowPaymentForm(false)}
+          onSuccess={handlePaymentSuccess}
           secureLabel={i.securePayment}
           cancelLabel={i.topup_back}
           successLabel={i.topup_paymentSuccess}
@@ -352,6 +424,8 @@ const TopUpPage = () => {
           {i.payByCard}
         </button>
 
+        {renderChargeAutoControl()}
+
         {renderTrustBadges()}
       </>
     );
@@ -373,6 +447,7 @@ const TopUpPage = () => {
             size={selectedPkg.gb}
             packageId={selectedPkg.id}
             onCancel={() => setShowPaymentForm(false)}
+            onSuccess={handlePaymentSuccess}
             secureLabel={i.securePayment}
             cancelLabel={i.topup_back}
             successLabel={i.topup_paymentSuccess}
@@ -481,6 +556,8 @@ const TopUpPage = () => {
           </button>
         )}
 
+        {renderChargeAutoControl()}
+
         {renderTrustBadges()}
       </>
     );
@@ -552,6 +629,21 @@ const TopUpPage = () => {
           </div>
         </div>
       </footer>
+
+      <AlertDialog open={showUnbindConfirm} onOpenChange={setShowUnbindConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{i.topup_unbindConfirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{i.topup_unbindConfirmDesc}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={unbinding}>{i.topup_unbindConfirmNo}</AlertDialogCancel>
+            <AlertDialogAction onClick={(e) => { e.preventDefault(); handleUnbindCard(); }} disabled={unbinding}>
+              {unbinding ? "..." : i.topup_unbindConfirmYes}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
