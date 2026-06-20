@@ -424,6 +424,8 @@ const TopUpPage = () => {
           {i.payByCard}
         </button>
 
+        {renderChargeAutoControl()}
+
         {renderTrustBadges()}
       </>
     );
