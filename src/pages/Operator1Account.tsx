@@ -65,6 +65,7 @@ const Operator1Account = () => {
     status: "" as string,
     isUpgrade: false,
     confirmedNow: false,
+    chargeAuto: false,
   });
 
   const loadData = async () => {
