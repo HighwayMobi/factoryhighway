@@ -138,6 +138,7 @@ const Operator2Account = () => {
         status: sub?.status ?? c.status ?? "",
         isUpgrade,
         confirmedNow: confirmed?.now || false,
+        chargeAuto: !!(sub as any)?.charge_auto,
       }));
 
       // Finance is loaded separately via loadFinance
