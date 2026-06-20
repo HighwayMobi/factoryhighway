@@ -343,6 +343,7 @@ const TopUpPage = () => {
           phone={isAuthed ? `34${phone.replace(/\D/g, "").replace(/^34/, "")}` : `34${phone}`}
           type="mobile"
           onCancel={() => setShowPaymentForm(false)}
+          onSuccess={handlePaymentSuccess}
           secureLabel={i.securePayment}
           cancelLabel={i.topup_back}
           successLabel={i.topup_paymentSuccess}
