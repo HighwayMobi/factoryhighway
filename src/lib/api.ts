@@ -157,6 +157,7 @@ export interface Subscriber {
   iccid: string;
   contract_number: string | null;
   notifications: number;
+  charge_auto?: boolean;
 }
 
 export interface UserClient {
