@@ -447,6 +447,7 @@ const TopUpPage = () => {
             size={selectedPkg.gb}
             packageId={selectedPkg.id}
             onCancel={() => setShowPaymentForm(false)}
+            onSuccess={handlePaymentSuccess}
             secureLabel={i.securePayment}
             cancelLabel={i.topup_back}
             successLabel={i.topup_paymentSuccess}
