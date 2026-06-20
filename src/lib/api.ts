@@ -195,6 +195,12 @@ export const addGbFromBalance = (subscriberId: number, size: number) =>
     body: JSON.stringify({ subscriber_id: subscriberId, size }),
   });
 
+export const setChargeAuto = (subscriberId: number, chargeAuto: boolean) =>
+  apiFetch("api/chargeAuto", {
+    method: "POST",
+    body: JSON.stringify({ subscriber_id: subscriberId, charge_auto: chargeAuto }),
+  });
+
 export interface CheckFundsResult {
   enough: boolean;
   deficit: number; // amount missing in EUR (0 if enough)
