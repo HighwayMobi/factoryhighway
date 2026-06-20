@@ -629,6 +629,21 @@ const TopUpPage = () => {
           </div>
         </div>
       </footer>
+
+      <AlertDialog open={showUnbindConfirm} onOpenChange={setShowUnbindConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{i.topup_unbindConfirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{i.topup_unbindConfirmDesc}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={unbinding}>{i.topup_unbindConfirmNo}</AlertDialogCancel>
+            <AlertDialogAction onClick={(e) => { e.preventDefault(); handleUnbindCard(); }} disabled={unbinding}>
+              {unbinding ? "..." : i.topup_unbindConfirmYes}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
