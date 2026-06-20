@@ -189,6 +189,66 @@ const TopUpPage = () => {
     }
   };
 
+  // Called after a successful Stripe payment. If the user opted in to remember
+  // the card, persist the flag server-side. Failures are non-fatal — the
+  // payment itself already succeeded.
+  const handlePaymentSuccess = async () => {
+    if (!rememberCard || subscriberId == null || chargeAuto) return;
+    try {
+      await setChargeAuto(subscriberId, true);
+      setChargeAutoState(true);
+      toast({ title: i.topup_cardSaved });
+    } catch (e) {
+      console.error("setChargeAuto failed", e);
+    }
+  };
+
+  const handleUnbindCard = async () => {
+    if (subscriberId == null) return;
+    setUnbinding(true);
+    try {
+      await setChargeAuto(subscriberId, false);
+      setChargeAutoState(false);
+      setRememberCard(false);
+      toast({ title: i.topup_cardUnbound });
+    } catch (e: any) {
+      toast({
+        title: i.common_error,
+        description: e?.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUnbinding(false);
+      setShowUnbindConfirm(false);
+    }
+  };
+
+  const renderChargeAutoControl = () => {
+    if (!isAuthed || subscriberId == null) return null;
+    if (chargeAuto) {
+      return (
+        <button
+          type="button"
+          onClick={() => setShowUnbindConfirm(true)}
+          className="mt-3 flex w-full items-center justify-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <CardAutoChargeIcon ringClassName="ring-card" className="text-foreground" />
+          <span className="underline-offset-2 hover:underline">{i.topup_unbindCard}</span>
+        </button>
+      );
+    }
+    return (
+      <label className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground">
+        <Checkbox
+          checked={rememberCard}
+          onCheckedChange={(v) => setRememberCard(v === true)}
+        />
+        <span>{i.topup_rememberCard}</span>
+      </label>
+    );
+  };
+
+
   const renderPhoneField = () => (
     <div className="mb-6 rounded-xl bg-secondary/60 px-4 py-3">
       <span className="text-sm text-muted-foreground">{i.phoneLabel}</span>
