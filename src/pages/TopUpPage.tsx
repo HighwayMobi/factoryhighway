@@ -83,6 +83,7 @@ const TopUpPage = () => {
           setSubscriberId(sub.id);
           setSubscriberBalance(Number(sub.balance) || 0);
           setOperatorId(sub.operator_id ?? null);
+          setChargeAutoState(!!(sub as any).charge_auto);
           if (sub.operator_id === 2 && activeTab === "gb") {
             setActiveTab("balance");
           }
