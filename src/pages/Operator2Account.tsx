@@ -12,6 +12,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useLangNavigate } from "@/hooks/use-lang-navigate";
 import InternalHeader from "@/components/InternalHeader";
 import { fetchUser, apiFetch, clearAuthToken, getAuthToken, apiUrl, type UserClient, type Subscriber } from "@/lib/api";
+import CardAutoChargeIcon from "@/components/CardAutoChargeIcon";
 import { pickSubscriber, getVisibleSubscribers } from "@/lib/selectedSubscriber";
 import { getConfirmedPlanChange, clearPlanChangeConfirmed } from "@/lib/confirmedPlanChange";
 import UserAvatar from "@/components/UserAvatar";
