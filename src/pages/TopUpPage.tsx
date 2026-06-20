@@ -6,10 +6,16 @@ import { cn, fmtPrice } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/contexts/LangContext";
 import InternalHeader from "@/components/InternalHeader";
-import { fetchUser, addGbFromBalance, checkFunds, type GbPackage } from "@/lib/api";
+import { fetchUser, addGbFromBalance, checkFunds, setChargeAuto, type GbPackage } from "@/lib/api";
 import { pickSubscriber } from "@/lib/selectedSubscriber";
 import { toast } from "@/hooks/use-toast";
 import StripePaymentForm from "@/components/StripePaymentForm";
+import CardAutoChargeIcon from "@/components/CardAutoChargeIcon";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const amountPresets = [5, 10, 20, 50];
 
