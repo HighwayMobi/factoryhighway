@@ -61,6 +61,10 @@ const TopUpPage = () => {
   const [subscriberBalance, setSubscriberBalance] = useState<number>(0);
   const [payingFromBalance, setPayingFromBalance] = useState(false);
   const [operatorId, setOperatorId] = useState<number | null>(null);
+  const [chargeAuto, setChargeAutoState] = useState<boolean>(false);
+  const [rememberCard, setRememberCard] = useState<boolean>(false);
+  const [showUnbindConfirm, setShowUnbindConfirm] = useState<boolean>(false);
+  const [unbinding, setUnbinding] = useState<boolean>(false);
   const gbAllowed = operatorId !== 2;
 
   useEffect(() => {
