@@ -395,7 +395,7 @@ const Operator2Account = () => {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-foreground">{lang === "ru" ? "Ваш тариф" : "Your Plan"}</span>
               </div>
-              <span className="text-sm font-bold text-primary">{user.planGb} Gb</span>
+              <span className="text-sm font-bold text-primary">{user.dataRemaining} Gb</span>
             </div>
             <div className="border-t border-border px-6 py-3">
               <button
