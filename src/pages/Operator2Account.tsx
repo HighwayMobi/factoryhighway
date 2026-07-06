@@ -393,7 +393,7 @@ const Operator2Account = () => {
           <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
             <div className="px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-foreground">{lang === "ru" ? "Осталось Гб" : "Remaining Gb"}</span>
+                <span className="text-sm font-medium text-foreground">{i.acc_dataRemaining}</span>
               </div>
               <span className="text-sm font-bold text-primary">{user.dataRemaining} Gb</span>
             </div>
